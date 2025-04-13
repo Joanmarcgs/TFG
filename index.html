@@ -1001,7 +1001,12 @@ display: none;
 			const canviaEscenaOriginal = canviaEscena;
 			canviaEscena = function(escena){
 				canviaEscenaOriginal(escena);
-				if(escena === "escena-joc") initDaus();
+				if (escena === "escena-joc") {
+				  initDaus();
+				  partidaIniciada = true;
+				  localStorage.setItem("partidaIniciada", "true");
+				}
+
 			}
 			
 			
@@ -1179,6 +1184,8 @@ display: none;
 			
 			
 			
+
+
 
 
 // Aquest codi va dins del bloc DOMContentLoaded (cap al final del document)
@@ -1471,7 +1478,7 @@ function actualitzaPantallaInici() {
 
 function guardarLlistaJugadors() {
   localStorage.setItem("llistaJugadors", JSON.stringify(llistaJugadors));
-  localStorage.setItem("partidaIniciada", "true");
+  //localStorage.setItem("partidaIniciada", "true");
 }
 
 
