@@ -56,7 +56,7 @@ Tot el funcionament es realitza **en client**, sense necessitat de base de dades
 Vista del joc en diferents dispositius:
 
 ### 💻 Ordinador
-![Captura PC](https://burxat.dev/TFG_UOC/img/exempleJoc.png)
+![Captura PC](https://burxat.dev/TFG-UOC/img/exempleJoc.png)
 
 ### 📱 Mòbil
 ![Captura mòbil]([https://burxat.dev/TFG_UOC/assets/captura_mobil.png](https://burxat.dev/TFG_UOC/img/exempleJocTelf.png))
