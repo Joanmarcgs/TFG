@@ -465,53 +465,6 @@
 
 		</div>
 		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-
-
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
 
 		<script>
 			
@@ -654,6 +607,11 @@
 				'img/dau5.png',
 				'img/dau6.png'
 			];
+			
+			// Constants que ens defineixen el poder tocar els daus amb el ratolí
+			const raycaster = new THREE.Raycaster();
+			const mouse = new THREE.Vector2();
+
 
 			function initDaus() {
 				if (escenaDausInicialitzada) return;
@@ -698,6 +656,7 @@
 				boto.style.left = "20px";
 				boto.onclick = tirarDaus;
 				document.getElementById("escena-joc").appendChild(boto);
+				renderer.domElement.addEventListener('click', onMouseClick, false); // Iniciem el poder tocar daus
 			}
 
 			function crearTerra() {
@@ -804,6 +763,29 @@
 					body.angularVelocity.set(rotationX, rotationY, rotationZ);
 				}
 			}
+			
+			
+			function onMouseClick(event) {
+				// Convertim coordenades del clic al sistema de Three.js
+				const rect = renderer.domElement.getBoundingClientRect();
+				mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+				mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+				raycaster.setFromCamera(mouse, camera);
+
+				// Recollim tots els "mesh" dels daus
+				const meshes = daus.map(dau => dau.mesh);
+
+				// Mirem si algun objecte ha estat clicat
+				const interseccions = raycaster.intersectObjects(meshes);
+
+				if (interseccions.length > 0) {
+					const dauTocat = interseccions[0].object;
+					const index = daus.findIndex(d => d.mesh === dauTocat);
+					alert(`Has tocat el dau número ${index + 1}`);
+				}
+			}
+
 
 			// EXTENSIÓ DE LA FUNCIÓ CANVIAESCENA
 			const canviaEscenaOriginal = canviaEscena;
