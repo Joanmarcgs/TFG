@@ -59,7 +59,7 @@ Vista del joc en diferents dispositius:
 ![Captura PC](https://burxat.dev/TFG-UOC/img/exempleJoc.png)
 
 ### 📱 Mòbil
-![Captura mòbil]([https://burxat.dev/TFG_UOC/assets/captura_mobil.png](https://burxat.dev/TFG_UOC/img/exempleJocTelf.png))
+![Captura mòbil](https://burxat.dev/TFG-UOC/img/exempleJocTelf.png)
 
 ---
 
