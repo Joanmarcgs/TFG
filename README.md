@@ -45,11 +45,9 @@ Això inclou:
 
 El projecte està format per un fitxer `index.html` principal i diverses carpetes amb:
 
-- Scripts (`/js/`)
-- Estils (`/css/`)
-- Recursos (`/assets/`)
-
-Tot el funcionament es realitza **en client**, sense necessitat de base de dades ni servidor back-end.
+- Arxius d'àudio (`/audio/`)
+- Arzius d'imatge (`/img/`)
+- Recursos generals (`/doc/`)
 
 ## 🖼️ Captures de pantalla
 

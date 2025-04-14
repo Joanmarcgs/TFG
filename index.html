@@ -297,26 +297,6 @@
 				transition: transform 0.2s;
 			}
 			
-			
-			
-						
-
-			
-
-			
-			
-			
-
-
-			
-			
-			
-			
-			
-			
-			
-			
-			
 			.avatarDesactivat img {
 				filter: grayscale(100%);
 				opacity: 0.5;
@@ -362,78 +342,71 @@
 				display: none; position: absolute; top: 20px; right: 20px; background: rgba(0,0,0,0.8); padding: 10px; z-index: 999; color: white; font-family: sans-serif; border-radius: 10px;
 			}
 			
-			  .teclat {
-    position: absolute;
-    width: 1300px;
-    background: rgba(0,0,0,0.8);
-    border-radius: 20px;
-    padding: 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    z-index: 9999;
-    font-family: sans-serif;
-  }
-  .teclat button {
-    flex: 1;
-    padding: 15px;
-    font-size: 40px;
-    border-radius: 5px;
-    border: none;
-    background: #dfbf9f;
-    cursor: pointer;
-  }
-  .teclat .fila {
-    display: flex;
-    gap: 5px;
-  }
-  .teclatOcult {
-    display: none;
-  }
-  .teclatDreta {
-    top: 50%;
-    left: unset;
-    right: 50px;
-    transform: translateY(-50%);
-  }
-  .teclatEsquerra {
-    top: 50%;
-    left: 50px;
-    transform: translateY(-50%);
-  }
-  .teclatAbaix {
-    bottom: 50px;
-    left: 50%;
-    transform: translateX(-50%);
-  }
-  .teclatAdalt {
-    top: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-  }
+			.teclat {
+				position: absolute;
+				width: 1300px;
+				background: rgba(0,0,0,0.8);
+				border-radius: 20px;
+				padding: 10px;
+				display: flex;
+				flex-direction: column;
+				gap: 5px;
+				z-index: 9999;
+				font-family: sans-serif;
+			}
+			.teclat button {
+				flex: 1;
+				padding: 15px;
+				font-size: 40px;
+				border-radius: 5px;
+				border: none;
+				background: #dfbf9f;
+				cursor: pointer;
+			}
+			.teclat .fila {
+				display: flex;
+				gap: 5px;
+			}
+			.teclatOcult {
+				display: none;
+			}
+			.teclatDreta {
+				top: 50%;
+				left: unset;
+				right: 50px;
+				transform: translateY(-50%);
+			}
+			.teclatEsquerra {
+				top: 50%;
+				left: 50px;
+				transform: translateY(-50%);
+			}
+			.teclatAbaix {
+				bottom: 50px;
+				left: 50%;
+				transform: translateX(-50%);
+			}
+			.teclatAdalt {
+				top: 10px;
+				left: 50%;
+				transform: translateX(-50%);
+			}
 			
 			
 			
-#modalPersonatges{
-display:none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-					background: rgba(0, 0, 0, 0.8); z-index: 99999; align-items: center; justify-content: center;
-}
+			#modalPersonatges{
+				display:none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+				background: rgba(0, 0, 0, 0.8); z-index: 99999; align-items: center; justify-content: center;
+			}
 
-#botoSeguentConfigurarPartida{
-display: none;
-}
+			#botoSeguentConfigurarPartida{
+				display: none;
+			}
 		</style>
 		<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 	</head>
 	<body>
 		
-		
-		
-
-
-
-
-
 		<div id="contenidor">
 			
 			<div id="contenidorFosc"></div>
@@ -602,66 +575,66 @@ display: none;
 				<!-- FI Només visible si activem el debug per la càmera -->
 			</div>
 
-<!-- 1. Afegeix això al teu HTML (fora de qualsevol escena): -->
-<div id="teclatPersonalitzat" class="teclat teclatOcult">
-  <div class="fila">
-  <button onclick="tancarTeclat()">ESC</button>
-    <button onclick="teclaVirtual('1')">1</button>
-    <button onclick="teclaVirtual('2')">2</button>
-    <button onclick="teclaVirtual('3')">3</button>
-    <button onclick="teclaVirtual('4')">4</button>
-    <button onclick="teclaVirtual('5')">5</button>
-    <button onclick="teclaVirtual('6')">6</button>
-    <button onclick="teclaVirtual('7')">7</button>
-    <button onclick="teclaVirtual('8')">8</button>
-    <button onclick="teclaVirtual('9')">9</button>
-    <button onclick="teclaVirtual('0')">0</button>
-	<button onclick="teclaVirtual('!')">!</button>
-	<button onclick="teclaVirtual('?')">?</button>
-	<button onclick="borrarTecla()">⌫</button>
-  </div>
-  <div class="fila">
-    <button onclick="teclaVirtual('Q')">Q</button>
-    <button onclick="teclaVirtual('W')">W</button>
-    <button onclick="teclaVirtual('E')">E</button>
-    <button onclick="teclaVirtual('R')">R</button>
-    <button onclick="teclaVirtual('T')">T</button>
-    <button onclick="teclaVirtual('Y')">Y</button>
-    <button onclick="teclaVirtual('U')">U</button>
-    <button onclick="teclaVirtual('I')">I</button>
-    <button onclick="teclaVirtual('O')">O</button>
-    <button onclick="teclaVirtual('P')">P</button>
-	<button onclick="teclaVirtual('Ç')">Ç</button>
-  </div>
-  <div class="fila">
-    <button onclick="teclaVirtual('A')">A</button>
-    <button onclick="teclaVirtual('S')">S</button>
-    <button onclick="teclaVirtual('D')">D</button>
-    <button onclick="teclaVirtual('F')">F</button>
-    <button onclick="teclaVirtual('G')">G</button>
-    <button onclick="teclaVirtual('H')">H</button>
-    <button onclick="teclaVirtual('J')">J</button>
-    <button onclick="teclaVirtual('K')">K</button>
-    <button onclick="teclaVirtual('L')">L</button>
-	<button onclick="teclaVirtual('Ñ')">Ñ</button>
-	<button onclick="tancarTeclat()">INTRO</button>
-  </div>
-  <div class="fila">
-	<button onclick="teclaVirtual('$')">$</button>
-    <button onclick="teclaVirtual('Z')">Z</button>
-    <button onclick="teclaVirtual('X')">X</button>
-    <button onclick="teclaVirtual('C')">C</button>
-    <button onclick="teclaVirtual('V')">V</button>
-    <button onclick="teclaVirtual('B')">B</button>
-    <button onclick="teclaVirtual('N')">N</button>
-    <button onclick="teclaVirtual('M')">M</button>
-	<button onclick="teclaVirtual('.')">.</button>
-	<button onclick="teclaVirtual('-')">-</button>
-  </div>
-   <div class="fila">
-    <button onclick="teclaVirtual(' ')" style="flex:2;">Espai</button>
-  </div>
-</div>
+			<!-- 1. Afegeix això al teu HTML (fora de qualsevol escena): -->
+			<div id="teclatPersonalitzat" class="teclat teclatOcult">
+			  <div class="fila">
+			  <button onclick="tancarTeclat()">ESC</button>
+				<button onclick="teclaVirtual('1')">1</button>
+				<button onclick="teclaVirtual('2')">2</button>
+				<button onclick="teclaVirtual('3')">3</button>
+				<button onclick="teclaVirtual('4')">4</button>
+				<button onclick="teclaVirtual('5')">5</button>
+				<button onclick="teclaVirtual('6')">6</button>
+				<button onclick="teclaVirtual('7')">7</button>
+				<button onclick="teclaVirtual('8')">8</button>
+				<button onclick="teclaVirtual('9')">9</button>
+				<button onclick="teclaVirtual('0')">0</button>
+				<button onclick="teclaVirtual('!')">!</button>
+				<button onclick="teclaVirtual('?')">?</button>
+				<button onclick="borrarTecla()">⌫</button>
+			  </div>
+			  <div class="fila">
+				<button onclick="teclaVirtual('Q')">Q</button>
+				<button onclick="teclaVirtual('W')">W</button>
+				<button onclick="teclaVirtual('E')">E</button>
+				<button onclick="teclaVirtual('R')">R</button>
+				<button onclick="teclaVirtual('T')">T</button>
+				<button onclick="teclaVirtual('Y')">Y</button>
+				<button onclick="teclaVirtual('U')">U</button>
+				<button onclick="teclaVirtual('I')">I</button>
+				<button onclick="teclaVirtual('O')">O</button>
+				<button onclick="teclaVirtual('P')">P</button>
+				<button onclick="teclaVirtual('Ç')">Ç</button>
+			  </div>
+			  <div class="fila">
+				<button onclick="teclaVirtual('A')">A</button>
+				<button onclick="teclaVirtual('S')">S</button>
+				<button onclick="teclaVirtual('D')">D</button>
+				<button onclick="teclaVirtual('F')">F</button>
+				<button onclick="teclaVirtual('G')">G</button>
+				<button onclick="teclaVirtual('H')">H</button>
+				<button onclick="teclaVirtual('J')">J</button>
+				<button onclick="teclaVirtual('K')">K</button>
+				<button onclick="teclaVirtual('L')">L</button>
+				<button onclick="teclaVirtual('Ñ')">Ñ</button>
+				<button onclick="tancarTeclat()">INTRO</button>
+			  </div>
+			  <div class="fila">
+				<button onclick="teclaVirtual('$')">$</button>
+				<button onclick="teclaVirtual('Z')">Z</button>
+				<button onclick="teclaVirtual('X')">X</button>
+				<button onclick="teclaVirtual('C')">C</button>
+				<button onclick="teclaVirtual('V')">V</button>
+				<button onclick="teclaVirtual('B')">B</button>
+				<button onclick="teclaVirtual('N')">N</button>
+				<button onclick="teclaVirtual('M')">M</button>
+				<button onclick="teclaVirtual('.')">.</button>
+				<button onclick="teclaVirtual('-')">-</button>
+			  </div>
+			   <div class="fila">
+				<button onclick="teclaVirtual(' ')" style="flex:2;">Espai</button>
+			  </div>
+			</div>
 
 
 
@@ -670,6 +643,7 @@ display: none;
 
 		<script>
 			
+			// D'entrada deixem que cap escena està activa
 			escenaActiva = "cap"; 
 			
 			// variable que ens controla els jugadors que juguen, la guardem en localStorage
@@ -787,9 +761,6 @@ display: none;
 
 			
 			
-
-		</script>
-		<script>
 			let escenaDausInicialitzada = false;
 			let scene, camera, renderer, world;
 			const daus = [];
@@ -1057,9 +1028,7 @@ display: none;
 				
 			}
 
-		</script>
-		
-		<script>
+
 			// Constant, o llista, on definim tot el que volem carregar abans d'iniciar el joc (no cal posar-ho tot)
 			// Important que l'últim element de la llista no tingui una coma al final.
 			const arxiusACarregar = [
