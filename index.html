@@ -136,6 +136,8 @@
 				left: 710px;
 			}
 			
+			
+			
 			.botoPantallaCompleta{
 				position: absolute;
 				width: 60px;
@@ -330,7 +332,7 @@
 				height: 100%; width: 0%; background: #dfbf9f; transition: width 0.2s;
 			}
 			
-			#botoIniciar{
+			#botoIniciarContainer{
 				display:none;
 			}
 			
@@ -410,7 +412,7 @@
 				width: 400px;
 				height: 800px;
 				
-				background-image: url('img/pergamiPuntuacio.png');
+			
 				background-size: 100% 100%;
 				background-repeat: no-repeat;
 				image-rendering: pixelated;
@@ -446,23 +448,116 @@ background-size: 100% 100%;
 }
 
 .puntuacionsJugadorsTop {
-	background-image: url('img/pergamiEnrollableTopv2.png');
+	background-image: url('img/pergamiEnrollableTop.png');
 }
 
 .puntuacionsJugadorsBot {
-	background-image: url('img/pergamiEnrollableBotv2.png');
+	background-image: url('img/pergamiEnrollableBot.png');
 	margin-top: -1px;
 }
 
 .puntuacionsJugadorsMid {
 	flex-grow: 1;
-	background-image: url('img/pergamiEnrollableMidv2.png');
+	background-image: url('img/pergamiEnrollableMid.png');
 	background-repeat: repeat-y;
 	background-size: 100% auto;
 	text-align: center;
 	margin-top: -1px;
 	/*padding: 20px 80px;*/
 	
+}
+
+
+.pergamiBoto {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-family: 'PiecesOfEight', sans-serif;
+  font-size: 40px;
+  color: #fff3d6;
+  text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.5);
+  width: fit-content;
+  transition: transform 0.2s ease-in-out;
+}
+
+.pergamiBoto:hover {
+			
+				transform: scale(1.05);
+			}
+			
+	.pergamiBotoCentreAbaix {
+		position: absolute;
+		bottom: 20px;
+	
+		
+		
+	}
+	
+	
+	.pergamiBotoDretaAbaix{
+				position: absolute;
+				right:20px;
+				bottom:20px;
+			}
+			
+			.pergamiBotoEsquerraAbaix{
+				position: absolute;
+				left:20px;
+				bottom:20px;
+			}
+			
+			
+			.pergamiBotoPantallaCompleta{
+				position: absolute;
+				width: 60px;
+
+				right:20px;
+				top:20px;
+			}
+
+			.pergamiBotoAudio{
+				position: absolute;
+				width: 60px;
+
+				right:20px;
+				top:100px;
+			}
+	
+	
+
+.pergamiBotoEsq, .pergamiBotoDret {
+
+  width: 30px;
+  height: 100px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+
+}
+
+.pergamiBotoEsq {
+  background-image: url('img/pergamiBotoEsquerra.png');
+   background-position: right center; /* ✅ Enganxat a la dreta */
+   margin-right:-1px;
+}
+
+.pergamiBotoDret {
+  background-image: url('img/pergamiBotoDreta.png');
+  background-position: left center; /* ✅ Enganxat a l'esquerra */
+  margin-left: -1px;
+}
+
+.pergamiBotoMid {
+  background-image: url('img/pergamiBotoMig.png');
+  background-repeat: repeat-x;
+  background-size: auto 100%;
+  padding: 0px 30px;
+   line-height: 100px; /* ✅ Centra el text verticalment */
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
 }
 
 
@@ -482,9 +577,10 @@ background-size: 100% 100%;
 			<div id="escena-pantallaCarrega" class="escena">
 			
 				<button class="botoPantallaCompleta" onclick="pantallaCompleta()"><i class="material-icons" style="font-size:30px;">fullscreen</i></button>
-				<h1 class="h1Titol">Illa Calavera</h1>
+				<!--<h1 class="h1Titol">Illa Calavera</h1>-->
 				
 				
+				<!--
 				<button id="botoCarregant">Carregant...
 				
 				<div id="contenidorProgres">
@@ -495,10 +591,45 @@ background-size: 100% 100%;
 				
 				
 				</button>
-				<button id="botoIniciar" onclick="carregaEscena('escena-pantallaInici');">Iniciar</button>
 				
-				<button onclick="reiniciaPartida()" id="botoEliminarPartida1" class="botoCentreAbaix">Eliminar partida en curs</button>
+				-->
+				
+				<div class="pergamiBoto" id="botoIniciarContainer">
+					<div class="pergamiBotoEsq" ></div>
+					<div class="pergamiBotoMid"  onclick="carregaEscena('escena-pantallaInici');" ><span id="botoIniciar">Carregant...</span> 
+					</div>
+					<div class="pergamiBotoDret" ></div>
+				</div>
+				
+				
+				<div class="pergamiBoto" id="botoCarregant">
+					<div class="pergamiBotoEsq"></div>
+					<div class="pergamiBotoMid" style="width:400px">
+						<div id="contenidorProgres">
+							<div id="barraProgres">
+								<span id="numPercentatge"> 0 %</span>
+							</div>
+						</div>
+					</div>
+					<div class="pergamiBotoDret"></div>
+				</div>
+				
+				
+				<!--
+				<button id="botoIniciar" onclick="carregaEscena('escena-pantallaInici');">Iniciar</button>
+				-->
+				
+				
 
+				
+				<!--<button onclick="reiniciaPartida()" id="botoEliminarPartida1" class="botoCentreAbaix">Eliminar partida en curs</button>-->
+				<!--
+				<div class="pergamiBoto pergamiBotoCentreAbaix" id="botoEliminarPartida1Container">
+					<div class="pergamiBotoEsq"></div>
+					<div class="pergamiBotoMid" onclick="reiniciaPartida()" id="botoEliminarPartida1">Eliminar partida en curs</div>
+					<div class="pergamiBotoDret"></div>
+				</div>
+-->
 			
 			</div>
 
@@ -509,8 +640,25 @@ background-size: 100% 100%;
 				<button class="botoPantallaCompleta" onclick="pantallaCompleta()"><i class="material-icons" style="font-size:30px;">fullscreen</i></button>
 				<button class="botoAudio" onclick="toggleAudio()"><i class="material-icons">volume_up</i></button>
 
-				<button onclick="carregaEscena('escena-configuraPartida')" id="escena-pantallaInici-botoIniciarPartida">Iniciar partida</button>
-				<button onclick="carregaEscena('escena-instruccions')">Regles del Joc</button>
+				<!--<button onclick="carregaEscena('escena-configuraPartida')" id="escena-pantallaInici-botoIniciarPartida">Iniciar partida</button>-->
+				<div class="pergamiBoto">
+					<div class="pergamiBotoEsq"></div>
+					<div class="pergamiBotoMid" onclick="carregaEscena('escena-configuraPartida')" id="escena-pantallaInici-botoIniciarPartida">Iniciar</div>
+					<div class="pergamiBotoDret"></div>
+				</div>
+				
+				
+				
+				
+				<!--<button onclick="carregaEscena('escena-instruccions')">Regles del Joc</button>-->
+				<div class="pergamiBoto">
+					<div class="pergamiBotoEsq"></div>
+					<div class="pergamiBotoMid" onclick="carregaEscena('escena-instruccions')">Regles del Joc</div>
+					<div class="pergamiBotoDret"></div>
+				</div>
+				
+				
+				
 				<button onclick="carregaEscena('escena-sobreProjecte')" class="botoEsquerraAbaix">Sobre el Projecte</button>
 				<button onclick="carregaEscena('escena-credits')" class="botoDretaAbaix">Crèdits</button>
 				
@@ -1122,6 +1270,9 @@ background-size: 100% 100%;
 			// Important que l'últim element de la llista no tingui una coma al final.
 			const arxiusACarregar = [
 				// IMG (daus, fons, avatars...)
+				'img/pergamiBotoDreta.png',
+				'img/pergamiBotoEsquerra.png',
+				'img/pergamiBotoMig.png',
 				'img/tauler-fusta.webp', 
 				'img/dau1.png', 
 				'img/dau2.png', 
@@ -1161,7 +1312,9 @@ background-size: 100% 100%;
 
 					if (carregats === total) {
 						document.getElementById("botoCarregant").style.display = "none";
-						document.getElementById("botoIniciar").style.display = "block";
+						document.getElementById("botoIniciar").innerHTML = "Navegar a Illa Calavera";
+						document.getElementById("botoIniciar").style.display = "flex";
+						document.getElementById("botoIniciarContainer").style.display = "flex";
 					}
 				}
 
@@ -1264,14 +1417,17 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // Si la partida ja estava començada, canviem el botó principal
+  
   if (partidaIniciada) {
-    const botoIniciar = document.getElementById("botoIniciar");
+    /*
+	const botoIniciar = document.getElementById("botoIniciar");
     if (botoIniciar) {
       botoIniciar.innerText = "Continuar partida";
       botoIniciar.onclick = function () {
         carregaEscena("escena-joc");
       };
     }
+	*/
 	const botoIniciarPantallaInici = document.getElementById("escena-pantallaInici-botoIniciarPartida");
 if (botoIniciarPantallaInici) {
   if (partidaIniciada) {
@@ -1285,10 +1441,10 @@ if (botoIniciarPantallaInici) {
     };
   }
 }
-	document.getElementById("botoEliminarPartida1").style.display = "block";
+	//document.getElementById("botoEliminarPartida1Container").style.display = "flex";
 	document.getElementById("botoEliminarPartida2").style.display = "block";
   }else{
-	document.getElementById("botoEliminarPartida1").style.display = "none";
+	//document.getElementById("botoEliminarPartida1Container").style.display = "none";
 	document.getElementById("botoEliminarPartida2").style.display = "none";
   }
   
@@ -1309,13 +1465,33 @@ function sincronitzaJugadorsAmbPantalla() {
 
 
 
+function netejaPantallaConfiguracioJugadors() {
+  for (let i = 1; i <= 6; i++) {
+    const avatar = document.getElementById("jugadorAvatar" + i);
+    const input = document.getElementById("nom" + i);
+    if (!avatar || !input) continue;
+
+    avatar.classList.remove("avatarActivat");
+    avatar.classList.add("avatarDesactivat");
+    input.disabled = true;
+    input.value = "";
+  }
+
+  const botoSeguent = document.getElementById("botoSeguentConfigurarPartida");
+  if (botoSeguent) botoSeguent.style.display = "none";
+}
+
+
+
 // Si més endavant vols poder "esborrar" la partida manualment (opcional):
 function reiniciaPartida() {
   localStorage.removeItem("llistaJugadors");
   localStorage.removeItem("partidaIniciada");
   llistaJugadors = [];
   partidaIniciada = false;
-  location.reload();
+  //location.reload();
+  netejaPantallaConfiguracioJugadors(); // <-- AFEGIT
+  carregaEscena("escena-pantallaInici");
 } 
 
 		</script>
@@ -1509,7 +1685,7 @@ console.log(JSON.stringify(llistaJugadors, null, 2));
 
 function actualitzaPantallaInici() {
   const botoIniciarPantallaInici = document.getElementById("escena-pantallaInici-botoIniciarPartida");
-  const botoEliminar1 = document.getElementById("botoEliminarPartida1");
+  //const botoEliminar1 = document.getElementById("botoEliminarPartida1");
   const botoEliminar2 = document.getElementById("botoEliminarPartida2");
 
   if (localStorage.getItem("partidaIniciada") === "true") {
@@ -1517,14 +1693,14 @@ function actualitzaPantallaInici() {
     botoIniciarPantallaInici.onclick = function () {
       carregaEscena("escena-joc");
     };
-    botoEliminar1.style.display = "block";
+    //botoEliminar1.style.display = "block";
     botoEliminar2.style.display = "block";
   } else {
     botoIniciarPantallaInici.innerText = "Iniciar partida";
     botoIniciarPantallaInici.onclick = function () {
       carregaEscena("escena-configuraPartida");
     };
-    botoEliminar1.style.display = "none";
+    //botoEliminar1.style.display = "none";
     botoEliminar2.style.display = "none";
   }
 }
