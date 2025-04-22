@@ -468,101 +468,102 @@ background-size: 100% 100%;
 }
 
 
-.pergamiBoto {
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  font-family: 'PiecesOfEight', sans-serif;
-  font-size: 40px;
-  color: #fff3d6;
-  text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.5);
-  width: fit-content;
-  transition: transform 0.2s ease-in-out;
-}
-
-.pergamiBoto:hover {
-			
-				transform: scale(1.05);
+			.pergamiBoto {
+				display: flex;
+				align-items: center;
+				cursor: pointer;
+				font-family: 'PiecesOfEight', sans-serif;
+				font-size: 40px;
+				color: #fff3d6;
+				text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.5);
+				width: fit-content;
+				transition: transform 0.2s ease-in-out;
 			}
+
+			.pergamiBoto:hover {transform: scale(1.05);}
+
+			.pergamiBotoEsq, .pergamiBotoDret {width: 30px;height: 100px;background-size: contain;background-repeat: no-repeat;background-position: center;}
+
+			.pergamiBotoEsq {
+				background-image: url('img/pergamiBotoEsquerra.png');
+				background-position: right center; /* ✅ Enganxat a la dreta */
+				margin-right:-1px;
+			}
+
+			.pergamiBotoDret {
+				background-image: url('img/pergamiBotoDreta.png');
+				background-position: left center; /* ✅ Enganxat a l'esquerra */
+				margin-left: -1px;
+			}
+
+			.pergamiBotoMid {
+				background-image: url('img/pergamiBotoMig.png');
+				background-repeat: repeat-x;
+				background-size: auto 100%;
+				padding: 0px 30px;
+				line-height: 100px; /* ✅ Centra el text verticalment */
+				height: 100px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
+
+			/* pergamiBoto posicions concretes */
+			.pergamiBotoCentreAbaix {position:absolute; bottom:20px;}
+			.pergamiBotoDretaAbaix{position:absolute; right:20px; bottom:20px;}
+			.pergamiBotoEsquerraAbaix{position:absolute; left:20px; bottom:20px;}
+			.pergamiBotoPantallaCompleta{position:absolute; width:60px; right:20px; top:20px;}
+			.pergamiBotoAudio{position:absolute; width:60px; right:20px; top:100px;}
 			
-	.pergamiBotoCentreAbaix {
-		position: absolute;
-		bottom: 20px;
-	
-		
-		
-	}
-	
-	
-	.pergamiBotoDretaAbaix{
+			
+			
+			.cartellBotoGran {
 				position: absolute;
-				right:20px;
-				bottom:20px;
-			}
-			
-			.pergamiBotoEsquerraAbaix{
-				position: absolute;
-				left:20px;
-				bottom:20px;
-			}
-			
-			
-			.pergamiBotoPantallaCompleta{
-				position: absolute;
-				width: 60px;
-
-				right:20px;
-				top:20px;
+				top:50px;
+				display: flex;
+				align-items: center;
+				cursor: pointer;
+				font-family: 'PiecesOfEight', sans-serif;
+				font-size: 150px;
+				width: fit-content;
+				color: #fff3d6;
+				text-shadow: 4px 4px 6px rgba(0, 0, 0, 0.8);
+				animation: tremolorSuau 5s infinite ease-in-out;
 			}
 
-			.pergamiBotoAudio{
-				position: absolute;
-				width: 60px;
+			.cartellBotoGran:hover {transform: scale(1.05);}
 
-				right:20px;
-				top:100px;
+			.cartellBotoGranEsq, .cartellBotoGranDret {width: 30px;height: 200px;background-size: contain;background-repeat: no-repeat;background-position: center;}
+
+			.cartellBotoGranEsq {
+				background-image: url('img/cartellBotoGranEsq.png');
+				background-position: right center; /* ✅ Enganxat a la dreta */
+				margin-right:-1px;
+				width: 200px;
+				background-size: auto 100%;
+				
 			}
-	
-	
 
-.pergamiBotoEsq, .pergamiBotoDret {
+			.cartellBotoGranDret {
+				background-image: url('img/cartellBotoGranDret.png');
+				background-position: left center; /* ✅ Enganxat a l'esquerra */
+				margin-left: -1px;
+				width: 200px;
+				background-size: auto 100%;
+				
+			}
 
-  width: 30px;
-  height: 100px;
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
-
-}
-
-.pergamiBotoEsq {
-  background-image: url('img/pergamiBotoEsquerra.png');
-   background-position: right center; /* ✅ Enganxat a la dreta */
-   margin-right:-1px;
-}
-
-.pergamiBotoDret {
-  background-image: url('img/pergamiBotoDreta.png');
-  background-position: left center; /* ✅ Enganxat a l'esquerra */
-  margin-left: -1px;
-}
-
-.pergamiBotoMid {
-  background-image: url('img/pergamiBotoMig.png');
-  background-repeat: repeat-x;
-  background-size: auto 100%;
-  padding: 0px 30px;
-   line-height: 100px; /* ✅ Centra el text verticalment */
-  height: 100px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-}
-
-
-
-
+			.cartellBotoGranMid {
+				background-image: url('img/cartellBotoGranMig.png');
+				background-repeat: repeat-x;
+				background-size: auto 100%;
+				padding: 0px 30px;
+				line-height: 100px; /* ✅ Centra el text verticalment */
+				height: 200px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
 
 		</style>
 		<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -572,6 +573,8 @@ background-size: 100% 100%;
 		<div id="contenidor">
 			
 			<div id="contenidorFosc"></div>
+			
+			
 
 
 			<div id="escena-pantallaCarrega" class="escena">
@@ -634,7 +637,18 @@ background-size: 100% 100%;
 			</div>
 
 			<div id="escena-pantallaInici" class="escena">
-				<h1 class="h1Titol">Illa Calavera</h1>
+				<!--<h1 class="h1Titol">Illa Calavera</h1>-->
+				<div class="cartellBotoGran">
+					<div class="cartellBotoGranEsq"></div>
+					<div class="cartellBotoGranMid">Illa Calavera</div>
+					<div class="cartellBotoGranDret"></div>
+				</div>
+				
+				
+				<img src="img/music_on-SFX_off.png" style="position:absolute;left:0px; width:300px;bottom:60px;">
+				<img src="img/pantallaCompleta.png" style="position:absolute;right:0px; width:300px;top:10px;">
+				
+				
 				<audio id="musica-fons" src="audio/melodiaPrincipal-corda.mp3" loop></audio>
 				
 				<button class="botoPantallaCompleta" onclick="pantallaCompleta()"><i class="material-icons" style="font-size:30px;">fullscreen</i></button>
@@ -647,22 +661,45 @@ background-size: 100% 100%;
 					<div class="pergamiBotoDret"></div>
 				</div>
 				
-				
-				
-				
-				<!--<button onclick="carregaEscena('escena-instruccions')">Regles del Joc</button>-->
-				<div class="pergamiBoto">
+				<div class="pergamiBoto" id="botoEliminarPartidaContainer">
 					<div class="pergamiBotoEsq"></div>
-					<div class="pergamiBotoMid" onclick="carregaEscena('escena-instruccions')">Regles del Joc</div>
+					<div class="pergamiBotoMid" onclick="reiniciaPartida()" id="botoEliminarPartida">Eliminar partida en curs</div>
 					<div class="pergamiBotoDret"></div>
 				</div>
 				
 				
 				
-				<button onclick="carregaEscena('escena-sobreProjecte')" class="botoEsquerraAbaix">Sobre el Projecte</button>
-				<button onclick="carregaEscena('escena-credits')" class="botoDretaAbaix">Crèdits</button>
+				<img src="img/instruccionsJoc.png" style="width:200px;position:absolute;bottom:10px;">
+				<!--<button onclick="carregaEscena('escena-instruccions')">Regles del Joc</button>-->
+				<div class="pergamiBoto" style="position:absolute; bottom:50px;">
+					<div class="pergamiBotoEsq"></div>
+					<div class="pergamiBotoMid" onclick="carregaEscena('escena-instruccions')">Instruccions</div>
+					<div class="pergamiBotoDret"></div>
+				</div>
 				
-				<button onclick="reiniciaPartida()" id="botoEliminarPartida2" class="botoCentreAbaix">Eliminar partida en curs</button>
+				
+				
+				<!--<button onclick="carregaEscena('escena-sobreProjecte')" class="botoEsquerraAbaix">Sobre el Projecte</button>-->
+				<div class="pergamiBoto pergamiBotoEsquerraAbaix">
+					<div class="pergamiBotoEsq"></div>
+					<div class="pergamiBotoMid" onclick="carregaEscena('escena-sobreProjecte')">El Projecte</div>
+					<div class="pergamiBotoDret"></div>
+				</div>
+				
+				
+				
+				
+				
+				<!--<button onclick="carregaEscena('escena-credits')" class="botoDretaAbaix">Crèdits</button>-->
+				<div class="pergamiBoto pergamiBotoDretaAbaix">
+					<div class="pergamiBotoEsq"></div>
+					<div class="pergamiBotoMid" onclick="carregaEscena('escena-credits')">Mencions</div>
+					<div class="pergamiBotoDret"></div>
+				</div>
+				
+				<!--<button onclick="reiniciaPartida()" id="botoEliminarPartida2" class="botoCentreAbaix">Eliminar partida en curs</button>-->
+				
+				
 				
 			</div>
 			<div id="escena-credits" class="escena">
@@ -686,34 +723,39 @@ background-size: 100% 100%;
 			 <!-- Pantalla de selecció de jugadors -->
 			<div id="escena-configuraPartida" class="escena">
 				<button class="botoPantallaCompleta" onclick="pantallaCompleta()"><i class="material-icons" style="font-size:30px;">fullscreen</i></button>
-				<button class="botoEsquerraAbaix" onclick="carregaEscena('escena-pantallaInici')">Enrere</button>
-				<h2>Selecciona els jugadors</h2>
+				<!--<button class="botoEsquerraAbaix" onclick="carregaEscena('escena-pantallaInici')">Enrere</button>-->
+				<div class="pergamiBoto pergamiBotoEsquerraAbaix">
+					<div class="pergamiBotoEsq"></div>
+					<div class="pergamiBotoMid" onclick="carregaEscena('escena-pantallaInici')">Enrere</div>
+					<div class="pergamiBotoDret"></div>
+				</div>
+				
 				<!--<input type="number" id="numJugadors" min="2" max="6" value="2">-->
 				
 					<!-- Els vaixells amb els noms -->
 					<div id="jugadorAvatar1" class="jugadorAvatar avatarDesactivat" >
-						<img id="img1" src="img/avatar1.png" alt="Jugador 1" onclick="seleccionarJugador(1)">
+						<img id="img1" src="img/avatar11.png" alt="Jugador 1" onclick="seleccionarJugador(1)">
 						<input type="text" id="nom1" placeholder="Capitana pirata" disabled readonly>
 					</div>
 					<div id="jugadorAvatar2" class="jugadorAvatar avatarDesactivat" >
-						<img id="img2" src="img/avatar2.png" alt="Jugador 2" onclick="seleccionarJugador(2)">
+						<img id="img2" src="img/avatar22.png" alt="Jugador 2" onclick="seleccionarJugador(2)">
 						<input type="text" id="nom2" placeholder="Oficial pirata" disabled readonly>
 					</div>
 					<div id="jugadorAvatar3" class="jugadorAvatar avatarDesactivat" >
-						<img id="img3" src="img/avatar3.png" alt="Jugador 3" onclick="seleccionarJugador(3)">
+						<img id="img3" src="img/avatar33.png" alt="Jugador 3" onclick="seleccionarJugador(3)">
 						<input type="text" id="nom3" placeholder="Veterinari pirata" disabled readonly>
 					</div>
 					
 					<div id="jugadorAvatar4" class="jugadorAvatar avatarDesactivat" >
-						<img id="img4" src="img/avatar4.png" alt="Jugador 4" onclick="seleccionarJugador(4)">
+						<img id="img4" src="img/avatar44.png" alt="Jugador 4" onclick="seleccionarJugador(4)">
 						<input type="text" id="nom4" placeholder="Capitana armada reial" disabled readonly>
 					</div>
 					<div id="jugadorAvatar5" class="jugadorAvatar avatarDesactivat" >
-						<img id="img5" src="img/avatar5.png" alt="Jugador 5" onclick="seleccionarJugador(5)">
+						<img id="img5" src="img/avatar55.png" alt="Jugador 5" onclick="seleccionarJugador(5)">
 						<input type="text" id="nom5" placeholder="Reina" disabled readonly>
 					</div>
 					<div id="jugadorAvatar6" class="jugadorAvatar avatarDesactivat" >
-						<img id="img6" src="img/avatar6.png" alt="Jugador 6" onclick="seleccionarJugador(6)">
+						<img id="img6" src="img/avatar66.png" alt="Jugador 6" onclick="seleccionarJugador(6)">
 						<input type="text" id="nom6" placeholder="Consellera de la moneda" disabled readonly>
 					</div>
 				
@@ -757,6 +799,12 @@ background-size: 100% 100%;
 			</div>
 
 			<div id="escena-joc" class="escena" style="position: relative; overflow: hidden;">
+			
+			<img src="img/music_on-SFX_off.png" style="position:absolute;left:0px; width:300px;bottom:60px;">
+				<img src="img/pantallaCompleta.png" style="position:absolute;right:0px; width:300px;top:10px;">
+			
+			
+			
 				<div id="contenidorDaus"></div>
 				<button class="botoEsquerraAbaix" onclick="carregaEscena('escena-pantallaInici')">Enrere</button>
 				<button class="botoPantallaCompleta" onclick="pantallaCompleta()"><i class="material-icons" style="font-size:30px;">fullscreen</i></button>
@@ -841,7 +889,7 @@ background-size: 100% 100%;
 				<button onclick="teclaVirtual('K')">K</button>
 				<button onclick="teclaVirtual('L')">L</button>
 				<button onclick="teclaVirtual('Ñ')">Ñ</button>
-				<button onclick="tancarTeclat()">INTRO</button>
+				<button onclick="tancarTeclat()">OK</button>
 			  </div>
 			  <div class="fila">
 				<button onclick="teclaVirtual('$')">$</button>
@@ -1270,6 +1318,7 @@ background-size: 100% 100%;
 			// Important que l'últim element de la llista no tingui una coma al final.
 			const arxiusACarregar = [
 				// IMG (daus, fons, avatars...)
+				'img/platja-pirata2.webp', 
 				'img/pergamiBotoDreta.png',
 				'img/pergamiBotoEsquerra.png',
 				'img/pergamiBotoMig.png',
@@ -1280,7 +1329,6 @@ background-size: 100% 100%;
 				'img/dau4.png', 
 				'img/dau5.png', 
 				'img/dau6.png',
-				'img/platja-pirata2.webp', 
 				'img/pergami-fons.webp',
 				'img/avatar1.png', 
 				'img/avatar2.png', 
@@ -1441,11 +1489,11 @@ if (botoIniciarPantallaInici) {
     };
   }
 }
-	//document.getElementById("botoEliminarPartida1Container").style.display = "flex";
-	document.getElementById("botoEliminarPartida2").style.display = "block";
+	document.getElementById("botoEliminarPartidaContainer").style.display = "flex";
+	//document.getElementById("botoEliminarPartida").style.display = "flex";
   }else{
-	//document.getElementById("botoEliminarPartida1Container").style.display = "none";
-	document.getElementById("botoEliminarPartida2").style.display = "none";
+	document.getElementById("botoEliminarPartidaContainer").style.display = "none";
+	//document.getElementById("botoEliminarPartida").style.display = "none";
   }
   
 });
@@ -1494,9 +1542,6 @@ function reiniciaPartida() {
   carregaEscena("escena-pantallaInici");
 } 
 
-		</script>
-		
-		<script>
 		
 		
 		
@@ -1686,7 +1731,7 @@ console.log(JSON.stringify(llistaJugadors, null, 2));
 function actualitzaPantallaInici() {
   const botoIniciarPantallaInici = document.getElementById("escena-pantallaInici-botoIniciarPartida");
   //const botoEliminar1 = document.getElementById("botoEliminarPartida1");
-  const botoEliminar2 = document.getElementById("botoEliminarPartida2");
+  const botoEliminar = document.getElementById("botoEliminarPartidaContainer");
 
   if (localStorage.getItem("partidaIniciada") === "true") {
     botoIniciarPantallaInici.innerText = "Continuar partida";
@@ -1694,14 +1739,14 @@ function actualitzaPantallaInici() {
       carregaEscena("escena-joc");
     };
     //botoEliminar1.style.display = "block";
-    botoEliminar2.style.display = "block";
+    botoEliminar.style.display = "flex";
   } else {
     botoIniciarPantallaInici.innerText = "Iniciar partida";
     botoIniciarPantallaInici.onclick = function () {
       carregaEscena("escena-configuraPartida");
     };
     //botoEliminar1.style.display = "none";
-    botoEliminar2.style.display = "none";
+    botoEliminar.style.display = "none";
   }
 }
 
