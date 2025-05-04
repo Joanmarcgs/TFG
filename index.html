@@ -3,6 +3,10 @@
 	<head>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+		<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+		
 		<title>Illa Calavera - Joc de Daus</title>
 		<script src="doc/three.min.js"></script>
 		<script src="doc/cannon.min.js"></script>
@@ -407,7 +411,7 @@
 			/*
 			#puntuacionsJugadors{
 				position: absolute;
-				top: 20px;
+				
 				left: 20px;
 				width: 400px;
 				height: 800px;
@@ -427,7 +431,7 @@
 			
 #puntuacionsJugadors {
 	position: absolute;
-	top: 20px;
+	
 	left: 20px;
 	width: 200px;
 	z-index: 999;
@@ -512,6 +516,8 @@ background-size: 100% 100%;
 			.pergamiBotoCentreAbaix {position:absolute; bottom:20px;}
 			.pergamiBotoDretaAbaix{position:absolute; right:20px; bottom:20px;}
 			.pergamiBotoEsquerraAbaix{position:absolute; left:20px; bottom:20px;}
+			.pergamiBotoEsquerraAdalt{position:absolute; left:20px; top:20px;}
+			.pergamiBotoDretaAdalt{position:absolute; right:20px; top:20px;}
 			.pergamiBotoPantallaCompleta{position:absolute; width:60px; right:20px; top:20px;}
 			.pergamiBotoAudio{position:absolute; width:60px; right:20px; top:100px;}
 			.pergamiBotoNomJugador{width:100%;}
@@ -571,6 +577,39 @@ background-size: 100% 100%;
 				align-items: center;
 				justify-content: center;
 			}
+			
+			/* Només afecta el pergamí de la pantalla d’instruccions */
+#escena-instruccions .pergami {
+  max-height: 80%;      /* Limita l’alçada a un 80% de l’escena */
+  overflow-y: auto;     /* Activa el scroll vertical */
+  padding-right: 20px;   /* Deixa espai perquè no talli el text al costat de l’scroll */
+}
+
+#musicButton{
+position:absolute;right:0px; width:300px;bottom:80px;
+}
+
+#fullscreenButton{
+position:absolute;left:0px; width:300px;bottom:100px; transform: scaleX(-1);z-index:1000;
+}
+
+
+.pirateflagButton{
+position:absolute;left:-10px; width:350px;top:0px;z-index:1000;
+
+}
+
+.mostraInstruccionsMico{position:absolute;right:0px; width:300px;top:10px;z-index:1000}
+
+
+#puntsProvisional{
+	font-family: 'PiecesOfEight', sans-serif; position:absolute; top:50px; left:50%; transform:translateX(-50%); font-size:70px; font-weight:bold; color:white; text-shadow:2px 2px 5px black; display:none; text-position:center;
+	}
+	
+	#resumPuntsTornActiu{
+	display:none; font-size:40px;text-shadow:2px 2px 5px black;color:yellow;
+	position:absolute;width:60%;top:150px;text-align:center;
+	 }
 
 		</style>
 		<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -586,7 +625,19 @@ background-size: 100% 100%;
 
 			<div id="escena-pantallaCarrega" class="escena">
 			
+				<!--
 				<button class="botoPantallaCompleta" onclick="pantallaCompleta()"><i class="material-icons" style="font-size:30px;">fullscreen</i></button>
+				
+				-->
+				
+				<!--
+				<div class="pergamiBoto pergamiBotoDretaAdalt" onclick="pantallaCompleta()">
+					<div class="pergamiBotoEsq"></div>
+					<div class="pergamiBotoMid" style="padding:0px;"><i class="material-icons" style="font-size:30px;">fullscreen</i></div>
+					<div class="pergamiBotoDret"></div>
+				</div>
+				-->
+				
 				<!--<h1 class="h1Titol">Illa Calavera</h1>-->
 				
 				
@@ -636,14 +687,21 @@ background-size: 100% 100%;
 				</div>
 				
 				
-				<img src="img/music_on-SFX_off.png" style="position:absolute;left:0px; width:300px;bottom:60px;">
-				<img src="img/pantallaCompleta.png" style="position:absolute;right:0px; width:300px;top:10px;">
+				<img src="img/music_on-SFX_off.png" id="musicButton">
+				<img src="img/fullscreenButton.png?v=2" id="fullscreenButton" onclick="pantallaCompleta()">
+				<img src="img/pirateflagButton.png?v=2" class="pirateflagButton" onclick="toggleAjudaPunts()">
+				<img src="img/mostraInstruccionsMico.png" class ="mostraInstruccionsMico" style="position:absolute;right:0px; width:300px;top:10px;">
 				
 				
 				<audio id="musica-fons" src="audio/melodiaPrincipal-corda.mp3" loop></audio>
-				
-				<button class="botoPantallaCompleta" onclick="pantallaCompleta()"><i class="material-icons" style="font-size:30px;">fullscreen</i></button>
-				<button class="botoAudio" onclick="toggleAudio()"><i class="material-icons">volume_up</i></button>
+				<!--
+				<div class="pergamiBoto pergamiBotoDretaAdalt" onclick="pantallaCompleta()">
+					<div class="pergamiBotoEsq"></div>
+					<div class="pergamiBotoMid" style="padding:0px;"><i class="material-icons" style="font-size:30px;">fullscreen</i></div>
+					<div class="pergamiBotoDret"></div>
+				</div>
+				-->
+				<!-- <button class="botoAudio" onclick="toggleAudio()"><i class="material-icons">volume_up</i></button> -->
 
 				<!--<button onclick="carregaEscena('escena-configuraPartida')" id="escena-pantallaInici-botoIniciarPartida">Iniciar partida</button>-->
 				<div class="pergamiBoto">
@@ -706,6 +764,87 @@ background-size: 100% 100%;
 				</div>
 				
 			</div>
+			
+			
+			<!-- ESCENA INSTRUCCIONS -->
+<!-- ESCENA INSTRUCCIONS -->
+<div id="escena-instruccions" class="escena">
+  <div class="pergamiBoto pergamiBotoEsquerraAbaix" onclick="carregaEscena('escena-anterior')">
+    <div class="pergamiBotoEsq"></div>
+    <div class="pergamiBotoMid">Enrere</div>
+    <div class="pergamiBotoDret"></div>
+  </div>
+
+  <div class="pergami">
+    <h2 style="font-size:64px; text-align:center;">Regles del Joc</h2>
+    <ol style="font-size:32px; line-height:1.6;">
+      <li><b>Objectiu:</b> Ser el primer en arribar a 6 000 punts.</li>
+	  <ul>
+          <li>Hi ha imatges que potser fan coses, activen funcions, etc.. 🏴☠️🦜🐒🔭</li>
+        </ul>
+      <li><b>Torn de joc:</b>
+        <ul>
+          <li>Comença el teu torn tirant els 8 daus.</li>
+          <li>Pots <b>congelar</b> qualsevol dau — fes clic sobre ell per fixar-lo (s’apagarà i no es tornarà a tirar).</li>
+          <li>Quan vulguis, prem “Finalitzar Torn” per sumar tots els punts acumulats.</li>
+        </ul>
+      </li>
+      <li><b>Punts bàsics:</b>
+        <ul>
+          <li>🪙 Cada <b>Moneda</b> (cara 2) → +100 pts</li>
+          <li>💎 Cada <b>Diamant</b> (cara 4) → +100 pts</li>
+        </ul>
+      </li>
+      <li><b>Combinacions de cares iguals:</b>
+        <ul>
+          <li>3 iguals → +100 pts</li>
+          <li>4 iguals → +200 pts</li>
+          <li>5 iguals → +500 pts</li>
+          <li>6 iguals → +1 000 pts</li>
+          <li>7 iguals → +2 000 pts</li>
+          <li>8 iguals → +4 000 pts</li>
+          <li><i>Perfect Treasure</i> (tots els daus puntuen, incloses monedes/diamants) → +500 pts extra</li>
+        </ul>
+      </li>
+      <li><b>Calaveres:</b>
+        <ul>
+          <li>Si surten 3 <b>Calaveres</b> (cara 6), perds tots els punts del torn (o la penalització de la carta activa).</li>
+          <li>4 o més → entra el mode <i>Illa Calavera</i> (veure més avall).</li>
+        </ul>
+      </li>
+      <li><b>Cartes modificadores:</b>
+        Abans de comptar daus, roba una carta que pot:
+        <ul>
+          <li><b>Pirata:</b> duplica tots els punts del torn.</li>
+          <li><b>Calavera×1/2:</b> ignora 1 o 2 calaveres abans de perdre torn.</li>
+          <li><b>Vaixell×2/4:</b> +500/+1000 pts si tens ≥2/4 vaixells, si no perds aquesta quantitat.</li>
+          <li><b>Or/Diamant:</b> sumes +100 pts extra i compta com a cara per a combos.</li>
+          <li><b>Animals:</b> micos i lloros fan un únic combo (p. ex. 2 mi + 2 ll → 4 iguals).</li>
+        </ul>
+      </li>
+      <li><b>Poder dels personatges:</b> Cada avatar té un bonus especial al final del torn:
+        <ul>
+          <li>Capitana pirata: +100 pts per calavera</li>
+          <li>Oficial/Capitana armada: +100 pts per vaixell</li>
+          <li>Veterinari: +100 pts per mico o lloro</li>
+          <li>Reina: +100 pts per or</li>
+          <li>Consellera: +100 pts per diamant</li>
+        </ul>
+      </li>
+      <li><b>Mode Illa Calavera:</b> Si surten ≥4 calaveres,
+        <ul>
+          <li>Durant aquest torn, cada nova calavera +100 pts per a tu i –200 pts per cada rival.</li>
+          <li>Si al final no apareix cap calavera nova, el teu torn acaba sense sumar res.</li>
+        </ul>
+      </li>
+    </ol>
+  </div>
+</div>
+
+
+			
+			
+			
 			<div id="escena-configuraPartida2" class="escena">
 				<button onclick="carregaEscena('escena-pantallaInici')" class="botoEsquerraAbaix">Enrere</button>
 				<h2>Selecciona els jugadors</h2>
@@ -713,7 +852,14 @@ background-size: 100% 100%;
 			 
 			 <!-- Pantalla de selecció de jugadors -->
 			<div id="escena-configuraPartida" class="escena">
-				<button class="botoPantallaCompleta" onclick="pantallaCompleta()"><i class="material-icons" style="font-size:30px;">fullscreen</i></button>
+				
+				<!--
+				<div class="pergamiBoto pergamiBotoDretaAdalt" onclick="pantallaCompleta()">
+					<div class="pergamiBotoEsq"></div>
+					<div class="pergamiBotoMid" style="padding:0px;"><i class="material-icons" style="font-size:30px;">fullscreen</i></div>
+					<div class="pergamiBotoDret"></div>
+				</div>
+				-->
 				<!--<button class="botoEsquerraAbaix" onclick="carregaEscena('escena-pantallaInici')">Enrere</button>-->
 				<div class="pergamiBoto pergamiBotoEsquerraAbaix">
 					<div class="pergamiBotoEsq"></div>
@@ -750,23 +896,36 @@ background-size: 100% 100%;
 						<input type="text" id="nom6" placeholder="Consellera de la moneda" disabled readonly>
 					</div>
 				
-				<button class="botoCentreAbaix" onclick="mostrarModalPersonatges()" onclick="mostrarModalPersonatges()">Informació Personatges</button>
-				<button class="botoDretaAbaix" id="botoSeguentConfigurarPartida" onclick="carregaEscena('escena-joc')">Següent</button>
+				<!--<button class="botoCentreAbaix" onclick="mostrarModalPersonatges()" onclick="mostrarModalPersonatges()">Informació Personatges</button>-->
+				<div class="pergamiBoto" style="position:absolute; bottom:20px;" onclick="mostrarModalPersonatges()">
+					<div class="pergamiBotoEsq"></div>
+					<div class="pergamiBotoMid">Informació Personatges</div>
+					<div class="pergamiBotoDret"></div>
+				</div>
+				
+				
+				
+				<!--<button class="botoDretaAbaix" id="botoSeguentConfigurarPartida" onclick="carregaEscena('escena-joc')">Següent</button>-->
+				<div class="pergamiBoto pergamiBotoDretaAbaix" >
+					<div class="pergamiBotoEsq"></div>
+					<div class="pergamiBotoMid" id="botoSeguentConfigurarPartida" onclick="carregaEscena('escena-joc')">Següent</div>
+					<div class="pergamiBotoDret"></div>
+				</div>
 				
 				
 				
 				
 				<div id="modalPersonatges">
-					<div style="background: #fff3d6; color: #3b2e1f; padding: 40px; border-radius: 20px; width: 80%; max-width: 1200px; font-family: 'PiecesOfEight'; position: relative;">
-						<h2 style="text-align:center;">Poder dels Personatges</h2>
-						<ul style="font-size: 22px; list-style: none; padding: 0;">
-							<li><b>Capitana pirata:</b> Pot tornar a tirar un dau un cop per torn.</li>
-							<li><b>Oficial pirata:</b> Pot intercanviar el resultat de dos daus després de llençar-los.</li>
-							<li><b>Veterinari pirata:</b> Guanya 1 punt extra si surt una combinació doble.</li>
-							<li><b>Capitana armada reial:</b> Pot anul·lar el poder d’un altre jugador una vegada per partida.</li>
-							<li><b>Reina:</b> Guanya +1 punt si fa la millor tirada del torn.</li>
-							<li><b>Consellera de la moneda:</b> Pot sumar 1 a un dau qualsevol un cop per torn.</li>
-						</ul>
+					<div style="background: #fff3d6; color: #3b2e1f; padding: 40px; border-radius: 20px; width: 80%; max-width: 1200px; font-family: 'PiecesOfEight'; position: relative; text-align:center; font-size: 40px">
+						<h2 style="text-align:center; font-size: 56px">Poder dels Personatges</h2>
+						
+							<b>Capitana pirata:</b> 100 punts a calaveres<br>
+							<b>Oficial pirata:</b> 100 punts a vaixells <br>
+							<b>Veterinari pirata:</b> 100 punts a micos i lloros<br>
+							<b>Capitana armada reial:</b> 100 punts a vaixells<br>
+							<b>Reina:</b> 100 punts a monedes<br>
+							<b>Consellera de la moneda:</b> 100 punts a diamants<br>
+						
 						<button onclick="tancarModalPersonatges()" style="margin-top: 30px; padding: 15px; font-size: 24px;">Tancar</button>
 					</div>
 				</div>
@@ -841,10 +1000,10 @@ background-size: 100% 100%;
 
 			<div id="escena-joc" class="escena" style="position: relative; overflow: hidden;">
 			
-			<img src="img/music_on-SFX_off.png" style="position:absolute;left:0px; width:300px;bottom:60px;">
-				<img src="img/pantallaCompleta.png" style="position:absolute;right:0px; width:300px;top:10px;">
-			
-			
+			<img src="img/music_on-SFX_off.png" id="musicButton">
+				<img src="img/mostraInstruccionsMico.png" class="mostraInstruccionsMico" onclick="carregaEscena('escena-instruccions')" style="position:absolute;right:0px; width:300px;top:10px;">
+			<img src="img/fullscreenButton.png?v=2" id="fullscreenButton" onclick="pantallaCompleta()">
+			<img src="img/pirateflagButton.png?v=2" class="pirateflagButton" onclick="toggleAjudaPunts()">
 			
 				<div id="contenidorDaus"></div>
 				
@@ -853,9 +1012,15 @@ background-size: 100% 100%;
 					<div class="pergamiBotoMid" onclick="carregaEscena('escena-pantallaInici')">Enrere</div>
 					<div class="pergamiBotoDret"></div>
 				</div>
+				<!--
+				<div class="pergamiBoto pergamiBotoDretaAdalt" onclick="pantallaCompleta()">
+					<div class="pergamiBotoEsq"></div>
+					<div class="pergamiBotoMid" style="padding:0px;"><i class="material-icons" style="font-size:30px;">fullscreen</i></div>
+					<div class="pergamiBotoDret"></div>
+				</div>
+				-->
+				<!-- <button class="botoAudio" onclick="toggleAudio()"><i class="material-icons">volume_up</i></button> -->
 				
-				<button class="botoPantallaCompleta" onclick="pantallaCompleta()"><i class="material-icons" style="font-size:30px;">fullscreen</i></button>
-				<button class="botoAudio" onclick="toggleAudio()"><i class="material-icons">volume_up</i></button>
 				
 				
 				<div id="puntuacionsJugadors" >
@@ -890,10 +1055,11 @@ background-size: 100% 100%;
 					Torn de: <span id="nomJugadorActiu"></span>
 				</div>
 -->
-				<div id="puntsProvisional" style="position:absolute; top:20px; left:50%; transform:translateX(-50%); font-size:40px; font-weight:bold; color:white; text-shadow:2px 2px 5px black; display:none;">
-					Punts del torn: <span id="puntsTornActiu">0</span><br><span id="resumPuntsTornActiu" style="font-size:20px;text-shadow:2px 2px 5px black;color:yellow;"></span>
+				<div id="puntsProvisional" >
+					 <span id="puntsTornActiu">0</span> punts<br>
+					 
 				</div>
-				
+				<span id="resumPuntsTornActiu">Has descobert la "xuleta" dels punts 😉</span>
 				<!--<div id="numTiradaDisplay"></div>-->
 				
 				<div id="jugadorActiuInfo" style="position: absolute; bottom: 0px; left: 50%; transform: translateX(-50%); text-align: center; display: none; z-index: 10;">
@@ -972,29 +1138,41 @@ background-size: 100% 100%;
 
 
 
+
+
 // ─── Llista de cartes possibles ──────────────────────────
 const cartes = [
-  { id: 'Boti',          img: 'img/cartesTresor.png',        desc: 'Si fas 3 calaveres, mantens els punts fins ara', },
+  { id: 'Boti',          img: 'img/cartesTresor.png',        desc: 'Perdre torn per 3 calaveres et permet mantenir els punts', },
   { id: 'Pirata',        img: 'img/cartesPirata.png',        desc: 'Duplica la puntuació final del torn',       },
-  { id: 'Calavera1',     img: 'img/cartesCalavera1.png',        desc: 'Ja hi ha 1 calavera activa (2 max)',        },
-  { id: 'Calavera2',     img: 'img/cartesCalavera2.png',        desc: 'Ja hi ha 2 calaveres actives (3 max)',     },
-  { id: 'Vaixell2',      img: 'img/cartesVaixell2.png',        desc: 'Necessites ≥2 vaixells o perds 500 / guanyes 500', },
-  { id: 'Vaixell4',      img: 'img/cartesVaixell4.png',        desc: 'Necessites ≥4 vaixells o perds 1000 / guanyes 1000',},
-  { id: 'Diamant',       img: 'img/cartesDiamant.png',        desc: 'Ja hi ha un diamant actiu',                  },
-  { id: 'Or',            img: 'img/cartesMoneda.png',        desc: 'Ja hi ha un or actiu',                       },
-  { id: 'Animals',       img: 'img/cartesAnimals.png',        desc: 'Micos+i lloros compten com un mateix símbol',},
+  { id: 'Calavera1',     img: 'img/cartesCalavera1.png',        desc: 'Activa una calavera al tauler',        },
+  { id: 'Calavera2',     img: 'img/cartesCalavera2.png',        desc: 'Activa dues calaveres al tauler',     },
+  { id: 'Vaixell2',      img: 'img/cartesVaixell2.png',        desc: 'Has de finalitzar el torn amb 2 vaixells o més per guanyar 500 punts. Si no, en perds 500', },
+  { id: 'Vaixell4',      img: 'img/cartesVaixell4.png',        desc: 'Has de finalitzar el torn amb 4 vaixells o més per guanyar 1000 punts. Si no, en perds 1000',},
+  { id: 'Diamant',       img: 'img/cartesDiamant.png',        desc: 'Activa un diamant al tauler',                  },
+  { id: 'Or',            img: 'img/cartesMoneda.png',        desc: 'Activa una moneda al tauler',                       },
+  { id: 'Animals',       img: 'img/cartesAnimals.png',        desc: 'Micos i lloros compten com un mateix símbol',},
 ];
 // Mantindrem la carta d’aquest torn aquí:
 let cartaActual = null;
 
 
 
-
+// 1) Guarda la última escena
+let escenaAnterior = null;
 
 			// Funcions CUSTOM que hem generat per treballar més eficientment
 			
 			// Funció que cridem cada cop que volem carregar una escena
 			function carregaEscena(escena){
+			
+			// si demanes tornar enrere, substitueix per l'anterior
+  if (escena === 'escena-anterior') {
+    escena = escenaAnterior || 'escena-pantallaInici';
+  }
+  // abans de canviar, desa quina era l'escena activa
+  const abans = escenaActiva;
+  
+  
 				switch(escena){
 					case "escena-pantallaCarrega": // Tornem a pantalla inicial
 						//amagaEscenes(); // Amaguem totes les escenes
@@ -1026,8 +1204,13 @@ let cartaActual = null;
 					case "escena-joc":
 						canviaEscena(escena); // Funció que amaga l'escena activa i mostra la desitjada
 					break;
+					case "escena-anterior":
+					  // ja està resolt a l'inici de la funció
+					  break;
 				
 				}
+				 // actualitza escenaAnterior
+  escenaAnterior = abans;
 			}
 			
 			function seleccionarJugador(num) {
@@ -1097,6 +1280,9 @@ let cartaActual = null;
 				// Actualitzem l'escena activa
 				escenaActiva = escena;
 			}
+			
+			
+			
 
 			function actualitzaPuntuacions() {
 				const div = document.getElementById("puntuacionsJugadorsMid");
@@ -1176,7 +1362,15 @@ function tancarModalMissatge() {
     }
 }
 
+// FUnció que mostra i amaga l'ajuda dels punts que fem
 
+
+function toggleAjudaPunts() {
+  const puntsProv = document.getElementById("resumPuntsTornActiu");
+  // llegeix el display computat, no l’inline
+  const actual = window.getComputedStyle(puntsProv).getPropertyValue("display");
+  puntsProv.style.display = (actual === "none") ? "block" : "none";
+}
 
 
 
@@ -1549,7 +1743,7 @@ switch(cartaActual.id) {
 
 
     // Mostrem el resum al span
-    document.getElementById("resumPuntsTornActiu").innerHTML = missatgesResum.join('<br>');
+    document.getElementById("resumPuntsTornActiu").innerHTML = missatgesResum.join('   ');
 	
 	
 	/*
@@ -1782,9 +1976,9 @@ Guanyes ${skulls * 100} punts, rivals -${penal} punts.`,
 
 
 
-	// sortir del mode Illa
-illaCalaveraMode = false;
-calaveresIllaAcumulades = 0;
+			// sortir del mode Illa
+		illaCalaveraMode = false;
+		calaveresIllaAcumulades = 0;
 
 
 
@@ -1794,6 +1988,18 @@ calaveresIllaAcumulades = 0;
     const jugadorActiu = llistaJugadors[jugadorActiuIndex];
     jugadorActiu.punts += puntsTornActual;
     console.log(`🏆 ${jugadorActiu.nom} guanya ${puntsTornActual} punts. Total: ${jugadorActiu.punts}`);
+
+
+  // ← Aquí comprovem si ha arribat a 10000 punts
+  if (jugadorActiu.punts >= 10000) {
+    mostrarModalMissatge(`🎉 Enhorabona ${jugadorActiu.nom}! Has arribat a 10000 punts i guanyes la partida!`, false);
+    // Opcional: amagar controls per no seguir tirant
+    document.getElementById("dauTiradesContainer")?.remove();
+    document.getElementById("finalitzarTornContainer")?.remove();
+    return;  // sortim de la funció per no passar torn
+  }
+
+
 
     // Passem al següent jugador
     llistaJugadors[jugadorActiuIndex].torn = false;
@@ -2310,13 +2516,20 @@ function obtenirCaraAmunt(mesh) {
 				  }
 				  mostrarCartaAlUI(cartaActual);
 			}
-
+/*
 			function mostrarCartaAlUI(carta) {
 				//document.getElementById('cartaNom').textContent  = carta.id;
 				//document.getElementById('cartaDesc').textContent = carta.desc;
 				document.getElementById('cartesImgSrc').src = carta.img;
 			}
+*/
 
+			function mostrarCartaAlUI(carta) {
+			  const img = document.getElementById('cartesImgSrc');
+			  img.src = carta.img;
+			  // Assignem un callback, no cridem la funció ara mateix:
+			  img.onclick = () => mostrarModalMissatge(carta.desc, true);
+			}
 
 
 			
@@ -2393,6 +2606,8 @@ function obtenirCaraAmunt(mesh) {
 				'img/avatar4.png', 
 				'img/avatar5.png', 
 				'img/avatar6.png',
+				'img/fullscreenButton.png',
+				'img/pirateflagButton.png',
 				'img/vaixell-jocv2.png'
 
 				// AUDIO

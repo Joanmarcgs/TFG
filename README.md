@@ -18,7 +18,7 @@ L'objectiu és mantenir la jugabilitat i l’essència del joc analògic, amb un
 El projecte està allotjat en dues versions accessibles via navegador:
 
 - 🔧 **Versió de desenvolupament (pre-producció):**  
-  [https://burxat.dev/TFG_UOC/](https://burxat.dev/TFG_UOC/)
+  [https://burxat.dev/TFG-UOC/](https://burxat.dev/TFG-UOC/)
 
 - 🚀 **Versió de producció (estable):**  
   [https://TFG.burxat.dev](https://TFG.burxat.dev)
