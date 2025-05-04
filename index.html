@@ -482,6 +482,7 @@ background-size: 100% 100%;
 				text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.5);
 				width: fit-content;
 				transition: transform 0.2s ease-in-out;
+				z-index:1000;
 			}
 
 			.pergamiBoto:hover {transform: scale(1.05);}
@@ -590,7 +591,7 @@ position:absolute;right:0px; width:300px;bottom:80px;
 }
 
 #fullscreenButton{
-position:absolute;left:0px; width:300px;bottom:100px; transform: scaleX(-1);z-index:1000;
+position:absolute;left:0px; width:300px;bottom:10px; transform: scaleX(-1);z-index:1000;
 }
 
 
@@ -625,35 +626,6 @@ position:absolute;left:-10px; width:350px;top:0px;z-index:1000;
 
 			<div id="escena-pantallaCarrega" class="escena">
 			
-				<!--
-				<button class="botoPantallaCompleta" onclick="pantallaCompleta()"><i class="material-icons" style="font-size:30px;">fullscreen</i></button>
-				
-				-->
-				
-				<!--
-				<div class="pergamiBoto pergamiBotoDretaAdalt" onclick="pantallaCompleta()">
-					<div class="pergamiBotoEsq"></div>
-					<div class="pergamiBotoMid" style="padding:0px;"><i class="material-icons" style="font-size:30px;">fullscreen</i></div>
-					<div class="pergamiBotoDret"></div>
-				</div>
-				-->
-				
-				<!--<h1 class="h1Titol">Illa Calavera</h1>-->
-				
-				
-				<!--
-				<button id="botoCarregant">Carregant...
-				
-				<div id="contenidorProgres">
-					<div id="barraProgres">
-						<div id="numPercentatge">0 %</div>
-					</div>
-				</div>
-				
-				
-				</button>
-				
-				-->
 				
 				<div class="pergamiBoto" id="botoIniciarContainer">
 					<div class="pergamiBotoEsq" ></div>
@@ -679,7 +651,6 @@ position:absolute;left:-10px; width:350px;top:0px;z-index:1000;
 			</div>
 
 			<div id="escena-pantallaInici" class="escena">
-				<!--<h1 class="h1Titol">Illa Calavera</h1>-->
 				<div class="cartellBotoGran">
 					<div class="cartellBotoGranEsq"></div>
 					<div class="cartellBotoGranMid">Illa Calavera</div>
@@ -688,22 +659,13 @@ position:absolute;left:-10px; width:350px;top:0px;z-index:1000;
 				
 				
 				<img src="img/music_on-SFX_off.png" id="musicButton">
-				<img src="img/fullscreenButton.png?v=2" id="fullscreenButton" onclick="pantallaCompleta()">
+				<img src="img/spyglassButton.png?v=2" id="fullscreenButton" onclick="pantallaCompleta()">
 				<img src="img/pirateflagButton.png?v=2" class="pirateflagButton" onclick="toggleAjudaPunts()">
-				<img src="img/mostraInstruccionsMico.png" class ="mostraInstruccionsMico" style="position:absolute;right:0px; width:300px;top:10px;">
+				<img src="img/mostraInstruccionsMico.png" class="mostraInstruccionsMico" onclick="carregaEscena('escena-instruccions')" style="position:absolute;right:0px; width:300px;top:10px;">
 				
 				
 				<audio id="musica-fons" src="audio/melodiaPrincipal-corda.mp3" loop></audio>
-				<!--
-				<div class="pergamiBoto pergamiBotoDretaAdalt" onclick="pantallaCompleta()">
-					<div class="pergamiBotoEsq"></div>
-					<div class="pergamiBotoMid" style="padding:0px;"><i class="material-icons" style="font-size:30px;">fullscreen</i></div>
-					<div class="pergamiBotoDret"></div>
-				</div>
-				-->
-				<!-- <button class="botoAudio" onclick="toggleAudio()"><i class="material-icons">volume_up</i></button> -->
 
-				<!--<button onclick="carregaEscena('escena-configuraPartida')" id="escena-pantallaInici-botoIniciarPartida">Iniciar partida</button>-->
 				<div class="pergamiBoto">
 					<div class="pergamiBotoEsq"></div>
 					<div class="pergamiBotoMid" onclick="carregaEscena('escena-configuraPartida')" id="escena-pantallaInici-botoIniciarPartida">Iniciar</div>
@@ -719,16 +681,14 @@ position:absolute;left:-10px; width:350px;top:0px;z-index:1000;
 				
 				
 				<img src="img/instruccionsJoc.png" style="width:200px;position:absolute;bottom:10px;">
-				<!--<button onclick="carregaEscena('escena-instruccions')">Regles del Joc</button>-->
+
 				<div class="pergamiBoto" style="position:absolute; bottom:50px;">
 					<div class="pergamiBotoEsq"></div>
 					<div class="pergamiBotoMid" onclick="carregaEscena('escena-instruccions')">Instruccions</div>
 					<div class="pergamiBotoDret"></div>
 				</div>
 				
-				
-				
-				<!--<button onclick="carregaEscena('escena-sobreProjecte')" class="botoEsquerraAbaix">Sobre el Projecte</button>-->
+
 				<div class="pergamiBoto pergamiBotoEsquerraAbaix">
 					<div class="pergamiBotoEsq"></div>
 					<div class="pergamiBotoMid" onclick="carregaEscena('escena-sobreProjecte')">El Projecte</div>
@@ -736,18 +696,12 @@ position:absolute;left:-10px; width:350px;top:0px;z-index:1000;
 				</div>
 				
 				
-				
-				
-				
-				<!--<button onclick="carregaEscena('escena-credits')" class="botoDretaAbaix">Crèdits</button>-->
+
 				<div class="pergamiBoto pergamiBotoDretaAbaix">
 					<div class="pergamiBotoEsq"></div>
 					<div class="pergamiBotoMid" onclick="carregaEscena('escena-credits')">Mencions</div>
 					<div class="pergamiBotoDret"></div>
 				</div>
-				
-				<!--<button onclick="reiniciaPartida()" id="botoEliminarPartida2" class="botoCentreAbaix">Eliminar partida en curs</button>-->
-				
 				
 				
 			</div>
@@ -765,90 +719,87 @@ position:absolute;left:-10px; width:350px;top:0px;z-index:1000;
 				
 			</div>
 			
-			
 			<!-- ESCENA INSTRUCCIONS -->
-<!-- ESCENA INSTRUCCIONS -->
-<div id="escena-instruccions" class="escena">
-  <div class="pergamiBoto pergamiBotoEsquerraAbaix" onclick="carregaEscena('escena-anterior')">
-    <div class="pergamiBotoEsq"></div>
-    <div class="pergamiBotoMid">Enrere</div>
-    <div class="pergamiBotoDret"></div>
-  </div>
+			<div id="escena-instruccions" class="escena">
+			  <div class="pergamiBoto pergamiBotoEsquerraAbaix" onclick="carregaEscena('escena-anterior')">
+				<div class="pergamiBotoEsq"></div>
+				<div class="pergamiBotoMid">Enrere</div>
+				<div class="pergamiBotoDret"></div>
+			  </div>
 
-  <div class="pergami">
-    <h2 style="font-size:64px; text-align:center;">Regles del Joc</h2>
-    <ol style="font-size:32px; line-height:1.6;">
-      <li><b>Objectiu:</b> Ser el primer en arribar a 6 000 punts.</li>
-	  <ul>
-          <li>Hi ha imatges que potser fan coses, activen funcions, etc.. 🏴☠️🦜🐒🔭</li>
-        </ul>
-      <li><b>Torn de joc:</b>
-        <ul>
-          <li>Comença el teu torn tirant els 8 daus.</li>
-          <li>Pots <b>congelar</b> qualsevol dau — fes clic sobre ell per fixar-lo (s’apagarà i no es tornarà a tirar).</li>
-          <li>Quan vulguis, prem “Finalitzar Torn” per sumar tots els punts acumulats.</li>
-        </ul>
-      </li>
-      <li><b>Punts bàsics:</b>
-        <ul>
-          <li>🪙 Cada <b>Moneda</b> (cara 2) → +100 pts</li>
-          <li>💎 Cada <b>Diamant</b> (cara 4) → +100 pts</li>
-        </ul>
-      </li>
-      <li><b>Combinacions de cares iguals:</b>
-        <ul>
-          <li>3 iguals → +100 pts</li>
-          <li>4 iguals → +200 pts</li>
-          <li>5 iguals → +500 pts</li>
-          <li>6 iguals → +1 000 pts</li>
-          <li>7 iguals → +2 000 pts</li>
-          <li>8 iguals → +4 000 pts</li>
-          <li><i>Perfect Treasure</i> (tots els daus puntuen, incloses monedes/diamants) → +500 pts extra</li>
-        </ul>
-      </li>
-      <li><b>Calaveres:</b>
-        <ul>
-          <li>Si surten 3 <b>Calaveres</b> (cara 6), perds tots els punts del torn (o la penalització de la carta activa).</li>
-          <li>4 o més → entra el mode <i>Illa Calavera</i> (veure més avall).</li>
-        </ul>
-      </li>
-      <li><b>Cartes modificadores:</b>
-        Abans de comptar daus, roba una carta que pot:
-        <ul>
-          <li><b>Pirata:</b> duplica tots els punts del torn.</li>
-          <li><b>Calavera×1/2:</b> ignora 1 o 2 calaveres abans de perdre torn.</li>
-          <li><b>Vaixell×2/4:</b> +500/+1000 pts si tens ≥2/4 vaixells, si no perds aquesta quantitat.</li>
-          <li><b>Or/Diamant:</b> sumes +100 pts extra i compta com a cara per a combos.</li>
-          <li><b>Animals:</b> micos i lloros fan un únic combo (p. ex. 2 mi + 2 ll → 4 iguals).</li>
-        </ul>
-      </li>
-      <li><b>Poder dels personatges:</b> Cada avatar té un bonus especial al final del torn:
-        <ul>
-          <li>Capitana pirata: +100 pts per calavera</li>
-          <li>Oficial/Capitana armada: +100 pts per vaixell</li>
-          <li>Veterinari: +100 pts per mico o lloro</li>
-          <li>Reina: +100 pts per or</li>
-          <li>Consellera: +100 pts per diamant</li>
-        </ul>
-      </li>
-      <li><b>Mode Illa Calavera:</b> Si surten ≥4 calaveres,
-        <ul>
-          <li>Durant aquest torn, cada nova calavera +100 pts per a tu i –200 pts per cada rival.</li>
-          <li>Si al final no apareix cap calavera nova, el teu torn acaba sense sumar res.</li>
-        </ul>
-      </li>
-    </ol>
-  </div>
-</div>
-
-
-			
-			
-			
-			<div id="escena-configuraPartida2" class="escena">
-				<button onclick="carregaEscena('escena-pantallaInici')" class="botoEsquerraAbaix">Enrere</button>
-				<h2>Selecciona els jugadors</h2>
+			  <div class="pergami">
+				<h2 style="font-size:64px; text-align:center;">Regles del Joc</h2>
+				<ol style="font-size:32px; line-height:1.6;">
+				  <li><b>Objectiu:</b> Ser el primer en arribar a 10 000 punts.</li>
+				  <ul>
+					  <li>TIP: Hi ha imatges que potser fan també de botó, activen funcions, etc.. <br>🏴☠️🦜🐒🔭</li>
+					</ul>
+				  <li><b>Torn de joc:</b>
+					<ul>
+					  <li>Comença el teu torn tirant els 8 daus.</li>
+					  <li>Pots <b>congelar</b> qualsevol dau — fes clic sobre ell per fixar-lo (s’apagarà i no es tornarà a tirar).</li>
+					  <li>D'igual manera, pots descongelar daus que hagis congelat tu, per si vols tornar-los a tirar.</li>
+					  <li>Les calaveres es congelen soles, i no es poden descongelar. Si n'acumules tres perds el torn! </li>
+					  <li>Quan vulguis, prem “Finalitzar Torn” per sumar tots els punts acumulats.</li>
+					</ul>
+				  </li>
+				  <li><b>Punts bàsics:</b>
+					<ul>
+					  <li>🪙 Cada <b>Moneda</b> 100 pts</li>
+					  <li>💎 Cada <b>Diamant</b> 100 pts</li>
+					</ul>
+				  </li>
+				  <li><b>Combinacions de cares iguals:</b>
+					<ul>
+					  <li>3 iguals - 100 pts</li>
+					  <li>4 iguals - 200 pts</li>
+					  <li>5 iguals - 500 pts</li>
+					  <li>6 iguals - 1 000 pts</li>
+					  <li>7 iguals - 2 000 pts</li>
+					  <li>8 iguals - 4 000 pts</li>
+					  <li><i>Perfect Treasure</i> (tots els daus puntuen, incloses monedes/diamants) 500 pts extra</li>
+					</ul>
+				  </li>
+				  <li><b>Calaveres:</b>
+					<ul>
+					  <li>Si surten 3 <b>Calaveres</b>, perds tots els punts del torn (o la penalització de la carta activa).</li>
+					  <li>Amb 4 o més entres en el mode <i>Illa Calavera</i> (veure més avall).</li>
+					</ul>
+				  </li>
+				  <li><b>Cartes modificadores:</b>
+					Al principi de cada torn, es roba una carta que estarà activa durant totes les tirades del torn:
+					<ul>
+					  <li><b>Pirata:</b> duplica tots els punts del torn.</li>
+					  <li><b>Calavera:</b> posa una calavera en joc addicional.</li>
+					  <li><b>Calaveres:</b> posa dues calaveres en joc addicionals.</li>
+					  <li><b>Vaixell x2:</b> Guanyes 500 pts si tens 2 vaixells o més, si no, perds aquesta quantitat.</li>
+					  <li><b>Vaixell x4:</b> Guanyes 1000 pts si tens 4 vaixells o més, si no, perds aquesta quantitat.</li>
+					  <li><b>Diamant:</b> sumes 100 pts extra i compta com a cara per a combos.</li>
+					  <li><b>Moneda:</b> sumes 100 pts extra i compta com a cara per a combos.</li>
+					  <li><b>Animals:</b> micos i lloros fan un únic combo.</li>
+					</ul>
+				  </li>
+				  <li><b>Poder dels personatges:</b> Cada avatar té un bonus especial al final del torn:
+					<ul>
+					  <li>Capitana pirata: 100 pts per calavera</li>
+					  <li>Oficial pirata armada: 100 pts per vaixell</li>
+					  <li>Veterinari pirata: 100 pts per mico o lloro</li>
+					  <li>Capitana armada: 100 pts per vaixell</li>
+					  <li>Reina: 100 pts per moneda</li>
+					  <li>Consellera del Tresor: 100 pts per diamant</li>
+					</ul>
+				  </li>
+				  <li><b>Mode Illa Calavera:</b> Si surten 4 calaveres o més.
+					<ul>
+					  <li>Durant aquest torn, cada nova calavera suma 100 pts per a tu i resta 200 pts a cada rival.</li>
+					  <li>Si en una tirada no apareix cap calavera nova, el torn Illa Calavera acaba, restes punts als rivals, sumes els teus, i acaba el teu torn.</li>
+					</ul>
+				  </li>
+				</ol>
+			  </div>
 			</div>
+
+
 			 
 			 <!-- Pantalla de selecció de jugadors -->
 			<div id="escena-configuraPartida" class="escena">
@@ -994,16 +945,13 @@ position:absolute;left:-10px; width:350px;top:0px;z-index:1000;
 				
 			</div>
 			
-			<div id="escena-jugaPartida" class="escena">
-			
-			</div>
 
 			<div id="escena-joc" class="escena" style="position: relative; overflow: hidden;">
 			
-			<img src="img/music_on-SFX_off.png" id="musicButton">
+				<img src="img/music_on-SFX_off.png" id="musicButton">
 				<img src="img/mostraInstruccionsMico.png" class="mostraInstruccionsMico" onclick="carregaEscena('escena-instruccions')" style="position:absolute;right:0px; width:300px;top:10px;">
-			<img src="img/fullscreenButton.png?v=2" id="fullscreenButton" onclick="pantallaCompleta()">
-			<img src="img/pirateflagButton.png?v=2" class="pirateflagButton" onclick="toggleAjudaPunts()">
+				<img src="img/spyglassButton.png?v=2" id="fullscreenButton" onclick="pantallaCompleta()">
+				<img src="img/pirateflagButton.png?v=2" class="pirateflagButton" onclick="toggleAjudaPunts()">
 			
 				<div id="contenidorDaus"></div>
 				
