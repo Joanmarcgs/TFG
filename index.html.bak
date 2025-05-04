@@ -514,6 +514,7 @@ background-size: 100% 100%;
 			.pergamiBotoEsquerraAbaix{position:absolute; left:20px; bottom:20px;}
 			.pergamiBotoPantallaCompleta{position:absolute; width:60px; right:20px; top:20px;}
 			.pergamiBotoAudio{position:absolute; width:60px; right:20px; top:100px;}
+			.pergamiBotoNomJugador{width:100%;}
 			
 			
 			
@@ -617,22 +618,6 @@ background-size: 100% 100%;
 					<div class="pergamiBotoDret"></div>
 				</div>
 				
-				
-				<!--
-				<button id="botoIniciar" onclick="carregaEscena('escena-pantallaInici');">Iniciar</button>
-				-->
-				
-				
-
-				
-				<!--<button onclick="reiniciaPartida()" id="botoEliminarPartida1" class="botoCentreAbaix">Eliminar partida en curs</button>-->
-				<!--
-				<div class="pergamiBoto pergamiBotoCentreAbaix" id="botoEliminarPartida1Container">
-					<div class="pergamiBotoEsq"></div>
-					<div class="pergamiBotoMid" onclick="reiniciaPartida()" id="botoEliminarPartida1">Eliminar partida en curs</div>
-					<div class="pergamiBotoDret"></div>
-				</div>
--->
 			
 			</div>
 
@@ -734,28 +719,28 @@ background-size: 100% 100%;
 				
 					<!-- Els vaixells amb els noms -->
 					<div id="jugadorAvatar1" class="jugadorAvatar avatarDesactivat" >
-						<img id="img1" src="img/avatar11.png" alt="Jugador 1" onclick="seleccionarJugador(1)">
+						<img id="img1" src="img/avatar1.png" alt="Jugador 1" onclick="seleccionarJugador(1)">
 						<input type="text" id="nom1" placeholder="Capitana pirata" disabled readonly>
 					</div>
 					<div id="jugadorAvatar2" class="jugadorAvatar avatarDesactivat" >
-						<img id="img2" src="img/avatar22.png" alt="Jugador 2" onclick="seleccionarJugador(2)">
+						<img id="img2" src="img/avatar2.png" alt="Jugador 2" onclick="seleccionarJugador(2)">
 						<input type="text" id="nom2" placeholder="Oficial pirata" disabled readonly>
 					</div>
 					<div id="jugadorAvatar3" class="jugadorAvatar avatarDesactivat" >
-						<img id="img3" src="img/avatar33.png" alt="Jugador 3" onclick="seleccionarJugador(3)">
+						<img id="img3" src="img/avatar3.png" alt="Jugador 3" onclick="seleccionarJugador(3)">
 						<input type="text" id="nom3" placeholder="Veterinari pirata" disabled readonly>
 					</div>
 					
 					<div id="jugadorAvatar4" class="jugadorAvatar avatarDesactivat" >
-						<img id="img4" src="img/avatar44.png" alt="Jugador 4" onclick="seleccionarJugador(4)">
+						<img id="img4" src="img/avatar4.png" alt="Jugador 4" onclick="seleccionarJugador(4)">
 						<input type="text" id="nom4" placeholder="Capitana armada reial" disabled readonly>
 					</div>
 					<div id="jugadorAvatar5" class="jugadorAvatar avatarDesactivat" >
-						<img id="img5" src="img/avatar55.png" alt="Jugador 5" onclick="seleccionarJugador(5)">
+						<img id="img5" src="img/avatar5.png" alt="Jugador 5" onclick="seleccionarJugador(5)">
 						<input type="text" id="nom5" placeholder="Reina" disabled readonly>
 					</div>
 					<div id="jugadorAvatar6" class="jugadorAvatar avatarDesactivat" >
-						<img id="img6" src="img/avatar66.png" alt="Jugador 6" onclick="seleccionarJugador(6)">
+						<img id="img6" src="img/avatar6.png" alt="Jugador 6" onclick="seleccionarJugador(6)">
 						<input type="text" id="nom6" placeholder="Consellera de la moneda" disabled readonly>
 					</div>
 				
@@ -779,96 +764,9 @@ background-size: 100% 100%;
 						<button onclick="tancarModalPersonatges()" style="margin-top: 30px; padding: 15px; font-size: 24px;">Tancar</button>
 					</div>
 				</div>
-
 				
 				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-			</div>
-			
-			<div id="escena-jugaPartida" class="escena">
-			
-			</div>
-
-			<div id="escena-joc" class="escena" style="position: relative; overflow: hidden;">
-			
-			<img src="img/music_on-SFX_off.png" style="position:absolute;left:0px; width:300px;bottom:60px;">
-				<img src="img/pantallaCompleta.png" style="position:absolute;right:0px; width:300px;top:10px;">
-			
-			
-			
-				<div id="contenidorDaus"></div>
-				
-				<div class="pergamiBoto pergamiBotoEsquerraAbaix">
-					<div class="pergamiBotoEsq"></div>
-					<div class="pergamiBotoMid" onclick="carregaEscena('escena-pantallaInici')">Enrere</div>
-					<div class="pergamiBotoDret"></div>
-				</div>
-				
-				<button class="botoPantallaCompleta" onclick="pantallaCompleta()"><i class="material-icons" style="font-size:30px;">fullscreen</i></button>
-				<button class="botoAudio" onclick="toggleAudio()"><i class="material-icons">volume_up</i></button>
-				<button class="botoMenu" onclick="toggleAudio()"><i class="material-icons">menu</i></button>
-				
-				<div id="puntuacionsJugadors" >
-					<div class="puntuacionsJugadorsTop"></div>
-					<div id="puntuacionsJugadorsMid" class="puntuacionsJugadorsMid">
-						<!-- Aquí van les puntuacions -->
-					</div>
-					<div class="puntuacionsJugadorsBot"></div>
-				</div>
-				
-				<div id="finalitzarTornContainer" style="position:absolute; bottom:20px; left:50%; transform:translateX(-50%); display:none; z-index:10;">
-					<button onclick="finalitzarTorn()" style="padding:20px; font-size:30px;" id="botoFinalitzarTorn">Finalitzar Torn</button>
-				</div>
-
-				<div id="tornActual" style="position:absolute; top:20px; left:50%; transform:translateX(-50%); font-size:40px; font-weight:bold; color:white; text-shadow:2px 2px 5px black; display:none;">
-					Torn de: <span id="nomJugadorActiu"></span>
-				</div>
-
-				<div id="puntsProvisional" style="position:absolute; top:80px; left:50%; transform:translateX(-50%); font-size:30px; font-weight:bold; color:yellow; text-shadow:2px 2px 5px black; display:none;">
-					Punts del torn: <span id="puntsTornActiu">0</span>
-				</div>
-				
-				<div id="numTiradaDisplay"></div>
-
-
-				
-				<!-- Només visible si activem el debug per la càmera -->
-				<div id="cameraControls">
-					<div>
-						<label>posX: <span id="posX-debug"></span> <input type="range" min="-50" max="50" step="0.1" value="0" id="camPosX"></label>
-					</div>
-					<div>
-						<label>posY: <span id="posY-debug"></span> <input type="range" min="0" max="50" step="0.1" value="0" id="camPosY"></label>
-					</div>
-					<div>
-						<label>posZ: <span id="posZ-debug"></span> <input type="range" min="-50" max="50" step="0.1" value="0" id="camPosZ"></label>
-					</div>
-					<div>
-						<label>lookX: <span id="lookX-debug"></span> <input type="range" min="-10" max="10" step="0.1" value="0" id="camLookX"></label>
-					</div>
-					<div>
-						<label>lookY: <span id="lookY-debug"></span> <input type="range" min="-10" max="10" step="0.1" value="0" id="camLookY"></label>
-					</div>
-					<div>
-						<label>lookZ: <span id="lookZ-debug"></span> <input type="range" min="-10" max="10" step="0.1" value="0" id="camLookZ"></label>
-					</div>
-					<div>
-						<label>fov: <span id="fov-debug"></span> <input type="range" min="10" max="100" step="1" value="0" id="camFOV"></label>
-					</div>
-				</div>
-				<!-- FI Només visible si activem el debug per la càmera -->
-			</div>
-
-			<!-- 1. Afegeix això al teu HTML (fora de qualsevol escena): -->
+							<!-- 1. Afegeix això al teu HTML (fora de qualsevol escena): -->
 			<div id="teclatPersonalitzat" class="teclat teclatOcult">
 			  <div class="fila">
 			  <button onclick="tancarTeclat()">ESC</button>
@@ -928,6 +826,112 @@ background-size: 100% 100%;
 				<button onclick="teclaVirtual(' ')" style="flex:2;">Espai</button>
 			  </div>
 			</div>
+				
+			</div>
+			
+			<div id="escena-jugaPartida" class="escena">
+			
+			</div>
+
+			<div id="escena-joc" class="escena" style="position: relative; overflow: hidden;">
+			
+			<img src="img/music_on-SFX_off.png" style="position:absolute;left:0px; width:300px;bottom:60px;">
+				<img src="img/pantallaCompleta.png" style="position:absolute;right:0px; width:300px;top:10px;">
+			
+			
+			
+				<div id="contenidorDaus"></div>
+				
+				<div class="pergamiBoto pergamiBotoEsquerraAbaix">
+					<div class="pergamiBotoEsq"></div>
+					<div class="pergamiBotoMid" onclick="carregaEscena('escena-pantallaInici')">Enrere</div>
+					<div class="pergamiBotoDret"></div>
+				</div>
+				
+				<button class="botoPantallaCompleta" onclick="pantallaCompleta()"><i class="material-icons" style="font-size:30px;">fullscreen</i></button>
+				<button class="botoAudio" onclick="toggleAudio()"><i class="material-icons">volume_up</i></button>
+				<button class="botoMenu" onclick="toggleAudio()"><i class="material-icons">menu</i></button>
+				
+				<div id="puntuacionsJugadors" >
+					<div class="puntuacionsJugadorsTop"></div>
+					<div id="puntuacionsJugadorsMid" class="puntuacionsJugadorsMid">
+						<!-- Aquí van les puntuacions -->
+					</div>
+					<div class="puntuacionsJugadorsBot"></div>
+				</div>
+				
+				<div id="modalMissatge" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:99999; align-items:center; justify-content:center;">
+				  <div style="background:#fff3d6; color:#3b2e1f; padding:60px; border-radius:30px; font-family:'PiecesOfEight'; font-size:32px; max-width:800px; text-align:center; box-shadow:0 0 30px rgba(0,0,0,0.7);">
+					<div id="textModalMissatge">Missatge aquí</div>
+					<br><br>
+					<button onclick="tancarModalMissatge()" style="padding: 20px 40px; font-size: 28px; background: #3b2e1f; color: #fff3d6; border: none; border-radius: 10px; cursor: pointer;">D'acord</button>
+				  </div>
+				</div>
+
+
+				
+				<div id="finalitzarTornContainer" class="pergamiBoto pergamiBotoDretaAbaix" >
+						<div class="pergamiBotoEsq"></div>
+						<div class="pergamiBotoMid" id="botoFinalitzarTorn" onclick="finalitzarTorn()"> Finalitzar Torn</div>
+						<div class="pergamiBotoDret"></div>
+					</div>
+				
+<!--
+				<div id="tornActual" style="position:absolute; top:20px; left:50%; transform:translateX(-50%); font-size:40px; font-weight:bold; color:white; text-shadow:2px 2px 5px black; display:none;">
+					Torn de: <span id="nomJugadorActiu"></span>
+				</div>
+-->
+				<div id="puntsProvisional" style="position:absolute; top:20px; left:50%; transform:translateX(-50%); font-size:40px; font-weight:bold; color:white; text-shadow:2px 2px 5px black; display:none;">
+					Punts del torn: <span id="puntsTornActiu">0</span><br><span id="resumPuntsTornActiu" style="font-size:20px;text-shadow:2px 2px 5px black;color:yellow;"></span>
+				</div>
+				
+				<!--<div id="numTiradaDisplay"></div>-->
+				
+				<div id="jugadorActiuInfo" style="position: absolute; bottom: 0px; left: 50%; transform: translateX(-50%); text-align: center; display: none; z-index: 10;">
+					
+					<img id="avatarJugadorActiu" src="" style="height: 350px; display: block;  bottom:0px;">
+					
+					<div class="pergamiBoto pergamiBotoNomJugador">
+						<div class="pergamiBotoEsq"></div>
+						<div class="pergamiBotoMid" id="nomJugadorActiuDisplay" style="width:100%;"></div>
+						<div class="pergamiBotoDret"></div>
+					</div>
+					
+					
+					
+					
+				</div>
+
+
+				
+				<!-- Només visible si activem el debug per la càmera -->
+				<div id="cameraControls">
+					<div>
+						<label>posX: <span id="posX-debug"></span> <input type="range" min="-50" max="50" step="0.1" value="0" id="camPosX"></label>
+					</div>
+					<div>
+						<label>posY: <span id="posY-debug"></span> <input type="range" min="0" max="50" step="0.1" value="0" id="camPosY"></label>
+					</div>
+					<div>
+						<label>posZ: <span id="posZ-debug"></span> <input type="range" min="-50" max="50" step="0.1" value="0" id="camPosZ"></label>
+					</div>
+					<div>
+						<label>lookX: <span id="lookX-debug"></span> <input type="range" min="-10" max="10" step="0.1" value="0" id="camLookX"></label>
+					</div>
+					<div>
+						<label>lookY: <span id="lookY-debug"></span> <input type="range" min="-10" max="10" step="0.1" value="0" id="camLookY"></label>
+					</div>
+					<div>
+						<label>lookZ: <span id="lookZ-debug"></span> <input type="range" min="-10" max="10" step="0.1" value="0" id="camLookZ"></label>
+					</div>
+					<div>
+						<label>fov: <span id="fov-debug"></span> <input type="range" min="10" max="100" step="1" value="0" id="camFOV"></label>
+					</div>
+				</div>
+				<!-- FI Només visible si activem el debug per la càmera -->
+			</div>
+
+
 
 
 
@@ -1089,39 +1093,50 @@ function iniciarTorns() {
     actualitzaTornsPantalla();
 }
 
+
+
 function actualitzaTornsPantalla() {
     const jugadorActiu = llistaJugadors.find(j => j.torn);
     if (!jugadorActiu) return;
-	
-	document.getElementById("finalitzarTornContainer").style.display = "block";
-	
-    document.getElementById("tornActual").style.display = "block";
+
+    document.getElementById("finalitzarTornContainer").style.display = "flex";
+    //document.getElementById("tornActual").style.display = "block";
     document.getElementById("puntsProvisional").style.display = "block";
 
-    document.getElementById("nomJugadorActiu").textContent = jugadorActiu.nom;
+    //document.getElementById("nomJugadorActiu").textContent = jugadorActiu.nom;
     document.getElementById("puntsTornActiu").textContent = puntsTornActual;
+
+    // 🔥 ACTUALITZA avatar i nom centrat
+    const avatarDisplay = document.getElementById("jugadorActiuInfo");
+    const avatarImg = document.getElementById("avatarJugadorActiu");
+    const nomDisplay = document.getElementById("nomJugadorActiuDisplay");
+
+    avatarImg.src = jugadorActiu.avatar || "img/avatar"+jugadorActiu.poder+".png"; // Valor per defecte
+    nomDisplay.textContent = jugadorActiu.nom;
+
+    avatarDisplay.style.display = "block";
 }
-/*
-function actualitzaPuntsTorn() {
-    puntsTornActual = 0;
 
-    for (let { mesh } of daus) {
-        const caraAmunt = obtenirCaraAmunt(mesh);
-        if (caraAmunt === 2) { // Moneda
-            puntsTornActual += 100;
-        }
-        if (caraAmunt === 4) { // Diamant
-            puntsTornActual += 100;
-        }
-    }
 
-    document.getElementById("puntsTornActiu").textContent = puntsTornActual;
-	localStorage.setItem('puntsTornActual', puntsTornActual);
-
+function mostrarModalMissatge(text, callback) {
+  document.getElementById("textModalMissatge").textContent = text;
+  document.getElementById("modalMissatge").style.display = "flex";
+  document.getElementById("modalMissatge").dataset.callback = callback ? "true" : "";
 }
-*/
+
+function tancarModalMissatge() {
+  document.getElementById("modalMissatge").style.display = "none";
+  if (document.getElementById("modalMissatge").dataset.callback === "true") {
+    document.getElementById("modalMissatge").dataset.callback = "";
+  }
+}
+
+
+
+
 
 // Funció per calcular els punts actuals del torn, incloent combinacions especials
+/*
 function actualitzaPuntsTorn() {
     const cares = [];
     let numCalaveres = 0;
@@ -1136,10 +1151,18 @@ function actualitzaPuntsTorn() {
         if (cara === 6) numCalaveres++; // Calavera
     }
 
-    if (numCalaveres >= 3) {
-        alert('☠️ Has tret 3 calaveres! Perds el torn!');
+    if (numCalaveres == 3) {
+        //alert('☠️ Has tret 3 calaveres! Perds el torn!');
+		 mostrarModalMissatge("☠️ Has tret 3 calaveres! Perds el torn!", true);
         puntsTornActual = 0;
         finalitzarTorn();
+        return;
+    }
+	
+	if (numCalaveres > 3) {
+        //alert('☠️ Has tret 3 calaveres! Perds el torn!');
+		mostrarModalMissatge("Has tret 4 calaveres o més! Anem a Illa Calavera!☠️☠️☠️☠️", true);
+        puntsTornActual = 0;
         return;
     }
 
@@ -1190,6 +1213,156 @@ function actualitzaPuntsTorn() {
 
 
 
+*/
+
+
+
+function actualitzaPuntsTorn() {
+    const cares = [];
+    let numCalaveres = 0;
+    puntsTornActual = 0;
+
+    let comptadorMonedes = 0;
+    let comptadorDiamants = 0;
+    let missatgesResum = [];
+
+    for (let { mesh } of daus) {
+        const cara = obtenirCaraAmunt(mesh);
+        if (cara) cares.push(cara);
+
+        if (cara === 2) {
+            puntsTornActual += 100;
+            comptadorMonedes++;
+        }
+        if (cara === 4) {
+            puntsTornActual += 100;
+            comptadorDiamants++;
+        }
+        if (cara === 6) numCalaveres++; // Calavera
+    }
+
+    if (comptadorMonedes > 0) {
+        const missatge = `🪙 ${comptadorMonedes * 100} punts per monedes d'or (${comptadorMonedes})`;
+        console.log(missatge);
+        missatgesResum.push(missatge);
+    }
+    if (comptadorDiamants > 0) {
+        const missatge = `💎 ${comptadorDiamants * 100} punts per diamants (${comptadorDiamants})`;
+        console.log(missatge);
+        missatgesResum.push(missatge);
+    }
+
+    if (numCalaveres == 3) {
+        mostrarModalMissatge("☠️ Has tret 3 calaveres! Perds el torn!", true);
+        puntsTornActual = 0;
+        finalitzarTorn();
+        document.getElementById("resumPuntsTornActiu").textContent = "";
+        return;
+    }
+
+    if (numCalaveres > 3) {
+        mostrarModalMissatge("Has tret 4 calaveres o més! Anem a Illa Calavera!☠️☠️☠️☠️", true);
+        puntsTornActual = 0;
+        document.getElementById("resumPuntsTornActiu").textContent = "☠️☠️☠️☠️ Illa Calavera!";
+        return;
+    }
+
+    const comptador = {};
+    for (let cara of cares) {
+        if (cara === 6) continue;
+        comptador[cara] = (comptador[cara] || 0) + 1;
+    }
+
+    let bonusCombinacio = 0;
+    let dausUtilitzats = new Set();
+
+    for (let cara in comptador) {
+        const num = comptador[cara];
+        if (num >= 3) {
+            let punts = 0;
+            if (num === 3) punts = 100;
+            if (num === 4) punts = 200;
+            if (num === 5) punts = 500;
+            if (num === 6) punts = 1000;
+            if (num === 7) punts = 2000;
+            if (num === 8) punts = 4000;
+
+            bonusCombinacio += punts;
+            const nom = nomCara(cara);
+            const missatge = `🎲 ${punts} punts per cares iguals (${num}) (${nom})`;
+            console.log(missatge);
+            missatgesResum.push(missatge);
+
+            for (let i = 0, comptats = 0; i < cares.length && comptats < num; i++) {
+                if (cares[i] == cara) {
+                    dausUtilitzats.add(i);
+                    comptats++;
+                }
+            }
+        }
+    }
+
+    for (let i = 0; i < cares.length; i++) {
+        if (cares[i] === 2 || cares[i] === 4) {
+            dausUtilitzats.add(i);
+        }
+    }
+
+    if (dausUtilitzats.size === cares.length) {
+        bonusCombinacio += 500;
+        const missatge = '💎 Tresor perfecte! Bonus extra de +500 punts';
+        console.log(missatge);
+        missatgesResum.push(missatge);
+    }
+
+    puntsTornActual += bonusCombinacio;
+    document.getElementById("puntsTornActiu").textContent = puntsTornActual;
+    localStorage.setItem('puntsTornActual', puntsTornActual);
+
+    // Mostrem el resum al span
+    document.getElementById("resumPuntsTornActiu").innerHTML = missatgesResum.join('<br>');
+}
+
+
+
+
+
+function nomCara(cara) {
+    switch (Number(cara)) {
+        case 1: return "Lloro";
+        case 2: return "Moneda";
+        case 3: return "Mico";
+        case 4: return "Diamant";
+        case 5: return "Vaixell";
+        case 6: return "Calavera";
+        default: return "Desconeguda";
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1214,7 +1387,9 @@ function finalitzarTorn() {
 		numTirada = 0;
   localStorage.setItem('numTirada', numTirada);
   updateFinalitzarTornButton();
-  updateNumTiradaDisplay();
+  //updateNumTiradaDisplay();
+  
+   document.getElementById("resumPuntsTornActiu").textContent = "";
 		
     actualitzaPuntuacions();
 	desbloquejarTotsElsDaus();
@@ -1226,15 +1401,16 @@ function updateFinalitzarTornButton() {
   if (numTirada === 0) {
     botoFinalitzar.style.display = 'none';
   } else {
-    botoFinalitzar.style.display = 'block';
+    botoFinalitzar.style.display = 'flex';
   }
 }
 
+/*
 function updateNumTiradaDisplay() {
   const marcadorTirada = document.getElementById('numTiradaDisplay');
   marcadorTirada.textContent = `Tirada nº ${numTirada}`;
 }
-
+*/
 
 
 function desbloquejarTotsElsDaus() {
@@ -1282,15 +1458,6 @@ function desbloquejarTotsElsDaus() {
 			//setupCameraSliders();
 			
 			// Definim les imatges de les cares dels daus
-			/*
-			const caresDau = [
-				'img/dau1.png', // dreta (+X) → Lloro
-				'img/dau2.png', // esquerra (-X) → Moneda
-				'img/dau3.png', // dalt (+Y) → Mico
-				'img/dau4.png', // baix (-Y) → Diamant
-				'img/dau5.png', // davant (+Z) → Vaixell
-				'img/dau6.png'  // darrere (-Z) → Calavera
-			];*/
 			
 			const caresDauSprite = 'img/dauCompletCompressed.png';
 			const caresDauMaterial = []; // Aquí guardem els materials creats des del sprite
@@ -1319,41 +1486,7 @@ function desbloquejarTotsElsDaus() {
 	});
 }
 			
-			
-			/*
-			function preCarregaTextures(callback) {
-				const loader = new THREE.TextureLoader();
-				let texturesCarregades = 0;
 
-				for (let i = 0; i < caresDau.length; i++) {
-					loader.load(caresDau[i], function (texture) {
-						caresDauMaterial[i] = texture;
-						texturesCarregades++;
-						if (texturesCarregades === caresDau.length) {
-							console.log("✅ Totes les textures carregades correctament.");
-							callback();
-						}
-					}, undefined, function (err) {
-						console.error("❌ Error carregant textura:", caresDau[i]);
-					});
-				}
-			}
-*/
-
-
-
-
-
-			/*
-			const caresDau = [
-				'img/1.png',
-				'img/2.png',
-				'img/3.png',
-				'img/4.png',
-				'img/5.png',
-				'img/6.png'
-			];
-			*/
 			// Constants que ens defineixen el poder tocar els daus amb el ratolí
 			const raycaster = new THREE.Raycaster();
 			const mouse = new THREE.Vector2();
@@ -1425,12 +1558,6 @@ function desbloquejarTotsElsDaus() {
 				const z = fila * 2.5 - 1.25;
 
 				const geometria = new THREE.BoxGeometry(1.5, 1.5, 1.5);
-				/*
-				const loader = new THREE.TextureLoader();
-				const materials = caresDau.map(src => new THREE.MeshPhongMaterial({ map: loader.load(src), shininess: 80 }));
-				*/
-				//const materials = caresDauMaterial.map(texture => new THREE.MeshPhongMaterial({ map: texture, shininess: 80 }));
-				//const materials = caresDauMaterial; // Ja són MeshPhongMaterial!
 				const materials = caresDauMaterial.map(mat => mat.clone());
 
 
@@ -1493,44 +1620,19 @@ function desbloquejarTotsElsDaus() {
 				actualitzaPuntuacions();
 
 			}
-/*
-			function tirarDaus() {
-				for (let { body } of daus) {
-					const minVerticalForce = 8;
-					const verticalForce = Math.random() * 6 + minVerticalForce;
 
-					body.velocity.set(
-						(Math.random() * 8 - 4) * 1.5,
-						verticalForce,
-						(Math.random() * 8 - 4) * 1.5
-					);
-
-					const minRotation = 200;
-					let rotationX = (Math.random() * 200 - 100) + minRotation;
-					let rotationY = (Math.random() * 200 - 100) + minRotation;
-					let rotationZ = (Math.random() * 200 - 100) + minRotation;
-
-					if (Math.abs(rotationX) < minRotation * 1.5) rotationX *= 1.5;
-					if (Math.abs(rotationY) < minRotation * 1.5) rotationY *= 1.5;
-					if (Math.abs(rotationZ) < minRotation * 1.5) rotationZ *= 1.5;
-
-					const maxRotation = Math.max(rotationX, rotationY, rotationZ);
-					rotationX = (rotationX / maxRotation) * minRotation;
-					rotationY = (rotationY / maxRotation) * minRotation;
-					rotationZ = (rotationZ / maxRotation) * minRotation;
-
-					body.angularVelocity.set(rotationX, rotationY, rotationZ);
-				}
-			}
-			*/
 			
 			function tirarDaus() {
+			 if (tiradaEnProgres) {
+        console.log("⏳ Tirada en curs. Espera que acabi abans de tornar a tirar.");
+        return;
+    }
     tiradaEnProgres = true;
     numTirada++;
     console.log(`➤ Llançant tirada ${numTirada}...`);
 	  localStorage.setItem('numTirada', numTirada);
 	  updateFinalitzarTornButton();
-  updateNumTiradaDisplay();
+  //updateNumTiradaDisplay();
 
     for (let { body, bloquejatCalavera } of daus) {
         if (body.type !== CANNON.Body.STATIC && !bloquejatCalavera) {
@@ -1562,28 +1664,7 @@ function desbloquejarTotsElsDaus() {
     }
 }
 
-			
-			/*
-			function onMouseClick(event) {
-				// Convertim coordenades del clic al sistema de Three.js
-				const rect = renderer.domElement.getBoundingClientRect();
-				mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-				mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-
-				raycaster.setFromCamera(mouse, camera);
-
-				// Recollim tots els "mesh" dels daus
-				const meshes = daus.map(dau => dau.mesh);
-
-				// Mirem si algun objecte ha estat clicat
-				const interseccions = raycaster.intersectObjects(meshes);
-
-				if (interseccions.length > 0) {
-					const dauTocat = interseccions[0].object;
-					const index = daus.findIndex(d => d.mesh === dauTocat);
-					alert(`Has aturat el dau número ${index + 1}`);
-				}
-			}*/
+		
 			
 function onMouseClick(event) {
 	if (numTirada === 0) {
@@ -1681,176 +1762,6 @@ function carregarEstatDaus() {
 }
 
 
-
-
-/*
-function comprovaCaresDaus() {
-    for (let i = 0; i < daus.length; i++) {
-        const { mesh, body } = daus[i];
-
-        // Només si el dau està gairebé aturat
-        if (body.velocity.lengthSquared() < 0.01 && body.angularVelocity.lengthSquared() < 0.01) {
-            const caraAmunt = obtenirCaraAmunt(mesh);
-            if (caraAmunt !== null) {
-                if (!daus[i].jaDetectat) { // només un cop
-                    console.log(`🎲 Dau ${i+1} mostra la cara: ${caraAmunt}`);
-
-                    if (caraAmunt === 1) { // Exemple: el dau 1 serà la calavera
-                        console.log(`☠️ Dau ${i+1} mostra una calavera! BLOQUEJAT!`);
-
-                        // Blocarem el dau per sempre
-                        body.velocity.set(0,0,0);
-                        body.angularVelocity.set(0,0,0);
-                        body.mass = 0;
-                        body.type = CANNON.Body.STATIC;
-                        body.updateMassProperties();
-                        mesh.material.forEach(m => {
-                            m.opacity = 0.5;
-                            m.transparent = true;
-                        });
-
-                        daus[i].bloquejatCalavera = true;
-                    }
-
-                    daus[i].jaDetectat = true; // marquem que ja hem detectat aquesta parada
-                }
-            }
-        } else {
-            daus[i].jaDetectat = false; // si el dau es mou de nou, reseteja detecció
-        }
-    }
-}*/
-/*
-function comprovaCaresDaus() {
-    let caresActuals = [];
-
-    let totsAturats = daus.every(({ body }) => 
-        body.velocity.lengthSquared() < 0.01 && body.angularVelocity.lengthSquared() < 0.01
-    );
-
-    if (totsAturats && tiradaEnProgres) {
-        console.log('--------------------------');
-        console.log(`Tirada ${numTirada}:`);
-
-        for (let i = 0; i < daus.length; i++) {
-            const { mesh, body } = daus[i];
-            const caraAmunt = obtenirCaraAmunt(mesh);
-
-            caresActuals.push(caraAmunt);
-
-            if (caraAmunt !== null) {
-                console.log(`Dau ${i + 1}: Cara ${caraAmunt}`);
-
-                if (caraAmunt === 1 && !daus[i].bloquejatCalavera) { // Assumint que 1 = calavera
-                    console.log(`☠️ Dau ${i+1} mostra una calavera! BLOQUEJAT!`);
-
-                    body.velocity.set(0,0,0);
-                    body.angularVelocity.set(0,0,0);
-                    body.mass = 0;
-                    body.type = CANNON.Body.STATIC;
-                    body.updateMassProperties();
-                    daus[i].bloquejatCalavera = true;
-
-                    daus[i].mesh.material.forEach(m => {
-                        m.opacity = 0.5;
-                        m.transparent = true;
-                    });
-                }
-            }
-        }
-
-        console.log('--------------------------');
-        tiradaEnProgres = false;
-    }
-}
-*/
-/*
-function comprovaCaresDaus() {
-    let caresActuals = [];
-
-    let totsAturats = daus.every(({ body }) => 
-        body.velocity.lengthSquared() < 0.01 && body.angularVelocity.lengthSquared() < 0.01
-    );
-
-    if (totsAturats && tiradaEnProgres) {
-        console.log('--------------------------');
-        console.log(`Tirada ${numTirada}:`);
-
-        for (let i = 0; i < daus.length; i++) {
-            const { mesh, body } = daus[i];
-            const caraAmunt = obtenirCaraAmunt(mesh);
-
-            caresActuals.push(caraAmunt);
-
-            if (caraAmunt !== null) {
-                // Traduïm el número de cara a text per entendre millor
-                const textosCares = ["Lloro", "Moneda", "Mico", "Diamant", "Vaixell", "Calavera"];
-                const textCara = textosCares[caraAmunt - 1];
-                console.log(`Dau ${i + 1}: Cara ${caraAmunt} (${textCara})`);
-
-                // ⚡ ATENCIÓ: la calavera ara és la cara 6!
-                if (caraAmunt === 6 && !daus[i].bloquejatCalavera) {
-                    console.log(`☠️ Dau ${i+1} mostra una calavera! BLOQUEJAT!`);
-
-                    body.velocity.set(0,0,0);
-                    body.angularVelocity.set(0,0,0);
-                    body.mass = 0;
-                    body.type = CANNON.Body.STATIC;
-                    body.updateMassProperties();
-                    daus[i].bloquejatCalavera = true;
-
-                    daus[i].mesh.material.forEach(m => {
-                        m.opacity = 0.5;
-                        m.transparent = true;
-                    });
-                }
-            }
-        }
-
-        console.log('--------------------------');
-        tiradaEnProgres = false;
-    }
-}
-*/
-/*
-function comprovaCaresDaus() {
-    let caresActuals = [];
-
-    let totsAturats = daus.every(({ body }) => 
-        body.velocity.lengthSquared() < 0.01 && body.angularVelocity.lengthSquared() < 0.01
-    );
-
-    if (totsAturats && tiradaEnProgres) {
-        console.log('--------------------------');
-        console.log(`Tirada ${numTirada}:`);
-
-        for (let i = 0; i < daus.length; i++) {
-            const { mesh, body } = daus[i];
-            const caraAmunt = obtenirCaraAmunt(mesh);
-
-            caresActuals.push(caraAmunt);
-
-            if (caraAmunt !== null) {
-                console.log(`🎲 Dau ${i + 1}: Cara ${caraAmunt}`);
-
-                // 🔥 DEBUG EXTRA: veiem quina cara física representa
-                const mappingDebug = {
-                    1: "Dreta (+X)",
-                    2: "Esquerra (-X)",
-                    3: "Dalt (+Y)",
-                    4: "Baix (-Y)",
-                    5: "Davant (+Z)",
-                    6: "Darrera (-Z)"
-                };
-                console.log(`➡️  El dau ${i + 1} té a dalt: ${mappingDebug[caraAmunt]}`);
-            }
-        }
-
-        console.log('--------------------------');
-        tiradaEnProgres = false;
-    }
-}
-*/
 
 function comprovaCaresDaus() {
     let caresActuals = [];
@@ -2014,7 +1925,7 @@ function obtenirCaraAmunt(mesh) {
 				'img/avatar4.png', 
 				'img/avatar5.png', 
 				'img/avatar6.png',
-				'img/vaixell-joc.png'
+				'img/vaixell-jocv2.png'
 
 				// AUDIO
 				//'audio/melodiaPrincipal-corda.mp3',
@@ -2154,7 +2065,6 @@ document.addEventListener("DOMContentLoaded", function () {
 		numTirada = 0;
 	}
 	
-	
 	const puntsTornActualGuardat = localStorage.getItem('puntsTornActual');
 if (puntsTornActualGuardat !== null) {
   puntsTornActual = parseInt(puntsTornActualGuardat, 10);
@@ -2162,24 +2072,13 @@ if (puntsTornActualGuardat !== null) {
   puntsTornActual = 0;
 }
 
-	
-	
-	
 	updateFinalitzarTornButton();
-      updateNumTiradaDisplay();
+     // updateNumTiradaDisplay();
 
   // Si la partida ja estava començada, canviem el botó principal
   
   if (partidaIniciada) {
-    /*
-	const botoIniciar = document.getElementById("botoIniciar");
-    if (botoIniciar) {
-      botoIniciar.innerText = "Continuar partida";
-      botoIniciar.onclick = function () {
-        carregaEscena("escena-joc");
-      };
-    }
-	*/
+
 	const botoIniciarPantallaInici = document.getElementById("escena-pantallaInici-botoIniciarPartida");
 if (botoIniciarPantallaInici) {
   if (partidaIniciada) {
@@ -2258,7 +2157,7 @@ function reiniciaPartida() {
   
     // 4. Amagar parts visuals de partida
   document.getElementById("finalitzarTornContainer").style.display = "none";
-  document.getElementById("tornActual").style.display = "none";
+  //document.getElementById("tornActual").style.display = "none";
   document.getElementById("puntsProvisional").style.display = "none";
   document.getElementById("puntuacionsJugadorsMid").innerHTML = "";
   
