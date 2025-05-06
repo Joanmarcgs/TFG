@@ -24,10 +24,10 @@
 		<script src="lib/cannon.min.js"></script>
 		
 		<!-- Entire game logic -->
-		<script src="main.js?v12" defer></script>
+		<script src="main.js?v31" defer></script>
 		
 		<!-- Stylesheet -->
-		<link rel="stylesheet" href="style.css?v12" defer>
+		<link rel="stylesheet" href="style.css?v25" defer>
 		
 		<!--
 		<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -306,95 +306,91 @@
 				</div>
 				
 				
-							<!-- 1. Afegeix això al teu HTML (fora de qualsevol escena): -->
-			<div id="teclatPersonalitzat" class="teclat teclatOcult">
-			  <div class="fila">
-			  <button onclick="tancarTeclat()">ESC</button>
-				<button onclick="teclaVirtual('1')">1</button>
-				<button onclick="teclaVirtual('2')">2</button>
-				<button onclick="teclaVirtual('3')">3</button>
-				<button onclick="teclaVirtual('4')">4</button>
-				<button onclick="teclaVirtual('5')">5</button>
-				<button onclick="teclaVirtual('6')">6</button>
-				<button onclick="teclaVirtual('7')">7</button>
-				<button onclick="teclaVirtual('8')">8</button>
-				<button onclick="teclaVirtual('9')">9</button>
-				<button onclick="teclaVirtual('0')">0</button>
-				<button onclick="teclaVirtual('!')">!</button>
-				<button onclick="teclaVirtual('?')">?</button>
-				<button onclick="borrarTecla()">⌫</button>
-			  </div>
-			  <div class="fila">
-				<button onclick="teclaVirtual('Q')">Q</button>
-				<button onclick="teclaVirtual('W')">W</button>
-				<button onclick="teclaVirtual('E')">E</button>
-				<button onclick="teclaVirtual('R')">R</button>
-				<button onclick="teclaVirtual('T')">T</button>
-				<button onclick="teclaVirtual('Y')">Y</button>
-				<button onclick="teclaVirtual('U')">U</button>
-				<button onclick="teclaVirtual('I')">I</button>
-				<button onclick="teclaVirtual('O')">O</button>
-				<button onclick="teclaVirtual('P')">P</button>
-				<button onclick="teclaVirtual('Ç')">Ç</button>
-			  </div>
-			  <div class="fila">
-				<button onclick="teclaVirtual('A')">A</button>
-				<button onclick="teclaVirtual('S')">S</button>
-				<button onclick="teclaVirtual('D')">D</button>
-				<button onclick="teclaVirtual('F')">F</button>
-				<button onclick="teclaVirtual('G')">G</button>
-				<button onclick="teclaVirtual('H')">H</button>
-				<button onclick="teclaVirtual('J')">J</button>
-				<button onclick="teclaVirtual('K')">K</button>
-				<button onclick="teclaVirtual('L')">L</button>
-				<button onclick="teclaVirtual('Ñ')">Ñ</button>
-				<button onclick="tancarTeclat()">OK</button>
-			  </div>
-			  <div class="fila">
-				<button onclick="teclaVirtual('$')">$</button>
-				<button onclick="teclaVirtual('Z')">Z</button>
-				<button onclick="teclaVirtual('X')">X</button>
-				<button onclick="teclaVirtual('C')">C</button>
-				<button onclick="teclaVirtual('V')">V</button>
-				<button onclick="teclaVirtual('B')">B</button>
-				<button onclick="teclaVirtual('N')">N</button>
-				<button onclick="teclaVirtual('M')">M</button>
-				<button onclick="teclaVirtual('.')">.</button>
-				<button onclick="teclaVirtual('-')">-</button>
-			  </div>
-			   <div class="fila">
-				<button onclick="teclaVirtual(' ')" style="flex:2;">Espai</button>
-			  </div>
-			</div>
+				<!-- Teclat en pantalla (Per evitar fer servir els natius dels dispositius mòbils) -->
+				<div id="teclatPersonalitzat" class="teclat teclatOcult">
+					<div class="fila">
+						<button onclick="tancarTeclat()">ESC</button>
+						<button onclick="teclaVirtual('1')">1</button>
+						<button onclick="teclaVirtual('2')">2</button>
+						<button onclick="teclaVirtual('3')">3</button>
+						<button onclick="teclaVirtual('4')">4</button>
+						<button onclick="teclaVirtual('5')">5</button>
+						<button onclick="teclaVirtual('6')">6</button>
+						<button onclick="teclaVirtual('7')">7</button>
+						<button onclick="teclaVirtual('8')">8</button>
+						<button onclick="teclaVirtual('9')">9</button>
+						<button onclick="teclaVirtual('0')">0</button>
+						<button onclick="teclaVirtual('!')">!</button>
+						<button onclick="teclaVirtual('?')">?</button>
+						<button onclick="borrarTecla()">⌫</button>
+					</div>
+					<div class="fila">
+						<button onclick="teclaVirtual('Q')">Q</button>
+						<button onclick="teclaVirtual('W')">W</button>
+						<button onclick="teclaVirtual('E')">E</button>
+						<button onclick="teclaVirtual('R')">R</button>
+						<button onclick="teclaVirtual('T')">T</button>
+						<button onclick="teclaVirtual('Y')">Y</button>
+						<button onclick="teclaVirtual('U')">U</button>
+						<button onclick="teclaVirtual('I')">I</button>
+						<button onclick="teclaVirtual('O')">O</button>
+						<button onclick="teclaVirtual('P')">P</button>
+						<button onclick="teclaVirtual('Ç')">Ç</button>
+					</div>
+					<div class="fila">
+						<button onclick="teclaVirtual('A')">A</button>
+						<button onclick="teclaVirtual('S')">S</button>
+						<button onclick="teclaVirtual('D')">D</button>
+						<button onclick="teclaVirtual('F')">F</button>
+						<button onclick="teclaVirtual('G')">G</button>
+						<button onclick="teclaVirtual('H')">H</button>
+						<button onclick="teclaVirtual('J')">J</button>
+						<button onclick="teclaVirtual('K')">K</button>
+						<button onclick="teclaVirtual('L')">L</button>
+						<button onclick="teclaVirtual('Ñ')">Ñ</button>
+						<button onclick="tancarTeclat()">OK</button>
+					</div>
+					<div class="fila">
+						<button onclick="teclaVirtual('$')">$</button>
+						<button onclick="teclaVirtual('Z')">Z</button>
+						<button onclick="teclaVirtual('X')">X</button>
+						<button onclick="teclaVirtual('C')">C</button>
+						<button onclick="teclaVirtual('V')">V</button>
+						<button onclick="teclaVirtual('B')">B</button>
+						<button onclick="teclaVirtual('N')">N</button>
+						<button onclick="teclaVirtual('M')">M</button>
+						<button onclick="teclaVirtual('.')">.</button>
+						<button onclick="teclaVirtual('-')">-</button>
+					</div>
+					<div class="fila">
+						<button onclick="teclaVirtual(' ')" style="flex:2;">Espai</button>
+					</div>
+				</div>
+				<!-- FI Teclat en pantalla -->
 				
 			</div>
 			<!-- FI ESCENA Pantalla de selecció de jugadors -->
-
+			
+			<!-- ESCENA Pantalla del joc -->
 			<div id="escena-joc" class="escena" style="position: relative; overflow: hidden;">
 			
+				<!-- Botons en format imatge -->
 				<img src="img/music_on-SFX_off.png" id="musicButton">
 				<img src="img/mostraInstruccionsMico.png" class="mostraInstruccionsMico" onclick="carregaEscena('escena-instruccions')" style="position:absolute;right:0px; width:300px;top:10px;">
 				<img src="img/spyglassButton.png?v=2" id="fullscreenButton" onclick="pantallaCompleta()">
 				<img src="img/pirateflagButton.png?v=2" class="pirateflagButton" onclick="toggleAjudaPunts()">
-			
+				
+				<!-- Contenidor que fan servir les llibreries de javascript que ens generen els daus en 3d -->
 				<div id="contenidorDaus"></div>
 				
+				<!-- Botó tipus pergamí -->
 				<div class="pergamiBoto pergamiBotoEsquerraAbaix">
 					<div class="pergamiBotoEsq"></div>
 					<div class="pergamiBotoMid" onclick="carregaEscena('escena-pantallaInici')">Enrere</div>
 					<div class="pergamiBotoDret"></div>
 				</div>
-				<!--
-				<div class="pergamiBoto pergamiBotoDretaAdalt" onclick="pantallaCompleta()">
-					<div class="pergamiBotoEsq"></div>
-					<div class="pergamiBotoMid" style="padding:0px;"><i class="material-icons" style="font-size:30px;">fullscreen</i></div>
-					<div class="pergamiBotoDret"></div>
-				</div>
-				-->
-				<!-- <button class="botoAudio" onclick="toggleAudio()"><i class="material-icons">volume_up</i></button> -->
 				
-				
-				
+				<!-- Conjunt de divs que mostren un pergamí en vertical, s'adapta a qualsevol mida de contingut fent el pergamí més llarg -->
 				<div id="puntuacionsJugadors" >
 					<div class="puntuacionsJugadorsTop"></div>
 					<div id="puntuacionsJugadorsMid" class="puntuacionsJugadorsMid">
@@ -403,76 +399,59 @@
 					<div class="puntuacionsJugadorsBot"></div>
 				</div>
 				
+				<!-- Div que fem servir com a modal per mostrar missatges en pantalla durant la partida -->
 				<div id="modalMissatge">
-				  <!--<div style="background:#fff3d6; color:#3b2e1f; padding:60px; border-radius:30px; font-family:'PiecesOfEight'; font-size:32px; max-width:800px; text-align:center; box-shadow:0 0 30px rgba(0,0,0,0.7);">
-					-->
 					<div class="pergami" style="text-align:center;">
-					<div id="textModalMissatge">Missatge aquí</div> <br>
+						<div id="textModalMissatge">Missatge aquí</div> <br>
 					
-					<!--<button onclick="tancarModalMissatge()" style="padding: 20px 40px; font-size: 28px; background: #3b2e1f; color: #fff3d6; border: none; border-radius: 10px; cursor: pointer;">D'acord</button>
-					-->
-				  <!-- Botó tipus pergamí -->
+						<!-- Botó tipus pergamí -->
 						<div class="pergamiBoto pergamiBotoCentreAbaixFixed" onclick="tancarModalMissatge()">
 							<div class="pergamiBotoEsq"></div>
 							<div class="pergamiBotoMid">Tancar</div>
 							<div class="pergamiBotoDret"></div>
 						</div>
-				  </div>
-				</div>
-
-
-				
-				<div id="finalitzarTornContainer" class="pergamiBoto pergamiBotoDretaAbaix" >
-						<div class="pergamiBotoEsq"></div>
-						<div class="pergamiBotoMid" id="botoFinalitzarTorn" onclick="finalitzarTorn()"> Finalitzar Torn</div>
-						<div class="pergamiBotoDret"></div>
 					</div>
-					
-
-					<div class="pergamiBoto dauTirades"><img src="img/dauTiradesBlanc.png" style="width:200px;" onclick="tirarDaus()"></div>
-				
-<!--
-				<div id="tornActual" style="position:absolute; top:20px; left:50%; transform:translateX(-50%); font-size:40px; font-weight:bold; color:white; text-shadow:2px 2px 5px black; display:none;">
-					Torn de: <span id="nomJugadorActiu"></span>
 				</div>
--->
+				<!-- FI Div que fem servir com a modal per mostrar missatges en pantalla durant la partida -->
+				
+				<!-- Botó tipus pergamí -->
+				<div id="finalitzarTornContainer" class="pergamiBoto pergamiBotoDretaAbaix" >
+					<div class="pergamiBotoEsq"></div>
+					<div class="pergamiBotoMid" id="botoFinalitzarTorn" onclick="finalitzarTorn()"> Finalitzar Torn</div>
+					<div class="pergamiBotoDret"></div>
+				</div>
+				
+				<!-- Imatge que fem servir de botó per tirar els daus -->
+				<img class="dauTirades" src="img/dauTiradesBlanc.png" onclick="tirarDaus()">
+				
+				<!-- Div que fem servir per mostrar en pantalla els punts que podria fer l'usuari si acaba el torn en aquest moment -->
 				<div id="puntsProvisional" >
 					 <span id="puntsTornActiu">0</span> punts<br>
-					 
 				</div>
-				<span id="resumPuntsTornActiu">Has descobert la "xuleta" dels punts 😉</span>
-				<!--<div id="numTiradaDisplay"></div>-->
 				
+				<!--Text que mostrem en pantalla si l'usuari fa clic a la bandera pirata. Ens explica els punts que estem aconseguint -->
+				<span id="resumPuntsTornActiu">Has descobert la "xuleta" dels punts 😉</span>
+
+				<!-- Div que engloba elements que mostrem en pantalla per donar info de quin jugador està actiu en aquest moment -->
 				<div id="jugadorActiuInfo" style="position: absolute; bottom: 0px; left: 50%; transform: translateX(-50%); text-align: center; display: none; z-index: 10;">
 					
+					<!-- Imatge que mostra l'avatar del jugador que està jugant en aquest moment -->
 					<img id="avatarJugadorActiu" src="" style="height: 350px; display: block;  bottom:0px;">
 					
+					<!-- Botó tipus pergamí. Ens diu el nom del jugador que està jugant en aquest moment -->
 					<div class="pergamiBoto pergamiBotoNomJugador">
 						<div class="pergamiBotoEsq"></div>
-						<div class="pergamiBotoMid" id="nomJugadorActiuDisplay" style="width:100%;"></div>
+						<div class="pergamiBotoMid" id="nomJugadorActiuDisplay"></div>
 						<div class="pergamiBotoDret"></div>
 					</div>
-					
-					
-					
-					
 				</div>
 				
-				
-				
-				
+				<!-- Div que mostra la carta modificadora en joc actualment -->
 				<div id="cartaEnJoc" class="pergamiBoto">
-				  <!--
-				  Carta: <span id="cartaNom"></span><br>
-				  <small id="cartaDesc"></small>
-				  -->
 				  <img id="cartesImgSrc" src="img/cartesPlantilla.png" style="width:200px;">
 				</div>
-
-
-
 				
-				<!-- Només visible si activem el debug per la càmera -->
+				<!-- Div que només visible si activem el debug per la càmera. Per activar-ho anem al javascript i descomentem la crida a la funció setupCameraSliders(); -->
 				<div id="cameraControls">
 					<div>
 						<label>posX: <span id="posX-debug"></span> <input type="range" min="-50" max="50" step="0.1" value="0" id="camPosX"></label>
@@ -497,20 +476,8 @@
 					</div>
 				</div>
 				<!-- FI Només visible si activem el debug per la càmera -->
-			
-			
-			
 			</div>
+			<!-- FI ESCENA Pantalla del joc -->
 		</div>
-		
-
-		<script>
-
-
-
-
-</script>
-
-
 	</body>
 </html>

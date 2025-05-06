@@ -1,4 +1,4 @@
-const CACHE_NAME = 'illa-calavera-v2';
+const CACHE_NAME = 'illa-calavera-v3';
 const ASSETS = [
   'index.html',
   'style.css',

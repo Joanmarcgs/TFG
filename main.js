@@ -27,6 +27,15 @@
 		'img/avatar4.png', 
 		'img/avatar5.png', 
 		'img/avatar6.png',
+		'img/cartesAnimals.png',
+		'img/cartesCalavera1.png',
+		'img/cartesCalavera2.png',
+		'img/cartesDiamant.png',
+		'img/cartesMoneda.png',
+		'img/cartesPirata.png',
+		'img/cartesTresor.png',
+		'img/cartesVaixell2.png',
+		'img/cartesVaixell4.png',
 		'img/fullscreenButton.png',
 		'img/pirateflagButton.png',
 		'img/music_on-SFX_off.png',
@@ -55,15 +64,15 @@
 
 	// Llista de cartes modificadores de torn
 	const cartes = [
-	  { id: 'Boti',          img: 'img/cartesTresor.png',        desc: 'Perdre torn per 3 calaveres et permet mantenir els punts', },
-	  { id: 'Pirata',        img: 'img/cartesPirata.png',        desc: 'Duplica la puntuació final del torn',       },
-	  { id: 'Calavera1',     img: 'img/cartesCalavera1.png',        desc: 'Activa una calavera al tauler',        },
-	  { id: 'Calavera2',     img: 'img/cartesCalavera2.png',        desc: 'Activa dues calaveres al tauler',     },
-	  { id: 'Vaixell2',      img: 'img/cartesVaixell2.png',        desc: 'Has de finalitzar el torn amb 2 vaixells o més per guanyar 500 punts. Si no, en perds 500', },
-	  { id: 'Vaixell4',      img: 'img/cartesVaixell4.png',        desc: 'Has de finalitzar el torn amb 4 vaixells o més per guanyar 1000 punts. Si no, en perds 1000',},
-	  { id: 'Diamant',       img: 'img/cartesDiamant.png',        desc: 'Activa un diamant al tauler',                  },
-	  { id: 'Or',            img: 'img/cartesMoneda.png',        desc: 'Activa una moneda al tauler',                       },
-	  { id: 'Animals',       img: 'img/cartesAnimals.png',        desc: 'Micos i lloros compten com un mateix símbol',},
+	  { id: 'Boti',          img: 'img/cartesTresor.png',      nom: 'Carta: Botí Pirata',          desc: 'Perdre torn per 3 calaveres et permet mantenir els punts', },
+	  { id: 'Pirata',        img: 'img/cartesPirata.png',      nom: 'Carta: Pirata de la Sort',    desc: 'Duplica la puntuació final del torn',       },
+	  { id: 'Calavera1',     img: 'img/cartesCalavera1.png',   nom: 'Carta: Calavera',             desc: 'Activa una calavera al tauler',        },
+	  { id: 'Calavera2',     img: 'img/cartesCalavera2.png',   nom: 'Carta: Calaveres',            desc: 'Activa dues calaveres al tauler',     },
+	  { id: 'Vaixell2',      img: 'img/cartesVaixell2.png',    nom: 'Carta: Emboscada x2',         desc: 'Has de finalitzar el torn amb 2 vaixells o més per guanyar 500 punts. Si no, en perds 500', },
+	  { id: 'Vaixell4',      img: 'img/cartesVaixell4.png',    nom: 'Carta: Emboscada x4',         desc: 'Has de finalitzar el torn amb 4 vaixells o més per guanyar 1000 punts. Si no, en perds 1000',},
+	  { id: 'Diamant',       img: 'img/cartesDiamant.png',     nom: 'Carta: Diamant',              desc: 'Activa un diamant al tauler',                  },
+	  { id: 'Or',            img: 'img/cartesMoneda.png',      nom: 'Carta: Moneda',               desc: 'Activa una moneda al tauler',                       },
+	  { id: 'Animals',       img: 'img/cartesAnimals.png',     nom: 'Carta: Harmonia Animal',      desc: 'Micos i lloros compten com un mateix símbol de cara a fer combos',},
 	];
 // FI FUNCIONS I DECLARACIONS globals
 
@@ -229,8 +238,10 @@ function iniciarTorns() {
 function actualitzaTornsPantalla() {
     const jugadorActiu = llistaJugadors.find(j => j.torn);
     if (!jugadorActiu) return;
-
-    document.getElementById("finalitzarTornContainer").style.display = "flex";
+	
+	document.getElementById("finalitzarTornContainer").style.display = "flex";
+	
+    
     //document.getElementById("tornActual").style.display = "block";
     document.getElementById("puntsProvisional").style.display = "block";
 
@@ -822,11 +833,13 @@ Guanyes ${skulls * 100} punts, rivals -${penal} punts.`,
 
 
   // ← Aquí comprovem si ha arribat a 10000 punts
-  if (jugadorActiu.punts >= 10000) {
+  if (jugadorActiu.punts >= 2000) {
     mostrarModalMissatge(`🎉 Enhorabona ${jugadorActiu.nom}! Has arribat a 10000 punts i guanyes la partida!`, false);
     // Opcional: amagar controls per no seguir tirant
-    document.getElementById("dauTiradesContainer")?.remove();
-    document.getElementById("finalitzarTornContainer")?.remove();
+    //document.getElementById("dauTiradesContainer")?.remove();
+    //document.getElementById("finalitzarTornContainer")?.remove();
+	//document.getElementById("finalitzarTornContainer").style.display = 'none';
+	document.getElementById("finalitzarTornContainer").style.display = 'none';
     return;  // sortim de la funció per no passar torn
   }
 
@@ -1359,7 +1372,9 @@ function obtenirCaraAmunt(mesh) {
 			  const img = document.getElementById('cartesImgSrc');
 			  img.src = carta.img;
 			  // Assignem un callback, no cridem la funció ara mateix:
-			  img.onclick = () => mostrarModalMissatge(carta.desc, false);
+			  missatge = carta.desc;
+			  img.onclick = () => mostrarModalMissatge(missatge, false);
+			  //img.onclick = () => mostrarModalMissatge(carta.desc, false);
 			}
 
 
@@ -1628,6 +1643,7 @@ function reiniciaPartida() {
   partidaIniciada = false;
   numTirada = 0;
   puntsTornActual = 0;
+  illaCalaveraMode = false;
   
   desbloquejarTotsElsDaus();
     actualitzaTornsPantalla();

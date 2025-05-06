@@ -462,7 +462,7 @@ button:active {
 .pergamiBotoNomJugador{width:100%;}
 .pergamiBotoCentreAbaixFixed {position:absolute; bottom:40px; left:50%; transform:translateX(-50%); z-index:1000}
 
-.dauTirades{position:absolute; left:550px; bottom:100px;}
+.dauTirades{position:absolute; left:550px; bottom:100px; width:200px;}
 #cartaEnJoc{position:absolute; left:1175px; bottom:100px;}
 
 .cartellBotoGran {
@@ -556,4 +556,8 @@ button:active {
 	z-index:99999; 
 	align-items:center; 
 	justify-content:center;
+}
+
+#nomJugadorActiuDisplay{
+	width:100%;
 }
