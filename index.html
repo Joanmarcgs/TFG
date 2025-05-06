@@ -4,709 +4,115 @@
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 		<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
+		<meta http-equiv="Pragma" content="no-cache">
+		<meta http-equiv="Expires" content="0">
 		
 		<title>Illa Calavera - Joc de Daus</title>
+		
+		<!-- Saved the libraries locally to cache them and make them available offline -->
 		<script src="doc/three.min.js"></script>
 		<script src="doc/cannon.min.js"></script>
-		<style>
-			* { margin: 0; padding: 0; box-sizing: border-box; user-select: none;}
-			body {
-				display: flex;
-				justify-content: center;
-				align-items: center;
-				height: 100vh;
-				width: 100vw;
-				overflow: hidden;
-				background: #28162e;
-				touch-action: none; 
-				user-select: none;
-			}
-			
-			@font-face {
-				font-family: 'PirataOne';
-				src: url('doc/pirataOneFont/PirataOne-Regular.ttf') format('truetype');
-				font-weight: normal;
-				font-style: normal;
-			}
-			
-			@font-face {
-				font-family: 'Jacquard';
-				src: url('doc/jacquardFont/Jacquard12-Regular.ttf') format('truetype');
-				font-weight: normal;
-				font-style: normal;
-			}
-			
-			@font-face {
-				font-family: 'Jacquard24';
-				src: url('doc/jacquardFont/Jacquard24-Regular.ttf') format('truetype');
-				font-weight: normal;
-				font-style: normal;
-			}
-			
-			@font-face {
-				font-family: 'PiecesOfEight';
-				src: url('doc/piecesofeightFont/PiecesofEight.ttf') format('truetype');
-				font-weight: normal;
-				font-style: normal;
-			}
-			
-			/* IMPORTANT! Els paràmetres d'amplada i alçada del contenidor sols funcionaran si la funció escalarContenidor() de Javascript està configurada amb els mateixos paràmetres */
-			#contenidor {
-				width: 1920px;
-				height: 1080px;
-				//border: 5px dashed white;
-				display: flex;
-				justify-content: center;
-				align-items: center;
-				position: absolute;
-				top: 50%;
-				left: 50%;
-				transform: translate(-50%, -50%) scale(1);
-				transform-origin: center;
-				background-image: url('img/platja-pirata2.webp');
-				background-size: cover; /* Ajusta la imatge per cobrir tot el div */
-				background-position: center; /* Centra la imatge */
-				background-attachment: fixed;
-			}
-
-			#contenidorFosc {
-				content: "";
-				position: absolute;
-				top: 0; left: 0; right: 0; bottom: 0;
-				background: rgba(0, 0, 0, 0.5); /* negre amb opacitat */
-				pointer-events: none;
-			}
-
-
-			.escena {
-				position: absolute;
-				width: 100%;
-				height: 100%;
-				display: none;
-				flex-direction: column;
-				justify-content: center;
-				align-items: center;
-				gap: 20px;
-				transition: opacity 0.5s ease;
-			}
-
-			button {
-				width: 300px;
-				padding: 15px;
-				font-size: 40px;
-				border: none;
-				color: #fff3d6; /* Color pergamí vell */
-				cursor: pointer;
-				font-family: 'PiecesOfEight', sans-serif;
-				border-radius: 10px;
-				text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.5);
-				box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3), 0 4px 6px rgba(0, 0, 0, 0.5);
-				position: relative;
-				transition: all 0.2s ease-in-out;
-				background: url('img/tauler-fusta.webp'); /* Fons de fusta */
-				background-size: 100% 100%; /* Amplada completa, alçada automàtica */
-				background-repeat: no-repeat; /* Evita que es repeteixi */
-				background-position: center; /* Centra la imatge dins del `h1` */
-			}
-
-			button:hover {
-				transform: scale(1.05);
-			}
-
-			/* Efecte de botó pressionat */
-			button:active {
-				box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.5);
-				transform: scale(0.98);
-			}
-
-			.botoDretaAbaix{
-				position: absolute;
-				right:20px;
-				bottom:20px;
-			}
-			
-			.botoEsquerraAbaix{
-				position: absolute;
-				left:20px;
-				bottom:20px;
-			}
-			
-			.botoCentreAbaix {
-				position: absolute;
-				width:500px;
-				bottom: 20px;
-				left: 710px;
-			}
-			
-			
-			
-			.botoPantallaCompleta{
-				position: absolute;
-				width: 60px;
-
-				right:20px;
-				top:20px;
-			}
-
-			.botoAudio{
-				position: absolute;
-				width: 60px;
-
-				right:20px;
-				top:100px;
-			}
-
-			.botoMenu{
-				position: absolute;
-				width: 60px;
-
-				left:20px;
-				top:100px;
-			}
-			
-			
-
-			@keyframes tremolorSuau {
-				0%, 90%	{ transform: translate(0, 0) rotate(0deg); } /* Estat normal */
-				91%		{ transform: translate(1px, -1px) rotate(-0.5deg); }
-				93%		{ transform: translate(-1px, 2px) rotate(0.8deg); }
-				95%		{ transform: translate(1px, -2px) rotate(-0.5deg); }
-				97%		{ transform: translate(-2px, 1px) rotate(0.7deg); }
-				100%	{ transform: translate(0, 0) rotate(0deg); } /* Torna a la posició inicial */
-			}
-
-			.h1Titol {
-				position: absolute;
-				top: 50px;
-				padding: 20px 100px;
-				font-family: 'PiecesofEight';
-				font-size: 100px;
-				background: url('img/tauler-fusta.webp'); /* Fons de fusta */
-				background-size: 100% 100%; /* Amplada completa, alçada automàtica */
-				background-repeat: no-repeat; /* Evita que es repeteixi */
-				background-position: center; /* Centra la imatge dins del `h1` */
-				color: #fff3d6;
-				text-shadow: 4px 4px 6px rgba(0, 0, 0, 0.8);
-				box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.6); /* Ombra per donar efecte 3D */
-				display: inline-block;
-				animation: tremolorSuau 5s infinite ease-in-out;
-				font-weight: normal;
-			}
-			
-			.pergami {
-				background: linear-gradient(rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.5)),
-							url('img/pergami-fons.webp') repeat-y center;
-				background-size: cover;
-				padding: 100px;
-				color: #3b2e1f;
-				font-family: 'PiecesofEight', serif;
-				font-size: 25px;
-				text-align: justify;
-				box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.7);
-				width: 60%;
-				margin: 20px auto;
-				min-height: 300px;
-				position: relative;
-				border-radius: 10px;
-				clip-path: polygon(
-					/* part superior */
-					5% 2%, 15% 1%, 25% 3%, 35% 2%, 45% 3%, 55% 2%, 65% 3%, 75% 1%, 85% 2%, 95% 1%,
-
-					/* vora dreta suau i natural */
-					98.5% 5%, 99% 10%, 98.5% 20%, 99% 30%, 98.5% 40%, 99% 50%, 98.5% 60%, 99% 70%, 98.5% 80%, 99% 90%, 98.5% 95%,
-
-					/* part inferior */
-					95% 99%, 85% 98%, 75% 99%, 65% 98%, 55% 99%, 45% 98%, 35% 99%, 25% 98%, 15% 99%, 5% 98%,
-
-					/* vora esquerra suau i natural */
-					1.5% 95%, 1% 90%, 1.5% 80%, 1% 70%, 1.5% 60%, 1% 50%, 1.5% 40%, 1% 30%, 1.5% 20%, 1% 10%, 1.5% 5%
-				);
-
-			}
-
-			.pergami::before, .pergami::after {
-				content: '';
-				position: absolute;
-				left: 0;
-				width: 100%;
-				height: 20px;
-				background: radial-gradient(circle, rgba(230, 194, 158, 0.8), transparent);
-			}
-
-			.pergami::before {
-				top: -20px;
-				border-top-left-radius: 10px;
-				border-top-right-radius: 10px;
-			}
-
-			.pergami::after {
-				bottom: -20px;
-				border-bottom-left-radius: 10px;
-				border-bottom-right-radius: 10px;
-			}
-			.jugadorAvatar {
-				position:absolute;
-				text-align: center;
-				cursor: pointer;
-				flex: 1 1 calc(33.333% - 20px); /* 3 per fila */
-				/* max-width: 150px; /* Evita que s'estirin massa */
-			}
-			#jugadorAvatar1{
-				left: 160px;
-				top: -50px;
-			}
-			#jugadorAvatar2{
-				left: 760px;
-				top: -50px;
-			}
-			#jugadorAvatar3{
-				left: 1360px;
-				top: -50px;
-			}
-			#jugadorAvatar4{
-				left: 160px;
-				bottom: 200px;
-			}
-			#jugadorAvatar5{
-				left: 760px;
-				bottom: 200px;
-			}
-			#jugadorAvatar6{
-				left: 1360px;
-				bottom: 200px;
-			}
-			.jugadorAvatar img {
-				width: 400px;
-				height: auto;
-				transition: opacity 0.3s ease-in-out;
-			}
-			.jugadorAvatar input {
-				display: block;
-				width: 90%;
-				margin: 10px auto;
-				text-align: center;
-				font-family: 'PiecesOfEight', serif;
-				font-size: 32px;
-				padding: 5px;
-				background: url('img/tauler-fusta.webp');
-				background-size: cover;
-				border: 3px solid #3b2e1f;
-				border-radius: 10px;
-				color: #fff3d6;
-				text-shadow: 1px 1px 2px #000;
-				padding: 10px;
-				box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
-				outline: none;
-				cursor: pointer;
-				transition: transform 0.2s;
-			}
-			
-			.avatarDesactivat img {
-				filter: grayscale(100%);
-				opacity: 0.5;
-				transition: filter 0.3s ease, opacity 0.3s ease;
-			}
-
-			.avatarActivat img {
-				filter: none;
-				opacity: 1;
-			}
-
-			#escena-joc {
-				background-image: url('img/vaixell-jocv2.png');
-				background-size: cover;
-				background-position: center;
-			}
-
-			#contenidorDaus canvas {
-				position: absolute;
-				top: 0;
-				left: 0;
-				width: 100% !important;
-				height: 100% !important;
-			}
-
-			#contenidorProgres{
-				width: 100%; height: 30px; background: rgba(0,0,0,0.5); border-radius: 15px; overflow: hidden;
-			}
-			
-			#barraProgres{
-				height: 100%; width: 0%; background: #dfbf9f; transition: width 0.2s;
-			}
-			
-			#botoIniciarContainer{
-				display:none;
-			}
-			
-			#numPercentatge{
-				font-size: 24px; text-shadow: 1px 1px 2px black;
-			}
-			
-			#cameraControls{
-				display: none; position: absolute; top: 20px; right: 20px; background: rgba(0,0,0,0.8); padding: 10px; z-index: 999; color: white; font-family: sans-serif; border-radius: 10px;
-			}
-			
-			.teclat {
-				position: absolute;
-				width: 1300px;
-				background: rgba(0,0,0,0.8);
-				border-radius: 20px;
-				padding: 10px;
-				display: flex;
-				flex-direction: column;
-				gap: 5px;
-				z-index: 9999;
-				font-family: sans-serif;
-			}
-			.teclat button {
-				flex: 1;
-				padding: 15px;
-				font-size: 40px;
-				border-radius: 5px;
-				border: none;
-				background: #dfbf9f;
-				cursor: pointer;
-			}
-			.teclat .fila {
-				display: flex;
-				gap: 5px;
-			}
-			.teclatOcult {
-				display: none;
-			}
-			.teclatDreta {
-				top: 50%;
-				left: unset;
-				right: 50px;
-				transform: translateY(-50%);
-			}
-			.teclatEsquerra {
-				top: 50%;
-				left: 50px;
-				transform: translateY(-50%);
-			}
-			.teclatAbaix {
-				bottom: 50px;
-				left: 50%;
-				transform: translateX(-50%);
-			}
-			.teclatAdalt {
-				top: 10px;
-				left: 50%;
-				transform: translateX(-50%);
-			}
-			
-			
-			
-			#modalPersonatges{
-				display:none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-				background: rgba(0, 0, 0, 0.8); z-index: 99999; align-items: center; justify-content: center;
-			}
-
-			#botoSeguentConfigurarPartida{
-				display: none;
-			}
-			/*
-			#puntuacionsJugadors{
-				position: absolute;
-				
-				left: 20px;
-				width: 400px;
-				height: 800px;
-				
-			
-				background-size: 100% 100%;
-				background-repeat: no-repeat;
-				image-rendering: pixelated;
-				color: #fff3d6;
-				font-family: 'PiecesOfEight';
-				padding: 20px;
-				border-radius: 15px;
-				z-index: 999;
-				font-size: 24px;
-			
-			}*/
-			
-#puntuacionsJugadors {
-	position: absolute;
-	
-	left: 20px;
-	width: 200px;
-	z-index: 999;
-	color: #3b1d08;
-	font-family: 'PiecesOfEight';
-	font-size: 24px;
-	
-	display: flex;
-	flex-direction: column;
-}
-
-.puntuacionsJugadorsTop,
-.puntuacionsJugadorsBot {
-	height: 40px; /* Ajusta segons el teu pergamí */
-	background-repeat: no-repeat;
-background-size: 100% 100%;
-	
-}
-
-.puntuacionsJugadorsTop {
-	background-image: url('img/pergamiEnrollableTop.png');
-}
-
-.puntuacionsJugadorsBot {
-	background-image: url('img/pergamiEnrollableBot.png');
-	margin-top: -1px;
-}
-
-.puntuacionsJugadorsMid {
-	flex-grow: 1;
-	background-image: url('img/pergamiEnrollableMid.png');
-	background-repeat: repeat-y;
-	background-size: 100% auto;
-	text-align: center;
-	margin-top: -1px;
-	/*padding: 20px 80px;*/
-	
-}
-
-
-			.pergamiBoto {
-				display: flex;
-				align-items: center;
-				cursor: pointer;
-				font-family: 'PiecesOfEight', sans-serif;
-				font-size: 40px;
-				color: #fff3d6;
-				text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.5);
-				width: fit-content;
-				transition: transform 0.2s ease-in-out;
-				z-index:1000;
-			}
-
-			.pergamiBoto:hover {transform: scale(1.05);}
-
-			.pergamiBotoEsq, .pergamiBotoDret {width: 30px;height: 100px;background-size: contain;background-repeat: no-repeat;background-position: center;}
-
-			.pergamiBotoEsq {
-				background-image: url('img/pergamiBotoEsquerra.png');
-				background-position: right center; /* ✅ Enganxat a la dreta */
-				margin-right:-1px;
-			}
-
-			.pergamiBotoDret {
-				background-image: url('img/pergamiBotoDreta.png');
-				background-position: left center; /* ✅ Enganxat a l'esquerra */
-				margin-left: -1px;
-			}
-
-			.pergamiBotoMid {
-				background-image: url('img/pergamiBotoMig.png');
-				background-repeat: repeat-x;
-				background-size: auto 100%;
-				padding: 0px 30px;
-				line-height: 100px; /* ✅ Centra el text verticalment */
-				height: 100px;
-				display: flex;
-				align-items: center;
-				justify-content: center;
-			}
-
-			/* pergamiBoto posicions concretes */
-			.pergamiBotoCentreAbaix {position:absolute; bottom:20px;}
-			.pergamiBotoDretaAbaix{position:absolute; right:20px; bottom:20px;}
-			.pergamiBotoEsquerraAbaix{position:absolute; left:20px; bottom:20px;}
-			.pergamiBotoEsquerraAdalt{position:absolute; left:20px; top:20px;}
-			.pergamiBotoDretaAdalt{position:absolute; right:20px; top:20px;}
-			.pergamiBotoPantallaCompleta{position:absolute; width:60px; right:20px; top:20px;}
-			.pergamiBotoAudio{position:absolute; width:60px; right:20px; top:100px;}
-			.pergamiBotoNomJugador{width:100%;}
-			
-			
-			
-			
-			.dauTirades{position:absolute; left:550px; bottom:100px;}
-			#cartaEnJoc{position:absolute; left:1175px; bottom:100px;}
-			
-			
-			
-			.cartellBotoGran {
-				position: absolute;
-				top:50px;
-				display: flex;
-				align-items: center;
-				cursor: pointer;
-				font-family: 'PiecesOfEight', sans-serif;
-				font-size: 150px;
-				width: fit-content;
-				color: #fff3d6;
-				text-shadow: 4px 4px 6px rgba(0, 0, 0, 0.8);
-				animation: tremolorSuau 5s infinite ease-in-out;
-			}
-
-			.cartellBotoGran:hover {transform: scale(1.05);}
-
-			.cartellBotoGranEsq, .cartellBotoGranDret {width: 30px;height: 200px;background-size: contain;background-repeat: no-repeat;background-position: center;}
-
-			.cartellBotoGranEsq {
-				background-image: url('img/cartellBotoGranEsq.png');
-				background-position: right center; /* ✅ Enganxat a la dreta */
-				margin-right:-1px;
-				width: 200px;
-				background-size: auto 100%;
-				
-			}
-
-			.cartellBotoGranDret {
-				background-image: url('img/cartellBotoGranDret.png');
-				background-position: left center; /* ✅ Enganxat a l'esquerra */
-				margin-left: -1px;
-				width: 200px;
-				background-size: auto 100%;
-				
-			}
-
-			.cartellBotoGranMid {
-				background-image: url('img/cartellBotoGranMig.png');
-				background-repeat: repeat-x;
-				background-size: auto 100%;
-				padding: 0px 30px;
-				line-height: 100px; /* ✅ Centra el text verticalment */
-				height: 200px;
-				display: flex;
-				align-items: center;
-				justify-content: center;
-			}
-			
-			/* Només afecta el pergamí de la pantalla d’instruccions */
-#escena-instruccions .pergami {
-  max-height: 80%;      /* Limita l’alçada a un 80% de l’escena */
-  overflow-y: auto;     /* Activa el scroll vertical */
-  padding-right: 20px;   /* Deixa espai perquè no talli el text al costat de l’scroll */
-}
-
-#musicButton{
-position:absolute;right:0px; width:300px;bottom:80px;
-}
-
-#fullscreenButton{
-position:absolute;left:0px; width:300px;bottom:10px; transform: scaleX(-1);z-index:1000;
-}
-
-
-.pirateflagButton{
-position:absolute;left:-10px; width:350px;top:0px;z-index:1000;
-
-}
-
-.mostraInstruccionsMico{position:absolute;right:0px; width:300px;top:10px;z-index:1000}
-
-
-#puntsProvisional{
-	font-family: 'PiecesOfEight', sans-serif; position:absolute; top:50px; left:50%; transform:translateX(-50%); font-size:70px; font-weight:bold; color:white; text-shadow:2px 2px 5px black; display:none; text-position:center;
-	}
-	
-	#resumPuntsTornActiu{
-	display:none; font-size:40px;text-shadow:2px 2px 5px black;color:yellow;
-	position:absolute;width:60%;top:150px;text-align:center;
-	 }
-
-		</style>
+		
+		<link rel="stylesheet" href="style.css">
 		<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 	</head>
 	<body>
 		
+		<!-- 
+		Aquest contenidor fa que el seu contingut es vegi sempre igual, sigui quina sigui la resolució i orientació del dispositiu.
+		D'aquesta manera aconseguim un comportament molt similar a l'escalat d'un videojoc.
+		-->
 		<div id="contenidor">
 			
+			<!-- Contenidor que fem sevir de capa per enfosquir el fons, quan ens cal -->
 			<div id="contenidorFosc"></div>
 			
+			<!-- A partir d'aquí cada DIV ens farà d'escena, així doncs mostrant o amagant el div "canviem" d'escena -->
 			
-
-
+			<!-- ESCENA Pantalla de càrrega -->
 			<div id="escena-pantallaCarrega" class="escena">
-			
-				
+				<!-- Botó tipus pergamí. Fem servir 3 div, els laterals fan de parts enrotllades del pergamí, i el central s'expandeix al gust, com un pergamí real -->
 				<div class="pergamiBoto" id="botoIniciarContainer">
 					<div class="pergamiBotoEsq" ></div>
-					<div class="pergamiBotoMid"  onclick="carregaEscena('escena-pantallaInici');" ><span id="botoIniciar">Carregant...</span> 
-					</div>
+					<div class="pergamiBotoMid"  onclick="carregaEscena('escena-pantallaInici');" ><span id="botoIniciar">Carregant...</span></div>
 					<div class="pergamiBotoDret" ></div>
 				</div>
 				
-				
+				<!-- Botó tipus pergamí -->
 				<div class="pergamiBoto" id="botoCarregant">
 					<div class="pergamiBotoEsq"></div>
-					<div class="pergamiBotoMid" style="width:400px">
-						<div id="contenidorProgres">
-							<div id="barraProgres">
-								<span id="numPercentatge"> 0 %</span>
-							</div>
-						</div>
-					</div>
+					<div class="pergamiBotoMid" id="botoCarregantMid"><div id="contenidorProgres"><div id="barraProgres"><span id="numPercentatge"> 0 %</span></div></div></div>
 					<div class="pergamiBotoDret"></div>
 				</div>
-				
-			
 			</div>
+			<!-- FI ESCENA Pantalla de càrrega -->
 
+			<!-- ESCENA Menú principal -->
 			<div id="escena-pantallaInici" class="escena">
+				<!-- Carreguem l'audio del joc -->
+				<audio id="musica-fons" src="audio/melodiaPrincipal-corda.mp3" loop></audio>
+				
+				<!-- Cartell principal del joc -->
 				<div class="cartellBotoGran">
 					<div class="cartellBotoGranEsq"></div>
 					<div class="cartellBotoGranMid">Illa Calavera</div>
 					<div class="cartellBotoGranDret"></div>
 				</div>
 				
-				
+				<!-- Imatges simpàtiques estil pixel art que també fan de botó -->
 				<img src="img/music_on-SFX_off.png" id="musicButton">
 				<img src="img/spyglassButton.png?v=2" id="fullscreenButton" onclick="pantallaCompleta()">
 				<img src="img/pirateflagButton.png?v=2" class="pirateflagButton" onclick="toggleAjudaPunts()">
-				<img src="img/mostraInstruccionsMico.png" class="mostraInstruccionsMico" onclick="carregaEscena('escena-instruccions')" style="position:absolute;right:0px; width:300px;top:10px;">
+				<img src="img/mostraInstruccionsMico.png" class="mostraInstruccionsMico" onclick="carregaEscena('escena-instruccions')" >
+				<img src="img/instruccionsJoc.png" style="width:200px;position:absolute;bottom:10px;">
 				
-				
-				<audio id="musica-fons" src="audio/melodiaPrincipal-corda.mp3" loop></audio>
-
+				<!-- Botó tipus pergamí -->
 				<div class="pergamiBoto">
 					<div class="pergamiBotoEsq"></div>
 					<div class="pergamiBotoMid" onclick="carregaEscena('escena-configuraPartida')" id="escena-pantallaInici-botoIniciarPartida">Iniciar</div>
 					<div class="pergamiBotoDret"></div>
 				</div>
 				
+				<!-- Botó tipus pergamí -->
 				<div class="pergamiBoto" id="botoEliminarPartidaContainer">
 					<div class="pergamiBotoEsq"></div>
 					<div class="pergamiBotoMid" onclick="reiniciaPartida()" id="botoEliminarPartida">Eliminar partida en curs</div>
 					<div class="pergamiBotoDret"></div>
 				</div>
 				
-				
-				
-				<img src="img/instruccionsJoc.png" style="width:200px;position:absolute;bottom:10px;">
-
+				<!-- Botó tipus pergamí -->
 				<div class="pergamiBoto" style="position:absolute; bottom:50px;">
 					<div class="pergamiBotoEsq"></div>
 					<div class="pergamiBotoMid" onclick="carregaEscena('escena-instruccions')">Instruccions</div>
 					<div class="pergamiBotoDret"></div>
 				</div>
 				
-
+				<!-- Botó tipus pergamí -->
 				<div class="pergamiBoto pergamiBotoEsquerraAbaix">
 					<div class="pergamiBotoEsq"></div>
 					<div class="pergamiBotoMid" onclick="carregaEscena('escena-sobreProjecte')">El Projecte</div>
 					<div class="pergamiBotoDret"></div>
 				</div>
 				
-				
-
+				<!-- Botó tipus pergamí -->
 				<div class="pergamiBoto pergamiBotoDretaAbaix">
 					<div class="pergamiBotoEsq"></div>
 					<div class="pergamiBotoMid" onclick="carregaEscena('escena-credits')">Mencions</div>
 					<div class="pergamiBotoDret"></div>
 				</div>
-				
-				
 			</div>
+			<!--FI ESCENA Menú principal -->
+			
+			<!-- ESCENA Crèdits -->
 			<div id="escena-credits" class="escena">
-				<button onclick="carregaEscena('escena-pantallaInici')" class="botoEsquerraAbaix">Enrere</button>
+				<!-- Botó tipus pergamí -->
+				<div class="pergamiBoto pergamiBotoEsquerraAbaix">
+					<div class="pergamiBotoEsq"></div>
+					<div class="pergamiBotoMid" onclick="carregaEscena('escena-pantallaInici')">Enrere</div>
+					<div class="pergamiBotoDret"></div>
+				</div>
+				
+				<!-- Div que ens fa de llenç on poder esciure. D'altra manera el contrast fa el text poc llegible -->
 				<div class="pergami">
 					<h2>Crèdits i Mencions</h2>
 					Fonts Utilitzades:
@@ -716,109 +122,100 @@ position:absolute;left:-10px; width:350px;top:0px;z-index:1000;
 						Crèdits <a href="doc/pirataOneFont/OFL.txt" target="_blank">aquí</a>
 					</div>
 				</div>
-				
 			</div>
+			<!-- FI ESCENA Crèdits -->
 			
 			<!-- ESCENA INSTRUCCIONS -->
 			<div id="escena-instruccions" class="escena">
-			  <div class="pergamiBoto pergamiBotoEsquerraAbaix" onclick="carregaEscena('escena-anterior')">
-				<div class="pergamiBotoEsq"></div>
-				<div class="pergamiBotoMid">Enrere</div>
-				<div class="pergamiBotoDret"></div>
-			  </div>
-
-			  <div class="pergami">
-				<h2 style="font-size:64px; text-align:center;">Regles del Joc</h2>
-				<ol style="font-size:32px; line-height:1.6;">
-				  <li><b>Objectiu:</b> Ser el primer en arribar a 10 000 punts.</li>
-				  <ul>
-					  <li>TIP: Hi ha imatges que potser fan també de botó, activen funcions, etc.. <br>🏴☠️🦜🐒🔭</li>
-					</ul>
-				  <li><b>Torn de joc:</b>
-					<ul>
-					  <li>Comença el teu torn tirant els 8 daus.</li>
-					  <li>Pots <b>congelar</b> qualsevol dau — fes clic sobre ell per fixar-lo (s’apagarà i no es tornarà a tirar).</li>
-					  <li>D'igual manera, pots descongelar daus que hagis congelat tu, per si vols tornar-los a tirar.</li>
-					  <li>Les calaveres es congelen soles, i no es poden descongelar. Si n'acumules tres perds el torn! </li>
-					  <li>Quan vulguis, prem “Finalitzar Torn” per sumar tots els punts acumulats.</li>
-					</ul>
-				  </li>
-				  <li><b>Punts bàsics:</b>
-					<ul>
-					  <li>🪙 Cada <b>Moneda</b> 100 pts</li>
-					  <li>💎 Cada <b>Diamant</b> 100 pts</li>
-					</ul>
-				  </li>
-				  <li><b>Combinacions de cares iguals:</b>
-					<ul>
-					  <li>3 iguals - 100 pts</li>
-					  <li>4 iguals - 200 pts</li>
-					  <li>5 iguals - 500 pts</li>
-					  <li>6 iguals - 1 000 pts</li>
-					  <li>7 iguals - 2 000 pts</li>
-					  <li>8 iguals - 4 000 pts</li>
-					  <li><i>Perfect Treasure</i> (tots els daus puntuen, incloses monedes/diamants) 500 pts extra</li>
-					</ul>
-				  </li>
-				  <li><b>Calaveres:</b>
-					<ul>
-					  <li>Si surten 3 <b>Calaveres</b>, perds tots els punts del torn (o la penalització de la carta activa).</li>
-					  <li>Amb 4 o més entres en el mode <i>Illa Calavera</i> (veure més avall).</li>
-					</ul>
-				  </li>
-				  <li><b>Cartes modificadores:</b>
-					Al principi de cada torn, es roba una carta que estarà activa durant totes les tirades del torn:
-					<ul>
-					  <li><b>Pirata:</b> duplica tots els punts del torn.</li>
-					  <li><b>Calavera:</b> posa una calavera en joc addicional.</li>
-					  <li><b>Calaveres:</b> posa dues calaveres en joc addicionals.</li>
-					  <li><b>Vaixell x2:</b> Guanyes 500 pts si tens 2 vaixells o més, si no, perds aquesta quantitat.</li>
-					  <li><b>Vaixell x4:</b> Guanyes 1000 pts si tens 4 vaixells o més, si no, perds aquesta quantitat.</li>
-					  <li><b>Diamant:</b> sumes 100 pts extra i compta com a cara per a combos.</li>
-					  <li><b>Moneda:</b> sumes 100 pts extra i compta com a cara per a combos.</li>
-					  <li><b>Animals:</b> micos i lloros fan un únic combo.</li>
-					</ul>
-				  </li>
-				  <li><b>Poder dels personatges:</b> Cada avatar té un bonus especial al final del torn:
-					<ul>
-					  <li>Capitana pirata: 100 pts per calavera</li>
-					  <li>Oficial pirata armada: 100 pts per vaixell</li>
-					  <li>Veterinari pirata: 100 pts per mico o lloro</li>
-					  <li>Capitana armada: 100 pts per vaixell</li>
-					  <li>Reina: 100 pts per moneda</li>
-					  <li>Consellera del Tresor: 100 pts per diamant</li>
-					</ul>
-				  </li>
-				  <li><b>Mode Illa Calavera:</b> Si surten 4 calaveres o més.
-					<ul>
-					  <li>Durant aquest torn, cada nova calavera suma 100 pts per a tu i resta 200 pts a cada rival.</li>
-					  <li>Si en una tirada no apareix cap calavera nova, el torn Illa Calavera acaba, restes punts als rivals, sumes els teus, i acaba el teu torn.</li>
-					</ul>
-				  </li>
-				</ol>
-			  </div>
-			</div>
-
-
-			 
-			 <!-- Pantalla de selecció de jugadors -->
-			<div id="escena-configuraPartida" class="escena">
-				
-				<!--
-				<div class="pergamiBoto pergamiBotoDretaAdalt" onclick="pantallaCompleta()">
+				<!-- Botó tipus pergamí -->
+				<div class="pergamiBoto pergamiBotoEsquerraAbaix" onclick="carregaEscena('escena-anterior')">
 					<div class="pergamiBotoEsq"></div>
-					<div class="pergamiBotoMid" style="padding:0px;"><i class="material-icons" style="font-size:30px;">fullscreen</i></div>
+					<div class="pergamiBotoMid">Enrere</div>
 					<div class="pergamiBotoDret"></div>
 				</div>
-				-->
-				<!--<button class="botoEsquerraAbaix" onclick="carregaEscena('escena-pantallaInici')">Enrere</button>-->
+				
+				<!-- Div que simula un pergamí on podem escriure text sense exposar-lo a un contrast alt i fer-li illegible -->
+				<div class="pergami">
+					<h2 style="font-size:64px; text-align:center;">Regles del Joc</h2>
+					<ol style="font-size:32px; line-height:1.6;">
+						<li><b>Objectiu:</b> Ser el primer en arribar a 10 000 punts.</li>
+							<ul>
+								<li>TIP: Hi ha imatges que potser fan també de botó, activen funcions, etc.. <br>🏴☠️🦜🐒🔭</li>
+							</ul>
+						<li><b>Torn de joc:</b>
+							<ul>
+								<li>Comença el teu torn tirant els 8 daus.</li>
+								<li>Pots <b>congelar</b> qualsevol dau — fes clic sobre ell per fixar-lo (s’apagarà i no es tornarà a tirar).</li>
+								<li>D'igual manera, pots descongelar daus que hagis congelat tu, per si vols tornar-los a tirar.</li>
+								<li>Les calaveres es congelen soles, i no es poden descongelar. Si n'acumules tres perds el torn! </li>
+								<li>Quan vulguis, prem “Finalitzar Torn” per sumar tots els punts acumulats.</li>
+							</ul>
+						</li>
+						<li><b>Punts bàsics:</b>
+							<ul>
+								<li>🪙 Cada <b>Moneda</b> 100 pts</li>
+								<li>💎 Cada <b>Diamant</b> 100 pts</li>
+							</ul>
+						</li>
+						<li><b>Combinacions de cares iguals:</b>
+							<ul>
+								<li>3 iguals - 100 pts</li>
+								<li>4 iguals - 200 pts</li>
+								<li>5 iguals - 500 pts</li>
+								<li>6 iguals - 1 000 pts</li>
+								<li>7 iguals - 2 000 pts</li>
+								<li>8 iguals - 4 000 pts</li>
+								<li><i>Perfect Treasure</i> (tots els daus puntuen, incloses monedes/diamants) 500 pts extra</li>
+							</ul>
+						</li>
+						<li><b>Calaveres:</b>
+							<ul>
+								<li>Si surten 3 <b>Calaveres</b>, perds tots els punts del torn (o la penalització de la carta activa).</li>
+								<li>Amb 4 o més entres en el mode <i>Illa Calavera</i> (veure més avall).</li>
+							</ul>
+						</li>
+						<li><b>Cartes modificadores:</b>
+							Al principi de cada torn, es roba una carta que estarà activa durant totes les tirades del torn:
+							<ul>
+								<li><b>Pirata:</b> duplica tots els punts del torn.</li>
+								<li><b>Calavera:</b> posa una calavera en joc addicional.</li>
+								<li><b>Calaveres:</b> posa dues calaveres en joc addicionals.</li>
+								<li><b>Vaixell x2:</b> Guanyes 500 pts si tens 2 vaixells o més, si no, perds aquesta quantitat.</li>
+								<li><b>Vaixell x4:</b> Guanyes 1000 pts si tens 4 vaixells o més, si no, perds aquesta quantitat.</li>
+								<li><b>Diamant:</b> sumes 100 pts extra i compta com a cara per a combos.</li>
+								<li><b>Moneda:</b> sumes 100 pts extra i compta com a cara per a combos.</li>
+								<li><b>Animals:</b> micos i lloros fan un únic combo.</li>
+							</ul>
+						</li>
+						<li><b>Poder dels personatges:</b> Cada avatar té un bonus especial al final del torn:
+							<ul>
+								<li>Capitana pirata: 100 pts per calavera</li>
+								<li>Oficial pirata armada: 100 pts per vaixell</li>
+								<li>Veterinari pirata: 100 pts per mico o lloro</li>
+								<li>Capitana armada: 100 pts per vaixell</li>
+								<li>Reina: 100 pts per moneda</li>
+								<li>Consellera del Tresor: 100 pts per diamant</li>
+							</ul>
+						</li>
+						<li><b>Mode Illa Calavera:</b> Si surten 4 calaveres o més.
+							<ul>
+								<li>Durant aquest torn, cada nova calavera suma 100 pts per a tu i resta 200 pts a cada rival.</li>
+								<li>Si en una tirada no apareix cap calavera nova, el torn Illa Calavera acaba, restes punts als rivals, sumes els teus, i acaba el teu torn.</li>
+							</ul>
+						</li>
+					</ol>
+				</div>
+			</div>
+			
+			<!-- ESCENA Pantalla de selecció de jugadors -->
+			<div id="escena-configuraPartida" class="escena">
+				
+				<!-- Botó tipus pergamí -->
 				<div class="pergamiBoto pergamiBotoEsquerraAbaix">
 					<div class="pergamiBotoEsq"></div>
 					<div class="pergamiBotoMid" onclick="carregaEscena('escena-pantallaInici')">Enrere</div>
 					<div class="pergamiBotoDret"></div>
 				</div>
-				
-				<!--<input type="number" id="numJugadors" min="2" max="6" value="2">-->
 				
 					<!-- Els vaixells amb els noms -->
 					<div id="jugadorAvatar1" class="jugadorAvatar avatarDesactivat" >
@@ -1302,12 +699,13 @@ function tancarModalMissatge() {
   document.getElementById("modalMissatge").style.display = "none";
   if (document.getElementById("modalMissatge").dataset.callback === "true") {
     document.getElementById("modalMissatge").dataset.callback = "";
-  }
-  
- if (numCalaveres == 3) {
+	 if (numCalaveres == 3) {
         
 		finalitzarTorn();
     }
+  }
+  
+
 }
 
 // FUnció que mostra i amaga l'ajuda dels punts que fem

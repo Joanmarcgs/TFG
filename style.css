@@ -1,0 +1,550 @@
+* { margin: 0; padding: 0; box-sizing: border-box; user-select: none;}
+
+body {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 100vh;
+	width: 100vw;
+	overflow: hidden;
+	background: #28162e;
+	touch-action: none; 
+	user-select: none;
+}
+
+@font-face {font-family: 'PirataOne';src: url('doc/pirataOneFont/PirataOne-Regular.ttf') format('truetype');font-weight: normal;font-style: normal;}
+@font-face {font-family: 'Jacquard';src: url('doc/jacquardFont/Jacquard12-Regular.ttf') format('truetype');font-weight: normal;font-style: normal;}
+@font-face {font-family: 'Jacquard24';src: url('doc/jacquardFont/Jacquard24-Regular.ttf') format('truetype');font-weight: normal;font-style: normal;}
+@font-face {font-family: 'PiecesOfEight';src: url('doc/piecesofeightFont/PiecesofEight.ttf') format('truetype');font-weight: normal;font-style: normal;}
+
+/* IMPORTANT! Els paràmetres d'amplada i alçada del contenidor sols funcionaran si la funció escalarContenidor() de Javascript està configurada amb els mateixos paràmetres */
+#contenidor {
+	width: 1920px;
+	height: 1080px;
+	//border: 5px dashed white;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%) scale(1);
+	transform-origin: center;
+	background-image: url('img/platja-pirata2.webp');
+	background-size: cover; /* Ajusta la imatge per cobrir tot el div */
+	background-position: center; /* Centra la imatge */
+	background-attachment: fixed;
+}
+
+#contenidorFosc {
+	content: "";
+	position: absolute;
+	top: 0; left: 0; right: 0; bottom: 0;
+	background: rgba(0, 0, 0, 0.5); /* negre amb opacitat */
+	pointer-events: none;
+}
+
+
+.escena {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	display: none;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	gap: 20px;
+	transition: opacity 0.5s ease;
+}
+
+button {
+	width: 300px;
+	padding: 15px;
+	font-size: 40px;
+	border: none;
+	color: #fff3d6; /* Color pergamí vell */
+	cursor: pointer;
+	font-family: 'PiecesOfEight', sans-serif;
+	border-radius: 10px;
+	text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.5);
+	box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3), 0 4px 6px rgba(0, 0, 0, 0.5);
+	position: relative;
+	transition: all 0.2s ease-in-out;
+	background: url('img/tauler-fusta.webp'); /* Fons de fusta */
+	background-size: 100% 100%; /* Amplada completa, alçada automàtica */
+	background-repeat: no-repeat; /* Evita que es repeteixi */
+	background-position: center; /* Centra la imatge dins del `h1` */
+}
+
+button:hover {
+	transform: scale(1.05);
+}
+
+/* Efecte de botó pressionat */
+button:active {
+	box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.5);
+	transform: scale(0.98);
+}
+
+.botoDretaAbaix{
+	position: absolute;
+	right:20px;
+	bottom:20px;
+}
+
+.botoEsquerraAbaix{
+	position: absolute;
+	left:20px;
+	bottom:20px;
+}
+
+.botoCentreAbaix {
+	position: absolute;
+	width:500px;
+	bottom: 20px;
+	left: 710px;
+}
+
+
+
+.botoPantallaCompleta{
+	position: absolute;
+	width: 60px;
+
+	right:20px;
+	top:20px;
+}
+
+.botoAudio{
+	position: absolute;
+	width: 60px;
+
+	right:20px;
+	top:100px;
+}
+
+.botoMenu{
+	position: absolute;
+	width: 60px;
+
+	left:20px;
+	top:100px;
+}
+
+
+
+@keyframes tremolorSuau {
+	0%, 90%	{ transform: translate(0, 0) rotate(0deg); } /* Estat normal */
+	91%		{ transform: translate(1px, -1px) rotate(-0.5deg); }
+	93%		{ transform: translate(-1px, 2px) rotate(0.8deg); }
+	95%		{ transform: translate(1px, -2px) rotate(-0.5deg); }
+	97%		{ transform: translate(-2px, 1px) rotate(0.7deg); }
+	100%	{ transform: translate(0, 0) rotate(0deg); } /* Torna a la posició inicial */
+}
+
+.h1Titol {
+	position: absolute;
+	top: 50px;
+	padding: 20px 100px;
+	font-family: 'PiecesofEight';
+	font-size: 100px;
+	background: url('img/tauler-fusta.webp'); /* Fons de fusta */
+	background-size: 100% 100%; /* Amplada completa, alçada automàtica */
+	background-repeat: no-repeat; /* Evita que es repeteixi */
+	background-position: center; /* Centra la imatge dins del `h1` */
+	color: #fff3d6;
+	text-shadow: 4px 4px 6px rgba(0, 0, 0, 0.8);
+	box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.6); /* Ombra per donar efecte 3D */
+	display: inline-block;
+	animation: tremolorSuau 5s infinite ease-in-out;
+	font-weight: normal;
+}
+
+.pergami {
+	background: linear-gradient(rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.5)),url('img/pergami-fons.webp') repeat-y center;
+	background-size: cover;
+	padding: 100px;
+	color: #3b2e1f;
+	font-family: 'PiecesofEight', serif;
+	font-size: 25px;
+	text-align: justify;
+	box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.7);
+	width: 60%;
+	margin: 20px auto;
+	min-height: 300px;
+	position: relative;
+	border-radius: 10px;
+	clip-path: polygon(
+		/* part superior */
+		5% 2%, 15% 1%, 25% 3%, 35% 2%, 45% 3%, 55% 2%, 65% 3%, 75% 1%, 85% 2%, 95% 1%,
+
+		/* vora dreta suau i natural */
+		98.5% 5%, 99% 10%, 98.5% 20%, 99% 30%, 98.5% 40%, 99% 50%, 98.5% 60%, 99% 70%, 98.5% 80%, 99% 90%, 98.5% 95%,
+
+		/* part inferior */
+		95% 99%, 85% 98%, 75% 99%, 65% 98%, 55% 99%, 45% 98%, 35% 99%, 25% 98%, 15% 99%, 5% 98%,
+
+		/* vora esquerra suau i natural */
+		1.5% 95%, 1% 90%, 1.5% 80%, 1% 70%, 1.5% 60%, 1% 50%, 1.5% 40%, 1% 30%, 1.5% 20%, 1% 10%, 1.5% 5%
+	);
+
+}
+
+.pergami::before, .pergami::after {
+	content: '';
+	position: absolute;
+	left: 0;
+	width: 100%;
+	height: 20px;
+	background: radial-gradient(circle, rgba(230, 194, 158, 0.8), transparent);
+}
+
+.pergami::before {
+	top: -20px;
+	border-top-left-radius: 10px;
+	border-top-right-radius: 10px;
+}
+
+.pergami::after {
+	bottom: -20px;
+	border-bottom-left-radius: 10px;
+	border-bottom-right-radius: 10px;
+}
+.jugadorAvatar {
+	position:absolute;
+	text-align: center;
+	cursor: pointer;
+	flex: 1 1 calc(33.333% - 20px); /* 3 per fila */
+	/* max-width: 150px; /* Evita que s'estirin massa */
+}
+#jugadorAvatar1{
+	left: 160px;
+	top: -50px;
+}
+#jugadorAvatar2{
+	left: 760px;
+	top: -50px;
+}
+#jugadorAvatar3{
+	left: 1360px;
+	top: -50px;
+}
+#jugadorAvatar4{
+	left: 160px;
+	bottom: 200px;
+}
+#jugadorAvatar5{
+	left: 760px;
+	bottom: 200px;
+}
+#jugadorAvatar6{
+	left: 1360px;
+	bottom: 200px;
+}
+.jugadorAvatar img {
+	width: 400px;
+	height: auto;
+	transition: opacity 0.3s ease-in-out;
+}
+.jugadorAvatar input {
+	display: block;
+	width: 90%;
+	margin: 10px auto;
+	text-align: center;
+	font-family: 'PiecesOfEight', serif;
+	font-size: 32px;
+	padding: 5px;
+	background: url('img/tauler-fusta.webp');
+	background-size: cover;
+	border: 3px solid #3b2e1f;
+	border-radius: 10px;
+	color: #fff3d6;
+	text-shadow: 1px 1px 2px #000;
+	padding: 10px;
+	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+	outline: none;
+	cursor: pointer;
+	transition: transform 0.2s;
+}
+
+.avatarDesactivat img {
+	filter: grayscale(100%);
+	opacity: 0.5;
+	transition: filter 0.3s ease, opacity 0.3s ease;
+}
+
+.avatarActivat img {
+	filter: none;
+	opacity: 1;
+}
+
+#escena-joc {
+	background-image: url('img/vaixell-jocv2.png');
+	background-size: cover;
+	background-position: center;
+}
+
+#contenidorDaus canvas {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100% !important;
+	height: 100% !important;
+}
+
+#contenidorProgres{
+	width: 100%; height: 30px; background: rgba(0,0,0,0.5); border-radius: 15px; overflow: hidden;
+}
+
+#barraProgres{
+	height: 100%; width: 0%; background: #dfbf9f; transition: width 0.2s;
+}
+
+#botoIniciarContainer{
+	display:none;
+}
+
+#numPercentatge{
+	font-size: 24px; text-shadow: 1px 1px 2px black;
+}
+
+#cameraControls{
+	display: none; position: absolute; top: 20px; right: 20px; background: rgba(0,0,0,0.8); padding: 10px; z-index: 999; color: white; font-family: sans-serif; border-radius: 10px;
+}
+
+.teclat {
+	position: absolute;
+	width: 1300px;
+	background: rgba(0,0,0,0.8);
+	border-radius: 20px;
+	padding: 10px;
+	display: flex;
+	flex-direction: column;
+	gap: 5px;
+	z-index: 9999;
+	font-family: sans-serif;
+}
+.teclat button {
+	flex: 1;
+	padding: 15px;
+	font-size: 40px;
+	border-radius: 5px;
+	border: none;
+	background: #dfbf9f;
+	cursor: pointer;
+}
+.teclat .fila {
+	display: flex;
+	gap: 5px;
+}
+.teclatOcult {
+	display: none;
+}
+.teclatDreta {
+	top: 50%;
+	left: unset;
+	right: 50px;
+	transform: translateY(-50%);
+}
+.teclatEsquerra {
+	top: 50%;
+	left: 50px;
+	transform: translateY(-50%);
+}
+.teclatAbaix {
+	bottom: 50px;
+	left: 50%;
+	transform: translateX(-50%);
+}
+.teclatAdalt {
+	top: 10px;
+	left: 50%;
+	transform: translateX(-50%);
+}
+
+
+
+#modalPersonatges{
+	display:none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+	background: rgba(0, 0, 0, 0.8); z-index: 99999; align-items: center; justify-content: center;
+}
+
+#botoSeguentConfigurarPartida{
+	display: none;
+}
+
+#puntuacionsJugadors {
+	position: absolute;
+	left: 20px;
+	width: 200px;
+	z-index: 999;
+	color: #3b1d08;
+	font-family: 'PiecesOfEight';
+	font-size: 24px;
+	display: flex;
+	flex-direction: column;
+}
+
+.puntuacionsJugadorsTop,
+.puntuacionsJugadorsBot {
+	height: 40px; /* Ajusta segons el teu pergamí */
+	background-repeat: no-repeat;
+	background-size: 100% 100%;
+
+}
+
+.puntuacionsJugadorsTop {
+	background-image: url('img/pergamiEnrollableTop.png');
+}
+
+.puntuacionsJugadorsBot {
+	background-image: url('img/pergamiEnrollableBot.png');
+	margin-top: -1px;
+}
+
+.puntuacionsJugadorsMid {
+	flex-grow: 1;
+	background-image: url('img/pergamiEnrollableMid.png');
+	background-repeat: repeat-y;
+	background-size: 100% auto;
+	text-align: center;
+	margin-top: -1px;
+}
+
+
+.pergamiBoto {
+	display: flex;
+	align-items: center;
+	cursor: pointer;
+	font-family: 'PiecesOfEight', sans-serif;
+	font-size: 40px;
+	color: #fff3d6;
+	text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.5);
+	width: fit-content;
+	transition: transform 0.2s ease-in-out;
+	z-index:1000;
+}
+
+.pergamiBoto:hover {transform: scale(1.05);}
+
+.pergamiBotoEsq, .pergamiBotoDret {width: 30px;height: 100px;background-size: contain;background-repeat: no-repeat;background-position: center;}
+
+.pergamiBotoEsq {
+	background-image: url('img/pergamiBotoEsquerra.png');
+	background-position: right center; /* ✅ Enganxat a la dreta */
+	margin-right:-1px;
+}
+
+.pergamiBotoDret {
+	background-image: url('img/pergamiBotoDreta.png');
+	background-position: left center; /* ✅ Enganxat a l'esquerra */
+	margin-left: -1px;
+}
+
+.pergamiBotoMid {
+	background-image: url('img/pergamiBotoMig.png');
+	background-repeat: repeat-x;
+	background-size: auto 100%;
+	padding: 0px 30px;
+	line-height: 100px; /* ✅ Centra el text verticalment */
+	height: 100px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+/* pergamiBoto posicions concretes */
+.pergamiBotoCentreAbaix {position:absolute; bottom:20px;z-index:1000}
+.pergamiBotoDretaAbaix{position:absolute; right:20px; bottom:20px;z-index:1000}
+.pergamiBotoEsquerraAbaix{position:absolute; left:20px; bottom:20px;z-index:1000}
+.pergamiBotoEsquerraAdalt{position:absolute; left:20px; top:20px;z-index:1000}
+.pergamiBotoDretaAdalt{position:absolute; right:20px; top:20px;z-index:1000}
+.pergamiBotoPantallaCompleta{position:absolute; width:60px; right:20px; top:20px;z-index:1000}
+.pergamiBotoAudio{position:absolute; width:60px; right:20px; top:100px;z-index:1000}
+.pergamiBotoNomJugador{width:100%;}
+
+.dauTirades{position:absolute; left:550px; bottom:100px;}
+#cartaEnJoc{position:absolute; left:1175px; bottom:100px;}
+
+.cartellBotoGran {
+	position: absolute;
+	top:50px;
+	display: flex;
+	align-items: center;
+	cursor: pointer;
+	font-family: 'PiecesOfEight', sans-serif;
+	font-size: 150px;
+	width: fit-content;
+	color: #fff3d6;
+	text-shadow: 4px 4px 6px rgba(0, 0, 0, 0.8);
+	animation: tremolorSuau 5s infinite ease-in-out;
+}
+
+.cartellBotoGran:hover {transform: scale(1.05);}
+
+.cartellBotoGranEsq, .cartellBotoGranDret {width: 30px;height: 200px;background-size: contain;background-repeat: no-repeat;background-position: center;}
+
+.cartellBotoGranEsq {
+	background-image: url('img/cartellBotoGranEsq.png');
+	background-position: right center; /* ✅ Enganxat a la dreta */
+	margin-right:-1px;
+	width: 200px;
+	background-size: auto 100%;
+	
+}
+
+.cartellBotoGranDret {
+	background-image: url('img/cartellBotoGranDret.png');
+	background-position: left center; /* ✅ Enganxat a l'esquerra */
+	margin-left: -1px;
+	width: 200px;
+	background-size: auto 100%;
+	
+}
+
+.cartellBotoGranMid {
+	background-image: url('img/cartellBotoGranMig.png');
+	background-repeat: repeat-x;
+	background-size: auto 100%;
+	padding: 0px 30px;
+	line-height: 100px; /* ✅ Centra el text verticalment */
+	height: 200px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+/* Només afecta el pergamí de la pantalla d’instruccions */
+#escena-instruccions .pergami {
+	max-height: 80%;      /* Limita l’alçada a un 80% de l’escena */
+	overflow-y: auto;     /* Activa el scroll vertical */
+	padding-right: 20px;   /* Deixa espai perquè no talli el text al costat de l’scroll */
+}
+
+/* Posició dels Botons imatge */
+#musicButton{position:absolute;right:0px; width:300px;bottom:80px;}
+#fullscreenButton{position:absolute;left:0px; width:300px;bottom:10px; transform: scaleX(-1);z-index:1000;}
+.pirateflagButton{position:absolute;left:-10px; width:350px;top:0px;z-index:1000;}
+.mostraInstruccionsMico{position:absolute;right:0px; width:300px;top:10px;z-index:1000}
+
+
+#puntsProvisional{
+	font-family: 'PiecesOfEight', sans-serif; 
+	position:absolute; 
+	top:50px; 
+	left:50%; 
+	transform:translateX(-50%); 
+	font-size:70px; 
+	font-weight:bold; 
+	color:white; 
+	text-shadow:2px 2px 5px black; 
+	display:none; 
+	text-position:center;
+}
+
+#resumPuntsTornActiu{
+	display:none; font-size:40px;text-shadow:2px 2px 5px black;color:yellow;
+	position:absolute;width:60%;top:150px;text-align:center;
+}
+
+#botoCarregantMid{width:400px;}
