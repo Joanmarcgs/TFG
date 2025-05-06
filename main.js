@@ -240,13 +240,14 @@ function actualitzaTornsPantalla() {
     if (!jugadorActiu) return;
 	
 	document.getElementById("finalitzarTornContainer").style.display = "flex";
+	document.getElementById("dauTirades").style.display = 'block';
 	
     
     //document.getElementById("tornActual").style.display = "block";
     document.getElementById("puntsProvisional").style.display = "block";
 
     //document.getElementById("nomJugadorActiu").textContent = jugadorActiu.nom;
-    document.getElementById("puntsTornActiu").textContent = puntsTornActual;
+    document.getElementById("puntsTornActiu").textContent = puntsTornActual + " punts";
 
     // 🔥 ACTUALITZA avatar i nom centrat
     const avatarDisplay = document.getElementById("jugadorActiuInfo");
@@ -480,7 +481,7 @@ switch(cartaActual.id) {
 	
 	
 	puntsTornActual += bonusCombinacio;
-    document.getElementById("puntsTornActiu").textContent = puntsTornActual;
+    document.getElementById("puntsTornActiu").textContent = puntsTornActual + " punts";
     localStorage.setItem('puntsTornActual', puntsTornActual);
 
 
@@ -568,7 +569,7 @@ switch(cartaActual.id) {
 
 
 //puntsTornActual += bonusCombinacio;
-    document.getElementById("puntsTornActiu").textContent = puntsTornActual;
+    document.getElementById("puntsTornActiu").textContent = puntsTornActual + " punts";
     localStorage.setItem('puntsTornActual', puntsTornActual);
 
 
@@ -832,18 +833,31 @@ Guanyes ${skulls * 100} punts, rivals -${penal} punts.`,
     console.log(`🏆 ${jugadorActiu.nom} guanya ${puntsTornActual} punts. Total: ${jugadorActiu.punts}`);
 
 
-  // ← Aquí comprovem si ha arribat a 10000 punts
-  if (jugadorActiu.punts >= 2000) {
+  // Aquí comprovem si ha arribat a 10000 punts
+  if (jugadorActiu.punts >= 10000) {
     mostrarModalMissatge(`🎉 Enhorabona ${jugadorActiu.nom}! Has arribat a 10000 punts i guanyes la partida!`, false);
     // Opcional: amagar controls per no seguir tirant
     //document.getElementById("dauTiradesContainer")?.remove();
     //document.getElementById("finalitzarTornContainer")?.remove();
 	//document.getElementById("finalitzarTornContainer").style.display = 'none';
+	document.getElementById("dauTirades").style.display = 'none';
 	document.getElementById("finalitzarTornContainer").style.display = 'none';
+	document.getElementById("puntsTornActiu").textContent = "Ha guanyat " + jugadorActiu.nom;
     return;  // sortim de la funció per no passar torn
   }
 
-
+  // Aquí comprovem si ha arribat a -5000 punts
+  if (jugadorActiu.punts <= -5000) {
+    mostrarModalMissatge(`🎉 Enhorabona ${jugadorActiu.nom}! Perdre tants punts ha tingut premi! Guanyes la partida!`, false);
+    // Opcional: amagar controls per no seguir tirant
+    //document.getElementById("dauTirades")?.remove();
+    //document.getElementById("finalitzarTornContainer")?.remove();
+	//document.getElementById("finalitzarTornContainer").style.display = 'none';
+	document.getElementById("puntsTornActiu").textContent = "Ha guanyat " + jugadorActiu.nom + " per loser!";
+	document.getElementById("dauTirades").style.display = 'none';
+	document.getElementById("finalitzarTornContainer").style.display = 'none';
+    return;  // sortim de la funció per no passar torn
+  }
 
     // Passem al següent jugador
     llistaJugadors[jugadorActiuIndex].torn = false;

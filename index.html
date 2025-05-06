@@ -24,10 +24,10 @@
 		<script src="lib/cannon.min.js"></script>
 		
 		<!-- Entire game logic -->
-		<script src="main.js?v31" defer></script>
+		<script src="main.js?v41" defer></script>
 		
 		<!-- Stylesheet -->
-		<link rel="stylesheet" href="style.css?v25" defer>
+		<link rel="stylesheet" href="style.css?v26" defer>
 		
 		<!--
 		<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -379,6 +379,7 @@
 				<img src="img/mostraInstruccionsMico.png" class="mostraInstruccionsMico" onclick="carregaEscena('escena-instruccions')" style="position:absolute;right:0px; width:300px;top:10px;">
 				<img src="img/spyglassButton.png?v=2" id="fullscreenButton" onclick="pantallaCompleta()">
 				<img src="img/pirateflagButton.png?v=2" class="pirateflagButton" onclick="toggleAjudaPunts()">
+				<img src="img/dauTiradesBlanc.png" id="dauTirades" class="dauTirades" onclick="tirarDaus()">
 				
 				<!-- Contenidor que fan servir les llibreries de javascript que ens generen els daus en 3d -->
 				<div id="contenidorDaus"></div>
@@ -421,12 +422,9 @@
 					<div class="pergamiBotoDret"></div>
 				</div>
 				
-				<!-- Imatge que fem servir de botó per tirar els daus -->
-				<img class="dauTirades" src="img/dauTiradesBlanc.png" onclick="tirarDaus()">
-				
 				<!-- Div que fem servir per mostrar en pantalla els punts que podria fer l'usuari si acaba el torn en aquest moment -->
 				<div id="puntsProvisional" >
-					 <span id="puntsTornActiu">0</span> punts<br>
+					 <span id="puntsTornActiu">0</span><br>
 				</div>
 				
 				<!--Text que mostrem en pantalla si l'usuari fa clic a la bandera pirata. Ens explica els punts que estem aconseguint -->
