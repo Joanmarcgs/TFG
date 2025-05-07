@@ -10,6 +10,100 @@
 	  });
 	}
 	
+	// Creem una classe “StorageVar” que ens permet treballar amb variables localStorage com si fossin variables globals normals
+	// Ho fem perquè ens sigui més fàcil mantenir una sèrie de variables persistents entre sessions
+	class StorageVar {
+		// El constructor principal
+		constructor(key, defaultValue = null) {
+			this.key = key;
+			this.default = defaultValue;
+			// Si encara no existeix al localStorage, ho inicialitzem
+			if (localStorage.getItem(this.key) === null && defaultValue !== null) {
+				localStorage.setItem(this.key, JSON.stringify(defaultValue));
+			}
+		}
+		
+		// Quan volem llegir el valor d'una variable localStorage
+		get value() {
+			const raw = localStorage.getItem(this.key);
+			try {
+				return raw === null ? null : JSON.parse(raw);
+			} catch {
+				return raw; // no era JSON, retornem la cadena
+			}
+		}
+		
+		// Quan volem canviar el valor d'una variable localStorage
+		set value(val) {
+			localStorage.setItem(this.key, JSON.stringify(val));
+		}
+		
+		// Quan volem eliminar una variable localStorage
+		clear() {
+			localStorage.removeItem(this.key);
+		}
+	}
+	
+	/*
+	============================================================================
+	==== Mini tutorial variables localStorage amb el constructor StorageVAr ====
+	============================================================================
+	
+	===== Resum funcionament =====
+		Hem generat un constructor anomenat StorageVar. Totes les variables que volem 
+		que siguin persistents entre sessions les declararem amb aquest constructor.
+		A efectes pràctics, quan treballem amb aquestes variables és com si estiguessim
+		treballant amb un objecte que té propietats, en aquest cas l'única que té és "value".
+	===== FI Resum funcionament =====
+	
+	===== Declarar variables =====
+		const partidaFinalitzada = new StorageVar('partidaFinalitzada', false); // Tipus Boolean
+		const llistaJugadors     = new StorageVar('llistaJugadors', []); // Array
+		const numTirada          = new StorageVar('numTirada', 0); // Int, string, etc
+		const cartaActual        = new StorageVar('cartaActual', null); // Serà exemple d'Objecte
+	===== FI Declarar variables =====
+	
+	===== Modificar variables =====
+		llistaJugadors.value = [{ id:1, nom:'Ana', punts:0 }];
+		partidaFinalitzada.value = true;
+		numTirada.value++;
+		cartaActual.value = cartes[0];
+	===== FI Modificar variables =====
+	
+	===== Llegir variables =====
+		// Exemple booleà
+		if (partidaFinalitzada.value){ 
+			console.log("La partida està marcada com a finalitzada");
+		}
+		
+		// Exemple valor senzill
+		console.log(numTirada.value);
+		
+		//Exemple array sencera
+		console.log("Mostrem el llistat de jugadors:", llistaJugadors.value);
+		
+		//Exemple objecte assignat a partir d'array
+		console.log( cartaActual.value.id ); 
+		console.log( cartaActual.value.desc ); 
+	===== FI Llegir variables =====
+	
+	===== Eliminar variables =====
+	partidaFinalitzada.clear();
+	llistaJugadors.clear();
+	numTirada.clear();
+	
+
+	============================================================================
+	==== Mini tutorial variables localStorage amb el constructor StorageVAr ====
+	============================================================================
+	*/
+
+	// Declaració de variables localStorage amb el constructor StorageVar
+	const partidaFinalitzada = new StorageVar('partidaFinalitzada', false); // Variable control per saber si la partida ha finalitzat
+	const numTirada = new StorageVar('numTirada', 0); // Variable control per saber en quina tirada estem
+	const puntsTornActual = new StorageVar('puntsTornActual', 0); // Variable control per saber en quina tirada estem
+	const cartaActual = new StorageVar('cartaActual', null); // Variable control per saber quina carta hi ha en joc
+	
 	// Llista on definim tot el que volem carregar abans d'iniciar el joc (no cal posar-ho tot)
 	const arxiusACarregar = [
 		// IMG (daus, fons, avatars...)
@@ -60,160 +154,135 @@
 	let llistaJugadors = []; // Llista de jugadors amb info, la guardem també en localStorage
 	let partidaIniciada = false; // Controla si hi ha una partida en curs
 	let primerTiradaFeta = false; // Controla si s'ha fet una tirada ja en el torn present
-	let cartaActual = null; // Controla quina carta està activa en el torn present
+	//let cartaActual = null; // Controla quina carta està activa en el torn present
+	//let partidaFinalitzada = false;
 
 	// Llista de cartes modificadores de torn
 	const cartes = [
-	  { id: 'Boti',          img: 'img/cartesTresor.png',      nom: 'Carta: Botí Pirata',          desc: 'Perdre torn per 3 calaveres et permet mantenir els punts', },
-	  { id: 'Pirata',        img: 'img/cartesPirata.png',      nom: 'Carta: Pirata de la Sort',    desc: 'Duplica la puntuació final del torn',       },
-	  { id: 'Calavera1',     img: 'img/cartesCalavera1.png',   nom: 'Carta: Calavera',             desc: 'Activa una calavera al tauler',        },
-	  { id: 'Calavera2',     img: 'img/cartesCalavera2.png',   nom: 'Carta: Calaveres',            desc: 'Activa dues calaveres al tauler',     },
-	  { id: 'Vaixell2',      img: 'img/cartesVaixell2.png',    nom: 'Carta: Emboscada x2',         desc: 'Has de finalitzar el torn amb 2 vaixells o més per guanyar 500 punts. Si no, en perds 500', },
-	  { id: 'Vaixell4',      img: 'img/cartesVaixell4.png',    nom: 'Carta: Emboscada x4',         desc: 'Has de finalitzar el torn amb 4 vaixells o més per guanyar 1000 punts. Si no, en perds 1000',},
-	  { id: 'Diamant',       img: 'img/cartesDiamant.png',     nom: 'Carta: Diamant',              desc: 'Activa un diamant al tauler',                  },
-	  { id: 'Or',            img: 'img/cartesMoneda.png',      nom: 'Carta: Moneda',               desc: 'Activa una moneda al tauler',                       },
-	  { id: 'Animals',       img: 'img/cartesAnimals.png',     nom: 'Carta: Harmonia Animal',      desc: 'Micos i lloros compten com un mateix símbol de cara a fer combos',},
+		{ id: 'Boti',          img: 'img/cartesTresor.png',      nom: 'Carta: Botí Pirata',          desc: 'Perdre torn per 3 calaveres et permet mantenir els punts', },
+		{ id: 'Pirata',        img: 'img/cartesPirata.png',      nom: 'Carta: Pirata de la Sort',    desc: 'Duplica la puntuació final del torn',       },
+		{ id: 'Calavera1',     img: 'img/cartesCalavera1.png',   nom: 'Carta: Calavera',             desc: 'Posa una calavera addicional en joc',        },
+		{ id: 'Calavera2',     img: 'img/cartesCalavera2.png',   nom: 'Carta: Calaveres',            desc: 'Posa dues calaveres addicionals en joc',     },
+		{ id: 'Vaixell2',      img: 'img/cartesVaixell2.png',    nom: 'Carta: Emboscada x2',         desc: 'Has de finalitzar el torn amb 2 vaixells o més per guanyar 500 punts. Si no, en perds 500', },
+		{ id: 'Vaixell4',      img: 'img/cartesVaixell4.png',    nom: 'Carta: Emboscada x4',         desc: 'Has de finalitzar el torn amb 4 vaixells o més per guanyar 1000 punts. Si no, en perds 1000',},
+		{ id: 'Diamant',       img: 'img/cartesDiamant.png',     nom: 'Carta: Diamant',              desc: 'Posa un diamant addicional en joc',                  },
+		{ id: 'Or',            img: 'img/cartesMoneda.png',      nom: 'Carta: Moneda',               desc: 'Posa una moneda addicional en joc',                       },
+		{ id: 'Animals',       img: 'img/cartesAnimals.png',     nom: 'Carta: Harmonia Animal',      desc: 'Micos i lloros es tornen compatibles',},
 	];
 // FI FUNCIONS I DECLARACIONS globals
 
-			// Funcions CUSTOM que hem generat per treballar més eficientment
 			
-			// Funció que cridem cada cop que volem carregar una escena
-			function carregaEscena(escena){
 			
-			// si demanes tornar enrere, substitueix per l'anterior
-  if (escena === 'escena-anterior') {
-    escena = escenaAnterior || 'escena-pantallaInici';
-  }
-  // abans de canviar, desa quina era l'escena activa
-  const abans = escenaActiva;
-  
-  
-				switch(escena){
-					case "escena-pantallaCarrega": // Tornem a pantalla inicial
-						//amagaEscenes(); // Amaguem totes les escenes
-						//mostraEscena(escena); // Carreguem escena de pantalla d'inici
-						canviaEscena(escena); // Funció que amaga l'escena activa i mostra la desitjada
-					break;
-					case "escena-pantallaInici": // Tornem a pantalla inicial
-						//amagaEscenes(); // Amaguem totes les escenes
-						//mostraEscena(escena); // Carreguem escena de pantalla d'inici
-						actualitzaPantallaInici(); // <--- AFEGEIX AIXÒ!
-						canviaEscena(escena); // Funció que amaga l'escena activa i mostra la desitjada
-					break;
-					case "escena-configuraPartida": // Iniciem una partida
-						//amagaEscenes(); // Amaguem totes les escenes
-						//mostraEscena(escena); // Carreguem escena que de configuració de partida
-						//numTirada = 0;
-						canviaEscena(escena); // Funció que amaga l'escena activa i mostra la desitjada
-					break;
-					case "escena-instruccions": // Veiem les instruccions del joc
-						//amagaEscenes(); // Amaguem totes les escenes
-						//mostraEscena(escena); // Carreguem escena amb les instruccions del joc
-						canviaEscena(escena); // Funció que amaga l'escena activa i mostra la desitjada
-					break;
-					case "escena-credits": // Veiem les instruccions del joc
-						//amagaEscenes(); // Amaguem totes les escenes
-						//mostraEscena(escena); // Carreguem escena amb les instruccions del joc
-						canviaEscena(escena); // Funció que amaga l'escena activa i mostra la desitjada
-					break;
-					case "escena-joc":
-						canviaEscena(escena); // Funció que amaga l'escena activa i mostra la desitjada
-					break;
-					case "escena-anterior":
-					  // ja està resolt a l'inici de la funció
-					  break;
-				
-				}
-				 // actualitza escenaAnterior
-  escenaAnterior = abans;
+// Funció que cridem cada cop que volem carregar una escena
+function carregaEscena(escena){
+			
+	// Fem servir una variable auxiliar abans de posar el valor de escenaActiva a escenaAnterior
+	const abans = escenaActiva;
+	
+	switch(escena){
+		case "escena-pantallaCarrega": // Tornem a pantalla inicial
+			canviaEscena(escena); // Funció que amaga l'escena activa i mostra la desitjada
+		break;
+		case "escena-pantallaInici": // Tornem a pantalla inicial
+			actualitzaPantallaInici(); // <--- AFEGEIX AIXÒ!
+			canviaEscena(escena); // Funció que amaga l'escena activa i mostra la desitjada
+		break;
+		case "escena-configuraPartida": // Iniciem una partida
+			canviaEscena(escena); // Funció que amaga l'escena activa i mostra la desitjada
+		break;
+		case "escena-instruccions": // Veiem les instruccions del joc
+			canviaEscena(escena); // Funció que amaga l'escena activa i mostra la desitjada
+		break;
+		case "escena-credits": // Veiem les instruccions del joc
+			canviaEscena(escena); // Funció que amaga l'escena activa i mostra la desitjada
+		break;
+		case "escena-joc":
+			canviaEscena(escena); // Funció que amaga l'escena activa i mostra la desitjada
+			// Fix per evitar que hi hagi bugs quan reprenem una partida i hi ha un jugador en el torn 0
+			//alert("carregaEscena: Torn " + numTirada.value);
+			if(numTirada.value == 0){ 
+				document.getElementById("botoFinalitzarTorn").style.display = "none";
+				document.getElementById("puntsTornActiu").textContent = "0 punts";
+				desbloquejarTotsElsDaus(); // Per si de cas
+			}else{
+				document.getElementById("botoFinalitzarTorn").style.display = "flex";
 			}
-			
-			function seleccionarJugador(num) {
-				let avatar = document.getElementById("jugadorAvatar" + num);
-				let input = document.getElementById("nom" + num);
-				
-				if (avatar.classList.contains("avatarActivat")) {
-					avatar.classList.remove("avatarActivat");
-					avatar.classList.add("avatarDesactivat");
-					input.disabled = true;
-					input.value = "";
-				} else {
-					avatar.classList.remove("avatarDesactivat");
-					avatar.classList.add("avatarActivat");
-					input.disabled = false;
-					input.focus();
-				}
-			}
+			// FI Fix per evitar que hi hagi bugs quan reprenem una partida i hi ha un jugador en el torn 0
+		break;
+		case "escena-anterior":
+			canviaEscena(escenaAnterior); // Funció que amaga l'escena activa i mostra la desitjada
+			break;
+	}
+	 // Ara que ja hem fet tots els canvis, actualitzem finalment escenaAnterior des de la variable auxiliar que hem fet servir
+	escenaAnterior = abans;
+}
 
+//Funció que cridem quan volem amagar totes les escenes
+function amagaEscenes(){
+	document.querySelectorAll('.escena').forEach(escena => { // Per cada element amb class 'escena'
+		escena.style.display = 'none'; // Li canviem la propietat DOM display a 'none' per amagar-ho
+	});
+}
 			
-			// Funció que activa o desactiva la pantalla completa
-			function pantallaCompleta() {
-				if (!document.fullscreenElement) {
-					document.documentElement.requestFullscreen().catch((err) => {
-						alert(`Error al intentar entrar en mode pantalla completa: ${err.message}`);
-					});
-				} else {
-					document.exitFullscreen();
-				}
-			}
-			
-			//Funció que cridem quan volem amagar totes les escenes
-			function amagaEscenes(){
-				document.querySelectorAll('.escena').forEach(escena => { // Per cada element amb class 'escena'
-					escena.style.display = 'none'; // Li canviem la propietat DOM display a 'none' per amagar-ho
-				});
-			}
-			
-			// Funció que cridem quan volem carregar una escena
-			function mostraEscena(escena){
-				document.getElementById(escena).style.display = 'flex'; // A l'element amb ID variable, li canvies la propietat DOM display a 'flex' per mostrar-ho
-			}
+// Funció que cridem quan volem carregar una escena
+function mostraEscena(escena){
+	document.getElementById(escena).style.display = 'flex'; // A l'element amb ID variable, li canvies la propietat DOM display a 'flex' per mostrar-ho
+}
 
-			// Funció que cridem quan volem canviar una escena per una altra
-			function canviaEscena(escena){
-				if (escena === escenaActiva) return; // Ja estem a l'escena
-				
-				let novaEscena = document.getElementById(escena);
+// Funció que cridem quan volem canviar una escena per una altra
+function canviaEscena(escena){
+	if (escena === escenaActiva) return; // Ja estem a l'escena
+	let novaEscena = document.getElementById(escena);
+	// Si ja hi ha una escena activa, fem el fade out
+	if (escenaActiva !== "cap") {
+		let escenaActual = document.getElementById(escenaActiva);
+		escenaActual.style.opacity = '0';
+		escenaActual.addEventListener('transitionend', function handler() {
+			escenaActual.style.display = 'none';
+			escenaActual.removeEventListener('transitionend', handler);
+		});
+	}
+	// Fade in nova escena
+	novaEscena.style.display = 'flex';
+	novaEscena.style.opacity = '0'; // Assegurem que comença transparent
+	setTimeout(() => {
+		novaEscena.style.opacity = '1';
+	}, 10);
+	// Actualitzem l'escena activa
+	escenaActiva = escena;
+}
+			
+// Funció que fem servir a la pantalla de selecció de jugadors. Quan fan clic en un avatar, aquest es posa en color i hi deixa posar un nom
+function seleccionarJugador(num) {
+	let avatar = document.getElementById("jugadorAvatar" + num);
+	let input = document.getElementById("nom" + num);
+	
+	if (avatar.classList.contains("avatarActivat")) {
+		avatar.classList.remove("avatarActivat");
+		avatar.classList.add("avatarDesactivat");
+		input.disabled = true;
+		input.value = "";
+	} else {
+		avatar.classList.remove("avatarDesactivat");
+		avatar.classList.add("avatarActivat");
+		input.disabled = false;
+		input.focus();
+	}
+}
 
-				// Si ja hi ha una escena activa, fem el fade out
-				if (escenaActiva !== "cap") {
-					let escenaActual = document.getElementById(escenaActiva);
-					escenaActual.style.opacity = '0';
-					escenaActual.addEventListener('transitionend', function handler() {
-						escenaActual.style.display = 'none';
-						escenaActual.removeEventListener('transitionend', handler);
-					});
-				}
-
-				// Fade in nova escena
-				novaEscena.style.display = 'flex';
-				novaEscena.style.opacity = '0'; // Assegurem que comença transparent
-				setTimeout(() => {
-					novaEscena.style.opacity = '1';
-				}, 10);
-
-				// Actualitzem l'escena activa
-				escenaActiva = escena;
-			}
-			
-			
-			
-
-			function actualitzaPuntuacions() {
-				const div = document.getElementById("puntuacionsJugadorsMid");
-				if (!div) return;
-
-				div.innerHTML = "<h2>Puntuació</h2><h3>~~~~~~</h3>";
-				llistaJugadors.forEach(j => {
-					div.innerHTML += "<div style='padding:10px;'>"+j.nom+"<br>"+j.punts+" </div> ";
-				});
-			}
+function actualitzaPuntuacions() {
+	const div = document.getElementById("puntuacionsJugadorsMid");
+	if (!div) return;
+	div.innerHTML = "<h2>Puntuació</h2><h3>~~~~~~</h3>";
+	llistaJugadors.forEach(j => {
+		div.innerHTML += "<div style='padding:10px;'>"+j.nom+"<br>"+j.punts+" </div> ";
+	});
+}
 			
 			
 			
 			
-			let puntsTornActual = 0;
+			//let puntsTornActual = 0;
 
 function iniciarTorns() {
     if (llistaJugadors.length === 0) return;
@@ -239,15 +308,26 @@ function actualitzaTornsPantalla() {
     const jugadorActiu = llistaJugadors.find(j => j.torn);
     if (!jugadorActiu) return;
 	
-	document.getElementById("finalitzarTornContainer").style.display = "flex";
-	document.getElementById("dauTirades").style.display = 'block';
 	
+	
+	// Si la partida està marcada com a finalitzada
+	if (partidaFinalitzada.value) {
+		document.getElementById("finalitzarTornContainer").style.display = "none";
+		document.getElementById("dauTirades").style.display = 'none';
+		document.getElementById("cartaEnJoc").style.display = 'none';
+		document.getElementById("puntsTornActiu").textContent = "Ha guanyat " + jugadorActiu.nom;
+	}else{
+		document.getElementById("finalitzarTornContainer").style.display = "flex";
+		document.getElementById("dauTirades").style.display = 'block';
+		document.getElementById("cartaEnJoc").style.display = 'block';
+		document.getElementById("puntsTornActiu").textContent = puntsTornActual.value + " punts";
+	}
     
     //document.getElementById("tornActual").style.display = "block";
     document.getElementById("puntsProvisional").style.display = "block";
 
     //document.getElementById("nomJugadorActiu").textContent = jugadorActiu.nom;
-    document.getElementById("puntsTornActiu").textContent = puntsTornActual + " punts";
+    
 
     // 🔥 ACTUALITZA avatar i nom centrat
     const avatarDisplay = document.getElementById("jugadorActiuInfo");
@@ -305,7 +385,7 @@ let calaveresIllaAcumulades = 0;
 function actualitzaPuntsTorn() {
     const cares = [];
     numCalaveres = 0;
-    puntsTornActual = 0;
+    puntsTornActual.value = 0;
 
     let comptadorMonedes = 0;
     let comptadorDiamants = 0;
@@ -313,17 +393,17 @@ function actualitzaPuntsTorn() {
 
 	let missatge = '';
 
-switch(cartaActual.id) {
+switch(cartaActual.value.id) {
   case 'Diamant':
 	comptadorDiamants++;
-	puntsTornActual += 100;
+	puntsTornActual.value += 100;
 	missatge = `💎 Sumes un diamant per carta modificadora!`;
      console.log(missatge);
        missatgesResum.push(missatge);
   break;
   case 'Or':
 	comptadorMonedes++;
-	puntsTornActual += 100;
+	puntsTornActual.value += 100;
 	missatge = `🪙 Sumes una moneda d'or per carta modificadora!`;
      console.log(missatge);
        missatgesResum.push(missatge);
@@ -337,11 +417,11 @@ switch(cartaActual.id) {
         if (cara) cares.push(cara);
 
         if (cara === 2) {
-            puntsTornActual += 100;
+            puntsTornActual.value += 100;
             comptadorMonedes++;
         }
         if (cara === 4) {
-            puntsTornActual += 100;
+            puntsTornActual.value += 100;
             comptadorDiamants++;
         }
         if (cara === 6) numCalaveres++; // Calavera
@@ -370,7 +450,7 @@ switch(cartaActual.id) {
 	
 	
 	// Comptador especial per monedes i diamants
-	switch (cartaActual.id) {
+	switch (cartaActual.value.id) {
 		  case 'Or':
 			// la cara “Moneda” de la carta també compta per al combo
 			comptador[2] = (comptador[2] || 0) + 1;
@@ -474,15 +554,15 @@ switch(cartaActual.id) {
       if (bonusAvatar > 0) {
         console.log(msgAvatar);
         missatgesResum.push(msgAvatar);
-        puntsTornActual += bonusAvatar;
+        puntsTornActual.value += bonusAvatar;
       }
     }
 	
 	
 	
-	puntsTornActual += bonusCombinacio;
-    document.getElementById("puntsTornActiu").textContent = puntsTornActual + " punts";
-    localStorage.setItem('puntsTornActual', puntsTornActual);
+	puntsTornActual.value += bonusCombinacio;
+    document.getElementById("puntsTornActiu").textContent = puntsTornActual.value + " punts";
+    //localStorage.setItem('puntsTornActual', puntsTornActual);
 
 
 
@@ -492,11 +572,11 @@ switch(cartaActual.id) {
 
 
 	
-switch(cartaActual.id) {
+switch(cartaActual.value.id) {
   case 'Pirata':
     // xo₂ al final
-    puntsTornActual *= 2;
-    missatgesResum.push(`☠️ Pirata: puntuació x2 = ${puntsTornActual}`);
+    puntsTornActual.value *= 2;
+    missatgesResum.push(`☠️ Pirata: puntuació x2 = ${puntsTornActual.value}`);
     break;
   case 'Calavera1':
     // Comptem una calavera extra “gratis”
@@ -510,20 +590,20 @@ switch(cartaActual.id) {
   case 'Vaixell2':
     const v2 = comptador[5] || 0;
     if (v2 >= 2) {
-      puntsTornActual += 500;
+      puntsTornActual.value += 500;
       missatgesResum.push(`🚢×2: +500 punts per ≥2 vaixells`);
     } else {
-      puntsTornActual -= 500;
+      puntsTornActual.value -= 500;
       missatgesResum.push(`🚢×2: -500 punts per <2 vaixells`);
     }
     break;
   case 'Vaixell4':
     const v4 = comptador[5] || 0;
     if (v4 >= 4) {
-      puntsTornActual += 1000;
+      puntsTornActual.value += 1000;
       missatgesResum.push(`🚢×4: +1000 punts per ≥4 vaixells`);
     } else {
-      puntsTornActual -= 1000;
+      puntsTornActual.value -= 1000;
       missatgesResum.push(`🚢×4: -1000 punts per <4 vaixells`);
     }
     break;
@@ -549,7 +629,7 @@ switch(cartaActual.id) {
   if (cntLloro >= 3) sub += ptsCombo(cntLloro);
   if (cntMico  >= 3) sub += ptsCombo(cntMico);
   if (sub) {
-    puntsTornActual -= sub;
+    puntsTornActual.value -= sub;
     missatgesResum.push(`🐒🦜 Animals carta: restem ${sub} punts de combos separats`);
   }
 
@@ -557,7 +637,7 @@ switch(cartaActual.id) {
   const totAnimals = cntLloro + cntMico;
   if (totAnimals >= 3) {
     const ptsA = ptsCombo(totAnimals);
-    puntsTornActual += ptsA;
+    puntsTornActual.value += ptsA;
     missatgesResum.push(`🐒🦜 Animals carta: +${ptsA} punts per ${totAnimals} cares iguals`);
   }
   break;
@@ -569,8 +649,8 @@ switch(cartaActual.id) {
 
 
 //puntsTornActual += bonusCombinacio;
-    document.getElementById("puntsTornActiu").textContent = puntsTornActual + " punts";
-    localStorage.setItem('puntsTornActual', puntsTornActual);
+    document.getElementById("puntsTornActiu").textContent = puntsTornActual.value + " punts";
+    //localStorage.setItem('puntsTornActual', puntsTornActual);
 
 
 
@@ -612,20 +692,20 @@ switch(cartaActual.id) {
 	
 	if (numCalaveres == 3) {
     let penal = 0;
-    if (cartaActual.id === "Vaixell2") penal = 500;
-    if (cartaActual.id === "Vaixell4") penal = 1000;
+    if (cartaActual.value.id === "Vaixell2") penal = 500;
+    if (cartaActual.value.id === "Vaixell4") penal = 1000;
 
-    if (cartaActual.id === "Boti") {
+    if (cartaActual.value.id === "Boti") {
         // el Botí ja manté punts normals: no tocar
         mostrarModalMissatge(
-          `☠️ Has tret 3 calaveres! Perds el torn! Gràcies a la carta de Botí t'endús ${puntsTornActual} punts!`,
+          `☠️ Has tret 3 calaveres! Perds el torn! Gràcies a la carta de Botí t'endús ${puntsTornActual.value} punts!`,
           true
         );
     } else {
         // si és carta de vaixell, assignem un valor negatiu a puntsTornActual
-        puntsTornActual = -penal;
+        puntsTornActual.value = -penal;
         let miss = `☠️ Has tret 3 calaveres! Perds el torn!`;
-        if (penal > 0) miss += ` A més perds ${penal} punts per la carta de ${cartaActual.id}.`;
+        if (penal > 0) miss += ` A més perds ${penal} punts per la carta de ${cartaActual.value.id}.`;
         mostrarModalMissatge(miss, true);
     }
 
@@ -688,7 +768,11 @@ switch(cartaActual.id) {
 		}
 
 	
-	
+	//alert("actualitzaPuntsTorn: Torn " + numTirada.value);
+	if(numTirada.value == 0){ 
+		document.getElementById("finalitzarTornContainer").style.display = "none";
+		document.getElementById("puntsTornActiu").textContent = "";
+	}
 	
 }
 
@@ -738,13 +822,13 @@ function actualitzaPuntsTornIllaCalavera() {
     const ptsSelf = noves * 100;
     const penal = noves * 200;
 
-    puntsTornActual += ptsSelf;
+    puntsTornActual.value += ptsSelf;
     llistaJugadors.forEach(j => {
         if (!j.torn) j.punts -= penal;
     });
 
     // 2) actualitza la UI
-    document.getElementById("puntsTornActiu").textContent = puntsTornActual;
+    document.getElementById("puntsTornActiu").textContent = puntsTornActual.value;
     document.getElementById("resumPuntsTornActiu").innerHTML =
       `☠️ Illa Calavera x${calaveresIllaAcumulades}: +${ptsSelf} (rivals -${penal})`;
 }
@@ -802,7 +886,7 @@ function finalitzarTorn() {
     // 1) si estàvem en mode Illa Calavera, ara sí que apliquem guany i penalització
     if (entrantEnIlla) {
         // +100 per calavera al jugador actiu
-        puntsTornActual = skulls * 100;
+        puntsTornActual.value = skulls * 100;
         // -200 per calavera a cada rival
         const penal = skulls * 200;
         llistaJugadors.forEach(j => {
@@ -811,7 +895,7 @@ function finalitzarTorn() {
         // (opcional) missatge resum
         mostrarModalMissatge(
           `🔚 Torn Illa Calavera acabat!  
-Guanyes ${skulls * 100} punts, rivals -${penal} punts.`,
+			Guanyes ${skulls * 100} punts, rivals -${penal} punts.`,
           false
         );
     }
@@ -829,30 +913,39 @@ Guanyes ${skulls * 100} punts, rivals -${penal} punts.`,
     if (jugadorActiuIndex === -1) return;
 
     const jugadorActiu = llistaJugadors[jugadorActiuIndex];
-    jugadorActiu.punts += puntsTornActual;
-    console.log(`🏆 ${jugadorActiu.nom} guanya ${puntsTornActual} punts. Total: ${jugadorActiu.punts}`);
+    jugadorActiu.punts += puntsTornActual.value;
+    console.log(`🏆 ${jugadorActiu.nom} guanya ${puntsTornActual.value} punts. Total: ${jugadorActiu.punts}`);
 
 
   // Aquí comprovem si ha arribat a 10000 punts
-  if (jugadorActiu.punts >= 10000) {
+  if (jugadorActiu.punts >= 3000) {
     mostrarModalMissatge(`🎉 Enhorabona ${jugadorActiu.nom}! Has arribat a 10000 punts i guanyes la partida!`, false);
+	//partidaFinalitzada = true;
+	//localStorage.setItem('partidaFinalitzada', JSON.stringify(true));
     // Opcional: amagar controls per no seguir tirant
     //document.getElementById("dauTiradesContainer")?.remove();
     //document.getElementById("finalitzarTornContainer")?.remove();
 	//document.getElementById("finalitzarTornContainer").style.display = 'none';
+	
+	partidaFinalitzada.value = true;
+	
+	
 	document.getElementById("dauTirades").style.display = 'none';
 	document.getElementById("finalitzarTornContainer").style.display = 'none';
 	document.getElementById("puntsTornActiu").textContent = "Ha guanyat " + jugadorActiu.nom;
     return;  // sortim de la funció per no passar torn
   }
 
-  // Aquí comprovem si ha arribat a -5000 punts
-  if (jugadorActiu.punts <= -5000) {
+  // Com a Easter Egg, es pot guanyar perdent molt fort. Aquí comprovem si ha arribat a -20000 punts
+  if (jugadorActiu.punts <= -20000) {
     mostrarModalMissatge(`🎉 Enhorabona ${jugadorActiu.nom}! Perdre tants punts ha tingut premi! Guanyes la partida!`, false);
+	//partidaFinalitzada = true;
+	//localStorage.setItem('partidaFinalitzada', JSON.stringify(true));
     // Opcional: amagar controls per no seguir tirant
     //document.getElementById("dauTirades")?.remove();
     //document.getElementById("finalitzarTornContainer")?.remove();
 	//document.getElementById("finalitzarTornContainer").style.display = 'none';
+	partidaFinalitzada.value = true;
 	document.getElementById("puntsTornActiu").textContent = "Ha guanyat " + jugadorActiu.nom + " per loser!";
 	document.getElementById("dauTirades").style.display = 'none';
 	document.getElementById("finalitzarTornContainer").style.display = 'none';
@@ -864,15 +957,16 @@ Guanyes ${skulls * 100} punts, rivals -${penal} punts.`,
     const següentIndex = (jugadorActiuIndex + 1) % llistaJugadors.length;
     llistaJugadors[següentIndex].torn = true;
 	
-	localStorage.removeItem('cartaActual');
+	//localStorage.removeItem('cartaActual');
+	cartaActual.clear();
 	
-    puntsTornActual = 0;
+    puntsTornActual.value = 0;
 
     localStorage.setItem("llistaJugadors", JSON.stringify(llistaJugadors));
 
 
-		numTirada = 0;
-  localStorage.setItem('numTirada', numTirada);
+		numTirada.value = 0;
+  //localStorage.setItem('numTirada', numTirada);
   updateFinalitzarTornButton();
   //updateNumTiradaDisplay();
   
@@ -885,10 +979,20 @@ Guanyes ${skulls * 100} punts, rivals -${penal} punts.`,
 
 	
 }
-
+/*
 function updateFinalitzarTornButton() {
   const botoFinalitzar = document.getElementById('botoFinalitzarTorn');
   if (numTirada === 0 || tiradaEnProgres) {
+    botoFinalitzar.style.display = 'none';
+  } else {
+    botoFinalitzar.style.display = 'flex';
+  }
+}
+*/
+
+function updateFinalitzarTornButton() {
+  const botoFinalitzar = document.getElementById('botoFinalitzarTorn');
+  if (numTirada.value === 0 || tiradaEnProgres) {
     botoFinalitzar.style.display = 'none';
   } else {
     botoFinalitzar.style.display = 'flex';
@@ -931,7 +1035,7 @@ function desbloquejarTotsElsDaus() {
 			const daus = [];
 			const limitPixels = 50;
 			const maxHeight = 8;
-			let numTirada = 0;
+			//let numTirada = 0;
 			let tiradaEnProgres = false;
 
 			
@@ -1123,11 +1227,11 @@ function desbloquejarTotsElsDaus() {
 					return;
 				}
 				tiradaEnProgres = true;
-				numTirada++;
+				numTirada.value++;
 				updateFinalitzarTornButton();
 				
-				console.log(`➤ Llançant tirada ${numTirada}...`);
-				  localStorage.setItem('numTirada', numTirada);
+				console.log(`➤ Llançant tirada ${numTirada.value}...`);
+				  //localStorage.setItem('numTirada', numTirada);
 				  updateFinalitzarTornButton();
 			  //updateNumTiradaDisplay();
 
@@ -1164,7 +1268,7 @@ function desbloquejarTotsElsDaus() {
 		
 			
 function onMouseClick(event) {
-	if (numTirada === 0) {
+	if (numTirada.value === 0) {
 		console.log("🚫 No es poden clicar daus a la tirada 0.");
 		return;
 	}
@@ -1269,7 +1373,7 @@ function comprovaCaresDaus() {
 
     if (totsAturats && tiradaEnProgres) {
         console.log('--------------------------');
-        console.log(`Tirada ${numTirada}:`);
+        console.log(`Tirada ${numTirada.value}:`);
 
         const simbols = ["Lloro", "Moneda", "Mico", "Diamant", "Vaixell", "Calavera"];
 
@@ -1362,18 +1466,40 @@ function obtenirCaraAmunt(mesh) {
 			
 			
 			
-			
+			/*
 			function robaCarta() {
 				 // Si ja en tenim una guardada, la recarreguem
-				  const guardada = localStorage.getItem('cartaActual');
+				  //const guardada = localStorage.getItem('cartaActual');
+				  const guardada = cartaActual.value;
 				  if (guardada) {
-					cartaActual = JSON.parse(guardada);
+					//cartaActual = JSON.parse(guardada);
+					cartaActual.value = guardada;
 				  } else {
-					cartaActual = cartes[Math.floor(Math.random() * cartes.length)];
-					localStorage.setItem('cartaActual', JSON.stringify(cartaActual));
+					
+					//cartaActual = cartes[Math.floor(Math.random() * cartes.length)];
+					//localStorage.setItem('cartaActual', JSON.stringify(cartaActual));
+					
+					cartaActual.value = cartes[Math.floor(Math.random() * cartes.length)];
 				  }
-				  mostrarCartaAlUI(cartaActual);
+				  mostrarCartaAlUI(cartaActual.value);
 			}
+			*/
+			
+			
+			function robaCarta() {
+			  const guardada = cartaActual.value;
+			  if (guardada) {
+				mostrarCartaAlUI(guardada);
+			  } else {
+				cartaActual.value = cartes[Math.floor(Math.random() * cartes.length)];
+				mostrarCartaAlUI(cartaActual.value);
+			  }
+			}
+
+			
+			
+			
+			
 /*
 			function mostrarCartaAlUI(carta) {
 				//document.getElementById('cartaNom').textContent  = carta.id;
@@ -1567,19 +1693,21 @@ document.addEventListener("DOMContentLoaded", function () {
 	sincronitzaJugadorsAmbPantalla(); // <-- AFEGEIX AIXÒ!
   }
   
-  const numTiradaGuardada = localStorage.getItem('numTirada');
+  //const numTiradaGuardada = localStorage.getItem('numTirada');
+  const numTiradaGuardada = numTirada.value;
     if (numTiradaGuardada !== null) {
-      numTirada = parseInt(numTiradaGuardada, 10);
+      numTirada.value = parseInt(numTiradaGuardada, 10);
       
     }else{
-		numTirada = 0;
+		numTirada.value = 0;
 	}
 	
-	const puntsTornActualGuardat = localStorage.getItem('puntsTornActual');
+	//const puntsTornActualGuardat = localStorage.getItem('puntsTornActual');
+	const puntsTornActualGuardat = puntsTornActual.value;
 if (puntsTornActualGuardat !== null) {
-  puntsTornActual = parseInt(puntsTornActualGuardat, 10);
+  puntsTornActual.value = parseInt(puntsTornActualGuardat, 10);
 } else {
-  puntsTornActual = 0;
+  puntsTornActual.value = 0;
 }
 
 	updateFinalitzarTornButton();
@@ -1649,14 +1777,22 @@ function reiniciaPartida() {
   localStorage.removeItem("llistaJugadors");
   localStorage.removeItem("partidaIniciada");
   localStorage.removeItem("estatDaus");
-  localStorage.removeItem("numTirada");
-  localStorage.removeItem("puntsTornActual");
-  localStorage.removeItem('cartaActual');
+  //localStorage.removeItem("numTirada");
+  //localStorage.removeItem("puntsTornActual");
+  //localStorage.removeItem('cartaActual');
+  
+  // Eliminem localStorage
+  partidaFinalitzada.clear();
+  puntsTornActual.value = 0;
+  numTirada.value = 0;
+  cartaActual.value = null;
+  //alert(numTirada.value);
+  //numTirada.clear();
 
   llistaJugadors = [];
   partidaIniciada = false;
-  numTirada = 0;
-  puntsTornActual = 0;
+  //numTirada = 0;
+  //puntsTornActual = 0;
   illaCalaveraMode = false;
   
   desbloquejarTotsElsDaus();
@@ -1896,3 +2032,28 @@ function guardarLlistaJugadors() {
   localStorage.setItem("llistaJugadors", JSON.stringify(llistaJugadors));
   //localStorage.setItem("partidaIniciada", "true");
 }
+
+
+
+
+
+
+
+
+
+
+
+// Funcions no rellevants per el transcurs del joc
+
+	// Funció que activa o desactiva la pantalla completa
+	function pantallaCompleta() {
+		if (!document.fullscreenElement) {
+			document.documentElement.requestFullscreen().catch((err) => {
+				alert(`Error al intentar entrar en mode pantalla completa: ${err.message}`);
+			});
+		} else {
+			document.exitFullscreen();
+		}
+	}
+
+// FI Funcions no rellevants per el transcurs del joc

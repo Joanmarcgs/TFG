@@ -24,10 +24,10 @@
 		<script src="lib/cannon.min.js"></script>
 		
 		<!-- Entire game logic -->
-		<script src="main.js?v41" defer></script>
+		<script src="main.js?v70" defer></script>
 		
 		<!-- Stylesheet -->
-		<link rel="stylesheet" href="style.css?v26" defer>
+		<link rel="stylesheet" href="style.css?v29" defer>
 		
 		<!--
 		<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -163,13 +163,10 @@
 					<h2 style="font-size:64px; text-align:center;">Regles del Joc</h2>
 					<ol style="font-size:52px; line-height:1.6;">
 						<li><b>Objectiu:</b> Ser el primer en arribar a 10 000 punts.</li>
-							<ul>
-								<li>TIP: Hi ha imatges que potser fan també de botó, activen funcions, etc.. <br>🏴☠️🦜🐒🔭</li>
-							</ul>
 						<li><b>Torn de joc:</b>
 							<ul>
 								<li>Comença el teu torn tirant els 8 daus.</li>
-								<li>Pots <b>congelar</b> qualsevol dau — fes clic sobre ell per fixar-lo (s’apagarà i no es tornarà a tirar).</li>
+								<li>Pots <b>congelar</b> qualsevol dau fent clic sobre ell per fixar-lo (s’apagarà i no es tornarà a tirar).</li>
 								<li>D'igual manera, pots descongelar daus que hagis congelat tu, per si vols tornar-los a tirar.</li>
 								<li>Les calaveres es congelen soles, i no es poden descongelar. Si n'acumules tres perds el torn! </li>
 								<li>Quan vulguis, prem “Finalitzar Torn” per sumar tots els punts acumulats.</li>
@@ -202,16 +199,17 @@
 							Al principi de cada torn, es roba una carta que estarà activa durant totes les tirades del torn:
 							<ul>
 								<li><b>Pirata:</b> duplica tots els punts del torn.</li>
-								<li><b>Calavera:</b> posa una calavera en joc addicional.</li>
-								<li><b>Calaveres:</b> posa dues calaveres en joc addicionals.</li>
-								<li><b>Vaixell x2:</b> Guanyes 500 pts si tens 2 vaixells o més, si no, perds aquesta quantitat.</li>
-								<li><b>Vaixell x4:</b> Guanyes 1000 pts si tens 4 vaixells o més, si no, perds aquesta quantitat.</li>
-								<li><b>Diamant:</b> sumes 100 pts extra i compta com a cara per a combos.</li>
-								<li><b>Moneda:</b> sumes 100 pts extra i compta com a cara per a combos.</li>
-								<li><b>Animals:</b> micos i lloros fan un únic combo.</li>
+								<li><b>Calavera:</b> posa una calavera addicional en joc.</li>
+								<li><b>Calaveres:</b> posa dues calaveres addicionals en joc.</li>
+								<li><b>Vaixell x2:</b> Guanyes 500 pts si tens 2 vaixells o més, si no, perds 500 pts.</li>
+								<li><b>Vaixell x4:</b> Guanyes 1000 pts si tens 4 vaixells o més, si no, perds 1000 pts.</li>
+								<li><b>Diamant:</b> posa un diamant addicional en joc.</li>
+								<li><b>Moneda:</b> posa una moneda addicional en joc.</li>
+								<li><b>Animals:</b> micos i lloros es tornen compatibles.</li>
+								<li><b>Botí:</b> si treus 3 calaveres, guanyes els punts que tenies acumulats fins aquell moment.</li>
 							</ul>
 						</li>
-						<li><b>Poder dels personatges:</b> Cada avatar té un bonus especial al final del torn:
+						<li><b>Poder dels personatges:</b> Cada avatar té un bonus especial de punts:
 							<ul>
 								<li>Capitana pirata: 100 pts per calavera</li>
 								<li>Oficial pirata armada: 100 pts per vaixell</li>
@@ -223,10 +221,12 @@
 						</li>
 						<li><b>Mode Illa Calavera:</b> Si surten 4 calaveres o més.
 							<ul>
-								<li>Durant aquest torn, cada nova calavera suma 100 pts per a tu i resta 200 pts a cada rival.</li>
-								<li>Si en una tirada no apareix cap calavera nova, el torn Illa Calavera acaba, restes punts als rivals, sumes els teus, i acaba el teu torn.</li>
+								<li>Durant aquest torn, cada calavera que hi hagi en joc et suma 100 pts i li resta 200 als rivals.</li>
+								<li>Si en una tirada no apareix cap calavera nova, el torn Illa Calavera acaba.</li>
 							</ul>
 						</li>
+						<li>TIP: Hi ha imatges que potser fan també de botó, activen funcions, etc.. <br>🏴☠️🦜🐒🔭</li>
+							
 					</ol>
 				</div>
 			</div>
