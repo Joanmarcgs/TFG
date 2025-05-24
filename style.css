@@ -11,6 +11,9 @@ body {
 	touch-action: none; 
 	user-select: none;
 }
+a, a:visited{
+	color: black;
+}
 
 /* Carreguem la font que farem servir en el joc*/
 @font-face {font-family: 'PiecesOfEight';src: url('lib/piecesofeightFont/PiecesofEight.ttf') format('truetype');font-weight: normal;font-style: normal;}
@@ -33,6 +36,37 @@ body {
 	background-position: center; /* Centra la imatge */
 	background-attachment: fixed;
 }
+
+/* Si NO suporten background-size: cover */
+@supports not (background-size: cover) {
+  #contenidor {
+    /* Fallback: escalem la imatge al 100×100% */
+    background-size: 100% 100%;
+    /* I forcem que es mogui amb el div, no fixed */
+    background-attachment: scroll;
+    /* Centrem només sobre l’eix horitzontal i vertical */
+    background-position: center center;
+  }
+}
+
+/* I de la mateixa manera, si no suporten background-attachment: fixed, 
+   diem que es comporti com a scroll */
+@supports not (background-attachment: fixed) {
+  #contenidor {
+    background-attachment: scroll;
+  }
+}
+
+.smartTV #contenidor {
+  /* en comptes de cover */
+  background-size: 100% 100% !important;
+  /* no usis l’attachment fixed, molts navegadors TV el trenquen */
+  background-attachment: scroll !important;
+  /* recentra bé */
+  background-position: center center !important;
+}
+
+
 
 #contenidorFosc {
 	content: "";
@@ -522,6 +556,7 @@ button:active {
 
 /* Posició dels Botons imatge */
 #musicButton{position:absolute;right:0px; width:300px;bottom:80px;}
+#musicButton2{position:absolute;right:0px; width:300px;bottom:80px;z-index:1000;}
 #fullscreenButton{position:absolute;left:0px; width:300px;bottom:10px; transform: scaleX(-1);z-index:1000;}
 .pirateflagButton{position:absolute;left:-10px; width:350px;top:0px;z-index:1000;}
 .mostraInstruccionsMico{position:absolute;right:0px; width:300px;top:10px;z-index:1000}

@@ -24,10 +24,10 @@
 		<script src="lib/cannon.min.js"></script>
 		
 		<!-- Entire game logic -->
-		<script src="main.js?v70" defer></script>
+		<script src="main.js?v113" defer></script>
 		
 		<!-- Stylesheet -->
-		<link rel="stylesheet" href="style.css?v29" defer>
+		<link rel="stylesheet" href="style.css?v36" defer>
 		
 		<!--
 		<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -74,7 +74,11 @@
 			<!-- ESCENA Menú principal -->
 			<div id="escena-pantallaInici" class="escena">
 				<!-- Carreguem l'audio del joc -->
-				<audio id="musica-fons" src="audio/melodiaPrincipal-corda.mp3" loop></audio>
+				<audio id="musica-fons" src="audio/musicaFons.mp3" loop></audio>
+				<audio id="audio-dau" src="audio/dau.mp3" preload="auto"></audio>
+				<audio id="audio-daus" src="audio/daus.mp3" preload="auto"></audio>
+				<audio id="audio-botoPirata" src="audio/botoPirata.mp3" preload="auto"></audio>
+				<audio id="audio-botoGeneral" src="audio/botoGeneral.mp3" preload="auto"></audio>
 				
 				<!-- Cartell principal del joc -->
 				<div class="cartellBotoGran">
@@ -84,7 +88,7 @@
 				</div>
 				
 				<!-- Imatges simpàtiques estil pixel art que també fan de botó -->
-				<img src="img/music_on-SFX_off.png" id="musicButton">
+				<img src="img/music_on-SFX_on.png" id="musicButton" onclick="toggleMusica()">
 				<img src="img/spyglassButton.png?v=2" id="fullscreenButton" onclick="pantallaCompleta()">
 				<img src="img/pirateflagButton.png?v=2" class="pirateflagButton" onclick="toggleAjudaPunts()">
 				<img src="img/mostraInstruccionsMico.png" class="mostraInstruccionsMico" onclick="carregaEscena('escena-instruccions')" >
@@ -114,7 +118,7 @@
 				<!-- Botó tipus pergamí -->
 				<div class="pergamiBoto pergamiBotoEsquerraAbaix">
 					<div class="pergamiBotoEsq"></div>
-					<div class="pergamiBotoMid" onclick="carregaEscena('escena-sobreProjecte')">El Projecte</div>
+					<div class="pergamiBotoMid" onclick="carregaEscena('escena-about')">About</div>
 					<div class="pergamiBotoDret"></div>
 				</div>
 				
@@ -186,7 +190,11 @@
 								<li>6 iguals - 1 000 pts</li>
 								<li>7 iguals - 2 000 pts</li>
 								<li>8 iguals - 4 000 pts</li>
-								<li><i>Perfect Treasure</i> (tots els daus puntuen, incloses monedes/diamants) 500 pts extra</li>
+							</ul>
+						</li>
+						<li><b>Perfect Treasure</b> 
+							<ul>
+								<li>Si tots els daus et donen punts sumes 500 pts extra</li>
 							</ul>
 						</li>
 						<li><b>Calaveres:</b>
@@ -230,6 +238,26 @@
 					</ol>
 				</div>
 			</div>
+			<!-- FI ESCENA INSTRUCCIONS -->
+			
+			<!-- ESCENA ABOUT -->
+			<div id="escena-about" class="escena">
+				<!-- Botó tipus pergamí -->
+				<div class="pergamiBoto pergamiBotoEsquerraAbaix" onclick="carregaEscena('escena-anterior')">
+					<div class="pergamiBotoEsq"></div>
+					<div class="pergamiBotoMid">Enrere</div>
+					<div class="pergamiBotoDret"></div>
+				</div>
+				
+				<!-- Div que simula un pergamí on podem escriure text sense exposar-lo a un contrast alt i fer-li illegible -->
+				<div class="pergami">
+					<h2 style="font-size:64px;">Illa Calavera <span style="font-size:40px;">v0.9.1</span></h2>
+					<ol style="font-size:52px; line-height:1.6;">
+						<li><a href="https://github.com/joanmarcgs/TFG">https://github.com/joanmarcgs/TFG</a></li>
+					</ol>
+				</div>
+			</div>
+			<!-- FI ESCENA ABOUT -->
 			
 			<!-- ESCENA Pantalla de selecció de jugadors -->
 			<div id="escena-configuraPartida" class="escena">
@@ -375,7 +403,7 @@
 			<div id="escena-joc" class="escena" style="position: relative; overflow: hidden;">
 			
 				<!-- Botons en format imatge -->
-				<img src="img/music_on-SFX_off.png" id="musicButton">
+				<img src="img/music_on-SFX_on.png" id="musicButton2" onclick="toggleMusica()">
 				<img src="img/mostraInstruccionsMico.png" class="mostraInstruccionsMico" onclick="carregaEscena('escena-instruccions')" style="position:absolute;right:0px; width:300px;top:10px;">
 				<img src="img/spyglassButton.png?v=2" id="fullscreenButton" onclick="pantallaCompleta()">
 				<img src="img/pirateflagButton.png?v=2" class="pirateflagButton" onclick="toggleAjudaPunts()">
