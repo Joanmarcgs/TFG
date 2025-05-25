@@ -1,4 +1,10 @@
 // FUNCIONS I DECLARACIONS globals
+
+	// BUG FIX: Afegim aquestes 4 línies de codi perquè a les smartTV amb navegadors antics es vegi bé el fons de pantalla
+	const tvRegex = /SMART[- ]?TV|Tizen|Web0S|WebOS|NETTV|NetCast|LG|Samsung/i;
+	if ( tvRegex.test(navigator.userAgent) ) {
+		document.body.classList.add('smartTV');
+	}
 	
 	// Definim primer de tot el service worker que ens fa el joc disponible offline
 	if ('serviceWorker' in navigator) {
@@ -10,94 +16,109 @@
 	  });
 	}
 	
+	// Funció que ens treu per console l'espai localStorage utilitzat
 	function getLocalStorageUsage() {
-  let totalChars = 0;
-  for (let key in localStorage) {
-    if (!localStorage.hasOwnProperty(key)) continue;
-    const value = localStorage.getItem(key);
-    // comptem caràcters de la clau + valor
-    totalChars += key.length + (value ? value.length : 0);
-  }
-  // cada caràcter en UTF-16 fa 2 bytes
-  const totalBytes = totalChars * 2;
-  const kb = totalBytes / 1024;
-  const mb = kb / 1024;
-  console.log(`localStorage aprox. ús:\n▶ ${totalBytes} bytes\n▶ ${kb.toFixed(2)} KB\n▶ ${mb.toFixed(2)} MB`);
-}
-getLocalStorageUsage();
+		let totalChars = 0;
+		for (let key in localStorage) {
+			if (!localStorage.hasOwnProperty(key)) continue;
+			const value = localStorage.getItem(key);
+			// comptem caràcters de la clau + valor
+			totalChars += key.length + (value ? value.length : 0);
+		}
+		// cada caràcter en UTF-16 fa 2 bytes
+		const totalBytes = totalChars * 2;
+		const kb = totalBytes / 1024;
+		const mb = kb / 1024;
+		console.log(`localStorage aprox. ús:\n▶ ${totalBytes} bytes\n▶ ${kb.toFixed(2)} KB\n▶ ${mb.toFixed(2)} MB`);
+	}
+	getLocalStorageUsage();
 	
 	// Creem una classe “StorageVar” que ens permet treballar amb variables localStorage com si fossin variables globals normals
-	// Ho fem perquè ens sigui més fàcil mantenir una sèrie de variables persistents entre sessions
-	
-	
+	// Ho fem perquè ens sigui més fàcil mantenir una sèrie de variables persistents entre sessions	
 	class StorageVar {
-  constructor(key, defaultValue = null) {
-    this.key = key;
-    this.defaultValue = defaultValue;              // ← guardar-lo
-    if (localStorage.getItem(key) === null && defaultValue !== null) {
-      localStorage.setItem(key, JSON.stringify(defaultValue));
-    }
-  }
+		/**
+		* @param {string} key - Clau sota la qual es guarda la variable a localStorage
+		* @param {*} defaultValue - Valor per defecte si no existeix res a localStorage
+		*/
+		constructor(key, defaultValue = null) {
+			this.key = key;
+			// Si encara no hi ha res guardat i hem passat un default, el guardem
+			if (localStorage.getItem(key) === null && defaultValue !== null) {
+				localStorage.setItem(key, JSON.stringify(defaultValue));
+			}
+		}
 
-  get value() {
-    const raw = localStorage.getItem(this.key);
-    if (raw === null) {
-      // Si no hi ha res guardat, re-inicialitzem al default
-      if (this.defaultValue !== null) {
-        localStorage.setItem(this.key, JSON.stringify(this.defaultValue));
-        // Retornem directament el proxy del default
-        return this._makeProxy(this.defaultValue);
-      }
-      return null;
-    }
+		/**
+		* Getter: retorna el valor actual de la clau a localStorage,
+		* parsejat de JSON, i l'embolica en un Proxy si és objecte/array
+		*/
+		get value() {
+			// 1) Obtenim la cadena en brut
+			const raw = localStorage.getItem(this.key);
+			// 2) Convertim a tipus JavaScript (JSON -> object/array o null)
+			const parsed = raw === null ? null : JSON.parse(raw);
+			// 3) Si és objecte/array, l'emboliquem en un Proxy que reculli canvis interns
+			return this._makeProxy(parsed);
+		}
 
-    // Si hi ha quelcom, fem JSON.parse habitual
-    let parsed;
-    try {
-      parsed = JSON.parse(raw);
-    } catch {
-      parsed = raw;
-    }
-    return this._makeProxy(parsed);
-  }
+		/**
+		* Setter: reb qualsevol valor (primitiva, objecte o array),
+		* serialitza a JSON i el guarda a localStorage
+		*/
+		set value(val) {
+			localStorage.setItem(this.key, JSON.stringify(val));
+		}
 
-  set value(val) {
-    localStorage.setItem(this.key, JSON.stringify(val));
-  }
+		/**
+		* Elimina completament la clau de localStorage
+		*/
+		clear() {
+			localStorage.removeItem(this.key);
+		}
 
-  clear() {
-    localStorage.removeItem(this.key);
-    // I si en volem mantenir el default, tornem-lo a escriure:
-    if (this.defaultValue !== null) {
-      localStorage.setItem(this.key, JSON.stringify(this.defaultValue));
-    }
-  }
+		// ---------- Helpers interns per a la creació de proxies ----------
 
-_makeProxy(obj) {
-  if (typeof obj !== 'object' || obj === null) return obj;
-  const self = this;
-  return new Proxy(obj, {
-    get(target, prop, receiver) {
-      // En lloc de target[prop], fem Reflect.get per heretar mètodes com .find, .push, etc.
-      const value = Reflect.get(target, prop, receiver);
-      return self._makeProxy(value);
-    },
-    set(target, prop, val, receiver) {
-      const result = Reflect.set(target, prop, val, receiver);
-      // Re-emmagatzema tot l'objecte modificat
-      self.value = target;
-      return result;
-    },
-    deleteProperty(target, prop) {
-      const result = Reflect.deleteProperty(target, prop);
-      self.value = target;
-      return result;
-    }
-  });
-}
+		/**
+		* Si obj no és objecte/array o és null, retorna directament
+		* Altrament, crea un Proxy per:
+		*  - GET: retornar cada propietat també proxyficada (recursiu)
+		*  - SET/DELETE: actualitzar la clau de localStorage amb l'estat sencer
+		*/
+		_makeProxy(obj) {
+			// Només proxy per objectes i arrays no-null
+			if (typeof obj !== 'object' || obj === null) return obj;
 
-}
+			const self = this; // referència per closures
+			return new Proxy(obj, {
+				/**
+				* Al llegir una propietat, la desemboliquem també si és objecte
+				*/
+				get(target, prop) {
+					return self._makeProxy(target[prop]);
+				},
+				/**
+				* En fer assignació target[prop] = val,
+				* primer modifiquem l'objecte local, després re-guardem tot JSON
+				*/
+				set(target, prop, val) {
+					target[prop] = val;
+					// re-serialitza i guarda
+					self.value = target;
+					return true;
+				},
+				/**
+				* Al esborrar una propietat, l'eliminem i reculem l'objecte actualitzat
+				*/
+				deleteProperty(target, prop) {
+					delete target[prop];
+					self.value = target;
+					return true;
+				}
+			});
+		}
+	}
 
+	
 	
 	
 	/*
@@ -121,8 +142,8 @@ _makeProxy(obj) {
 	
 	===== Modificar variables =====
 		llistaJugadors.value = [{ id:1, nom:'Ana', punts:0 }, { id:2, nom:'Pere', punts:0 }]; // Així reinicialitzariem per complet el valor de llistaJugadors
-		llistaJugadors.value.push({ id:3, nom:'Maria', punts:0 }); // Així afegim un registre a una array d'objectes. 
 		llistaJugadors.value[1].punts = 42; // Així modifiquem el valor d'un paràmetre d'un dels objectes de l'array
+		llistaJugadors.value.push({ id:3, nom:'Maria', punts:0 }); // Així afegim un registre a una array d'objectes. 
 		partidaFinalitzada.value = true;
 		numTirada.value++;
 		cartaActual.value = cartes[0];
@@ -146,9 +167,9 @@ _makeProxy(obj) {
 	===== FI Llegir variables =====
 	
 	===== Eliminar variables =====
-		partidaFinalitzada.clear();
-		llistaJugadors.clear();
-		numTirada.clear();
+	partidaFinalitzada.clear();
+	llistaJugadors.clear();
+	numTirada.clear();
 	
 
 	============================================================================
@@ -157,7 +178,6 @@ _makeProxy(obj) {
 	*/
 
 	// Declaració de variables localStorage amb el constructor StorageVar
-	const llistaJugadors = new StorageVar('llistaJugadors', []); // Llista de jugadors amb info de partida
 	const partidaIniciada = new StorageVar('partidaIniciada', false); // Variable control per saber si la partida ha estat iniciada
 	//const primerTiradaFeta = new StorageVar('primerTiradaFeta', false); // Variable control per saber si estem en la primera tirada d'un torn
 	const numTirada = new StorageVar('numTirada', 0); // Variable control per saber en quina tirada estem
@@ -212,7 +232,8 @@ _makeProxy(obj) {
 	// Variables globals
 	let escenaActiva = "cap"; // Per tenir control de quina escena està activa
 	let escenaAnterior = null; // Variable auxiliar que guarda l'escena anterior
-	//let llistaJugadors = []; // Llista de jugadors amb info, la guardem també en localStorage
+	let llistaJugadors = []; // Llista de jugadors amb info, la guardem també en localStorage
+	let audioState = 0; // Variable que ens controla l'audio
 	//let partidaIniciada = false; // Controla si hi ha una partida en curs
 	//let primerTiradaFeta = false; // Controla si s'ha fet una tirada ja en el torn present
 	//let cartaActual = null; // Controla quina carta està activa en el torn present
@@ -239,6 +260,9 @@ function carregaEscena(escena){
 			
 	// Fem servir una variable auxiliar abans de posar el valor de escenaActiva a escenaAnterior
 	const abans = escenaActiva;
+	
+	const audioBoto = document.getElementById('audio-botoGeneral');
+	if (audioBoto) { audioBoto.currentTime = 0; audioBoto.play().catch(() => {}); }
 	
 	switch(escena){
 		/*
@@ -335,55 +359,42 @@ function seleccionarJugador(num) {
 	}
 }
 
-// Nova versió adaptada al nou constructor de variables localStorage
 function actualitzaPuntuacions() {
-  const div = document.getElementById("puntuacionsJugadorsMid");
-  if (!div) return;
-
-  // Fem un snapshot de llistaJugadors.value en un array real
-  const jugadors = Array.isArray(llistaJugadors.value)
-    ? Array.from(llistaJugadors.value)
-    : [];  
-
-  div.innerHTML = "<h2>Puntuació</h2><h3>~~~~~~</h3>";
-  jugadors.forEach(j => {
-    div.innerHTML += "<div style='padding:10px;'>" +
-                      j.nom + "<br>" + j.punts +
-                     "</div>";
-  });
+	const div = document.getElementById("puntuacionsJugadorsMid");
+	if (!div) return;
+	div.innerHTML = "<h2>Puntuació</h2><h3>~~~~~~</h3>";
+	llistaJugadors.forEach(j => {
+		div.innerHTML += "<div style='padding:10px;'>"+j.nom+"<br>"+j.punts+" </div> ";
+	});
 }
-
-
 			
 			
+			
+			
+			//let puntsTornActual = 0;
+
 function iniciarTorns() {
-  if (llistaJugadors.value.length === 0) return;
+    if (llistaJugadors.length === 0) return;
 
-  llistaJugadors.value.forEach(j => {
-    if (j.torn === undefined) j.torn = false;
-  });
+    llistaJugadors.forEach((jugador, index) => {
+        if (jugador.torn === undefined) {
+            jugador.torn = false;
+        }
+    });
 
-// Si cap jugador té torn actiu, inicialitzem
-  if (!llistaJugadors.value.some(j => j.torn)) {
-    llistaJugadors.value[0].torn = true;
-  }
+    // Si cap jugador té torn actiu, inicialitzem
+    if (!llistaJugadors.some(j => j.torn)) {
+        llistaJugadors[0].torn = true;
+    }
 
-  actualitzaTornsPantalla();
+    localStorage.setItem("llistaJugadors", JSON.stringify(llistaJugadors));
+    actualitzaTornsPantalla();
 }
-
 
 
 
 function actualitzaTornsPantalla() {
-    
-	
-	 // Fem un snapshot de llistaJugadors.value en un array real
-  const jugadors = Array.isArray(llistaJugadors.value)
-    ? Array.from(llistaJugadors.value)
-    : [];  
-	
-	const jugadorActiu = jugadors.find(j => j.torn);
-	
+    const jugadorActiu = llistaJugadors.find(j => j.torn);
     if (!jugadorActiu) return;
 	
 	
@@ -407,7 +418,7 @@ function actualitzaTornsPantalla() {
     //document.getElementById("nomJugadorActiu").textContent = jugadorActiu.nom;
     
 
-    // ACTUALITZA avatar i nom centrat
+    // 🔥 ACTUALITZA avatar i nom centrat
     const avatarDisplay = document.getElementById("jugadorActiuInfo");
     const avatarImg = document.getElementById("avatarJugadorActiu");
     const nomDisplay = document.getElementById("nomJugadorActiuDisplay");
@@ -444,6 +455,8 @@ function tancarModalMissatge() {
 
 
 function toggleAjudaPunts() {
+	const audioBoto = document.getElementById('audio-botoPirata');
+	if (audioBoto) { audioBoto.currentTime = 0; audioBoto.play().catch(() => {}); }
   const puntsProv = document.getElementById("resumPuntsTornActiu");
   // llegeix el display computat, no l’inline
   const actual = window.getComputedStyle(puntsProv).getPropertyValue("display");
@@ -591,7 +604,7 @@ switch(cartaActual.value.id) {
 	
 	
     // 1. Troba el jugador actiu i el seu poder
-    const jugadorActiu = llistaJugadors.value.find(j => j.torn);
+    const jugadorActiu = llistaJugadors.find(j => j.torn);
     if (jugadorActiu) {
       const poder = jugadorActiu.poder;
       let bonusAvatar = 0;
@@ -797,6 +810,32 @@ switch(cartaActual.value.id) {
 	
 	
 	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
+/*
+    if (numCalaveres > 3) {
+        mostrarModalMissatge("Has tret 4 calaveres o més! Anem a Illa Calavera!☠️☠️☠️☠️", true);
+        puntsTornActual = 0;
+        document.getElementById("resumPuntsTornActiu").textContent = "☠️☠️☠️☠️ Illa Calavera!";
+        return;
+    }
+	*/
 			if (numCalaveres > 3 && !illaCalaveraMode) {
 			// 1) entrem en “Illa Calavera”
 			illaCalaveraMode = true;
@@ -828,7 +867,34 @@ switch(cartaActual.value.id) {
 	
 }
 
+/*
 
+function actualitzaPuntsTornIllaCalavera() {
+    // tornem a llegir les cares de tots els daus
+    const cares = daus.map(d => obtenirCaraAmunt(d.mesh));
+    // comptem quantes calaveres hi ha ara
+    const total = cares.filter(c => c === 6).length;
+
+    // noves calaveres des de l’inici d’Illa
+    const noves = total - calaveresIllaAcumulades;
+    if (noves <= 0) return;
+
+    // acumulem
+    calaveresIllaAcumulades = total;
+    const ptsSelf = noves * 100;
+    const penal = noves * 200;
+
+    puntsTornActual += ptsSelf;
+    llistaJugadors.forEach(j => {
+        if (!j.torn) j.punts -= penal;
+    });
+
+    // actualitza UI
+    document.getElementById("puntsTornActiu").textContent = puntsTornActual;
+    document.getElementById("resumPuntsTornActiu").innerHTML =
+      `☠️ Illa Calavera x${calaveresIllaAcumulades}: +${ptsSelf} (rivals -${penal})`;
+}
+*/
 
 function actualitzaPuntsTornIllaCalavera() {
     // 0) comprova si hi ha calaveres noves; si no, acabem el torn
@@ -848,7 +914,7 @@ function actualitzaPuntsTornIllaCalavera() {
     const penal = noves * 200;
 
     puntsTornActual.value += ptsSelf;
-    llistaJugadors.value.forEach(j => {
+    llistaJugadors.forEach(j => {
         if (!j.torn) j.punts -= penal;
     });
 
@@ -881,6 +947,27 @@ function nomCara(cara) {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 function finalitzarTorn() {
 
 
@@ -893,7 +980,7 @@ function finalitzarTorn() {
         puntsTornActual.value = skulls * 100;
         // -200 per calavera a cada rival
         const penal = skulls * 200;
-        llistaJugadors.value.forEach(j => {
+        llistaJugadors.forEach(j => {
             if (!j.torn) j.punts -= penal;
         });
         // (opcional) missatge resum
@@ -913,16 +1000,16 @@ function finalitzarTorn() {
 
 
 
-    const jugadorActiuIndex = llistaJugadors.value.findIndex(j => j.torn);
+    const jugadorActiuIndex = llistaJugadors.findIndex(j => j.torn);
     if (jugadorActiuIndex === -1) return;
 
-    const jugadorActiu = llistaJugadors.value[jugadorActiuIndex];
+    const jugadorActiu = llistaJugadors[jugadorActiuIndex];
     jugadorActiu.punts += puntsTornActual.value;
     console.log(`🏆 ${jugadorActiu.nom} guanya ${puntsTornActual.value} punts. Total: ${jugadorActiu.punts}`);
 
 
   // Aquí comprovem si ha arribat a 10000 punts
-  if (jugadorActiu.punts >= 3000) {
+  if (jugadorActiu.punts >= 10000) {
     mostrarModalMissatge(`🎉 Enhorabona ${jugadorActiu.nom}! Has arribat a 10000 punts i guanyes la partida!`, false);
 	//partidaFinalitzada = true;
 	//localStorage.setItem('partidaFinalitzada', JSON.stringify(true));
@@ -957,16 +1044,16 @@ function finalitzarTorn() {
   }
 
     // Passem al següent jugador
-    llistaJugadors.value[jugadorActiuIndex].torn = false;
-    const següentIndex = (jugadorActiuIndex + 1) % llistaJugadors.value.length;
-    llistaJugadors.value[següentIndex].torn = true;
+    llistaJugadors[jugadorActiuIndex].torn = false;
+    const següentIndex = (jugadorActiuIndex + 1) % llistaJugadors.length;
+    llistaJugadors[següentIndex].torn = true;
 	
 	//localStorage.removeItem('cartaActual');
 	cartaActual.clear();
 	
     puntsTornActual.value = 0;
 
-    //localStorage.setItem("llistaJugadors", JSON.stringify(llistaJugadors));
+    localStorage.setItem("llistaJugadors", JSON.stringify(llistaJugadors));
 
 
 		numTirada.value = 0;
@@ -1020,10 +1107,13 @@ function desbloquejarTotsElsDaus() {
             dau.body.updateMassProperties();
             dau.bloquejatCalavera = false;
             if (dau.mesh && dau.mesh.material) {
-                dau.mesh.material.forEach(m => {
+                /*dau.mesh.material.forEach(m => {
                     m.opacity = 1;
                     m.transparent = false;
+					m.color.setHex(0xffffff);  // o el color que fossin abans
                 });
+				*/
+				dau.edges.visible = false;
             }
         //}
     }
@@ -1169,6 +1259,17 @@ function desbloquejarTotsElsDaus() {
 				mesh.castShadow = true;
 				mesh.position.set(x, 5, z);
 				scene.add(mesh);
+				
+				// després de scene.add(mesh);
+const edgesGeom = new THREE.EdgesGeometry(geometria);
+const edgesMat = new THREE.LineBasicMaterial({ color: 0x000000, linewidth: 2 });
+const edges = new THREE.LineSegments(edgesGeom, edgesMat);
+mesh.add(edges);
+
+// Després, emprem l’array daus per guardar també l’objecte edges:
+daus.push({ mesh, body, edges, initialPosition: { x: mesh.position.x, z: mesh.position.z } });
+
+				
 
 				const shape = new CANNON.Box(new CANNON.Vec3(0.75, 0.75, 0.75));
 				const body = new CANNON.Body({
@@ -1184,10 +1285,22 @@ function desbloquejarTotsElsDaus() {
 				world.addBody(body);
 				daus.push({ mesh, body, initialPosition: { x: mesh.position.x, z: mesh.position.z } });
 			}
-
+			
+			const clock = new THREE.Clock(); // Definim constant per arreglar BUG de renderitzat massa ràpid a pantalles amb refresc alt
 			function animate() {
 				requestAnimationFrame(animate);
-				world.step(1 / 60);
+				
+				// BUG DETECTAT: al fer servir requestAnimationFrame(animate) i cridar world.step(1/60) sense passar-li el temps real transcorregut, la física “avança” 1/60 s cada vegada que arriba un frame, i a 144 Hz això són 144 calls/s, és a dir 144 × (1/60 s) = 2,4 s de simulació per cada segon real
+				//world.step(1 / 60); 
+				
+				// BUG FIX
+				// 1) Definim la mida del pas de temps real (en segons)
+				const delta = clock.getDelta();
+				// 2) en comptes de world.step(1/60), fem:
+				//    - primer argument: timeStep fix (per a la física, 1/60 s)
+				//    - segon argument: delta real (en s)
+				//    - tercer argument: nombre màxim de substeps (p. ex. 4)
+				world.step(1/60, delta, 4);
 
 				for (let { mesh, body, initialPosition } of daus) {
 					const deltaX = body.position.x - initialPosition.x;
@@ -1226,10 +1339,32 @@ function desbloquejarTotsElsDaus() {
 
 			
 			function tirarDaus() {
+				// Comptem quants daus queden disponibles (dinàmics i no bloquejats per calavera)
+				const disponibles = daus.filter(d =>
+					d.body.type !== CANNON.Body.STATIC &&
+					!d.bloquejatCalavera
+				).length;
+				
 				if (tiradaEnProgres) {
 					console.log("⏳ Tirada en curs. Espera que acabi abans de tornar a tirar.");
 					return;
 				}
+				
+				if (disponibles === 0) {
+					console.log("⏳ no hi ha daus disponibles per tirar.");
+					return;
+				}
+
+				// Reproduïm un so o l'altre segons quants quedin
+				if (disponibles === 1) {
+					const snd1 = document.getElementById('audio-dau');
+					if (snd1) { snd1.currentTime = 0; snd1.play().catch(() => {}); }
+				} else {
+					const snd = document.getElementById('audio-daus');
+					if (snd) { snd.currentTime = 0; snd.play().catch(() => {}); }
+				}
+				
+				
 				tiradaEnProgres = true;
 				numTirada.value++;
 				updateFinalitzarTornButton();
@@ -1303,10 +1438,14 @@ function onMouseClick(event) {
             body.velocity.set(0,0,0);
             body.angularVelocity.set(0,0,0);
             body.updateMassProperties();
-            mesh.material.forEach(m => {
+            /*
+			mesh.material.forEach(m => {
                 m.opacity = 1;
                 m.transparent = false;
+				m.color.setHex(0xffffff);  // o el color que fossin abans
             });
+			*/
+			dau.edges.visible = false;
             console.log(`Dau ${index + 1} DESBLOQUEJAT`);
         } else {
             // 🔴 Fixem
@@ -1315,10 +1454,15 @@ function onMouseClick(event) {
             body.mass = 0;
             body.type = CANNON.Body.STATIC;
             body.updateMassProperties();
-            mesh.material.forEach(m => {
-                m.opacity = 0.7;
+            /*
+			mesh.material.forEach(m => {
+                //m.opacity = 0.5;
                 m.transparent = true;
+				m.color.setHex(0xb3ffb6); //verd
             });
+			*/
+			dau.edges.material.color.setHex(0x00ff00);
+			dau.edges.visible = true;
             console.log(`Dau ${index + 1} FIXAT`);
         }
 		  guardarEstatDaus(); // <<<<< AFEGIR AIXÒ AQUÍ
@@ -1358,8 +1502,10 @@ function carregarEstatDaus() {
             body.updateMassProperties();
             daus[i].bloquejatCalavera = true;
             mesh.material.forEach(m => {
-                m.opacity = 0.5;
+                //m.opacity = 0.5;
                 m.transparent = true;
+				m.color.setHex(0xffb3b3);  // vermell
+				//m.color.setHex(0x707070);  // gris
             });
         }
     }
@@ -1368,62 +1514,68 @@ function carregarEstatDaus() {
 
 
 
-function comprovaCaresDaus() {
-    let caresActuals = [];
+	function comprovaCaresDaus() {
+		let caresActuals = [];
 
-    let totsAturats = daus.every(({ body }) => 
-        body.velocity.lengthSquared() < 0.01 && body.angularVelocity.lengthSquared() < 0.01
-    );
+		let totsAturats = daus.every(({ body }) => 
+		body.velocity.lengthSquared() < 0.01 && body.angularVelocity.lengthSquared() < 0.01
+		);
 
-    if (totsAturats && tiradaEnProgres) {
-        console.log('--------------------------');
-        console.log(`Tirada ${numTirada.value}:`);
+		if (totsAturats && tiradaEnProgres) {
+			console.log('--------------------------');
+			console.log(`Tirada ${numTirada.value}:`);
 
-        const simbols = ["Lloro", "Moneda", "Mico", "Diamant", "Vaixell", "Calavera"];
+			const simbols = ["Lloro", "Moneda", "Mico", "Diamant", "Vaixell", "Calavera"];
 
-        for (let i = 0; i < daus.length; i++) {
-            const { mesh, body } = daus[i];
-            const caraAmunt = obtenirCaraAmunt(mesh);
+			for (let i = 0; i < daus.length; i++) {
+				const { mesh, body } = daus[i];
+				const caraAmunt = obtenirCaraAmunt(mesh);
 
-            caresActuals.push(caraAmunt);
+				caresActuals.push(caraAmunt);
 
-            if (caraAmunt !== null) {
-                const simbol = simbols[caraAmunt - 1]; // recorda que el primer símbol és a index 0
-                console.log(`🎲 Dau ${i + 1}: ${simbol}`);
+				if (caraAmunt !== null) {
+					const simbol = simbols[caraAmunt - 1]; // recorda que el primer símbol és a index 0
+					console.log(`🎲 Dau ${i + 1}: ${simbol}`);
 
-                if (simbol === "Calavera" && !daus[i].bloquejatCalavera) {
-                    console.log(`☠️ Dau ${i+1} mostra una calavera! BLOQUEJAT!`);
+					if (simbol === "Calavera" && !daus[i].bloquejatCalavera) {
+						console.log(`☠️ Dau ${i+1} mostra una calavera! BLOQUEJAT!`);
 
-                    body.velocity.set(0,0,0);
-                    body.angularVelocity.set(0,0,0);
-                    body.mass = 0;
-                    body.type = CANNON.Body.STATIC;
-                    body.updateMassProperties();
-                    daus[i].bloquejatCalavera = true;
+						body.velocity.set(0,0,0);
+						body.angularVelocity.set(0,0,0);
+						body.mass = 0;
+						body.type = CANNON.Body.STATIC;
+						body.updateMassProperties();
+						daus[i].bloquejatCalavera = true;
+						/*
+						daus[i].mesh.material.forEach(m => {
+							m.transparent = true;
+							//m.opacity     = 0.50;           // baixa més l’opacitat
+							m.color.setHex(0xffb3b3); // vermell
+							//m.color.setHex(0x707070);  // gris
+						});
+						*/
+						dau.edges.material.color.setHex(0xff0000);
+dau.edges.visible = true;
 
-                    daus[i].mesh.material.forEach(m => {
-                        m.opacity = 0.5;
-                        m.transparent = true;
-                    });
-                }
-            }
-        }
+					}
+				}
+			}
 
-        console.log('--------------------------');
-        tiradaEnProgres = false;
-		updateFinalitzarTornButton(); // Fem que el dau de finalitzar torn torni a estar disponible
-		guardarEstatDaus(); // Guardem estat dels daus
-		//actualitzaPuntsTorn();
-		
-		// si estem en illaCalaveraMode, usem la nova funció; sinó, l’original
-		if (illaCalaveraMode) {
-			actualitzaPuntsTornIllaCalavera();
-		} else {
-			actualitzaPuntsTorn();
+			console.log('--------------------------');
+			tiradaEnProgres = false;
+			updateFinalitzarTornButton(); // Fem que el dau de finalitzar torn torni a estar disponible
+			guardarEstatDaus(); // Guardem estat dels daus
+			//actualitzaPuntsTorn();
+
+			// si estem en illaCalaveraMode, usem la nova funció; sinó, l’original
+			if (illaCalaveraMode) {
+				actualitzaPuntsTornIllaCalavera();
+			} else {
+				actualitzaPuntsTorn();
+			}
+
 		}
-
-    }
-}
+	}
 
 
 function obtenirCaraAmunt(mesh) {
@@ -1686,15 +1838,18 @@ document.addEventListener("DOMContentLoaded", function () {
 		  preCarregaTextures(() => {
 				preCarregaTot(); // Precarrega altres assets si vols
 			});
+			
+			const música = document.getElementById('musica-fons');
+    música.volume = 0.5;
+
 
 		  // Carreguem llista de jugadors si n'hi havia
-		  //const llistaGuardada = JSON.parse(localStorage.getItem("llistaJugadors")) || [];
+		  const llistaGuardada = JSON.parse(localStorage.getItem("llistaJugadors")) || [];
 		  //const partidaGuardada = localStorage.getItem("partidaIniciada") === "true";
 
 		  //if (llistaGuardada.length > 0 && partidaGuardada) {
-		//if (llistaGuardada.length > 0 && partidaIniciada.value) {
-			if (llistaJugadors.value.length > 0 && partidaIniciada.value) {
-			//llistaJugadors = llistaGuardada;
+		if (llistaGuardada.length > 0 && partidaIniciada.value) {
+			llistaJugadors = llistaGuardada;
 			//partidaIniciada = true;
 			sincronitzaJugadorsAmbPantalla(); // <-- AFEGEIX AIXÒ!
 		  }
@@ -1748,7 +1903,7 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 function sincronitzaJugadorsAmbPantalla() {
-  llistaJugadors.value.forEach(j => {
+  llistaJugadors.forEach(j => {
     const avatar = document.getElementById("jugadorAvatar" + j.id);
     const input = document.getElementById("nom" + j.id);
     if (avatar && input) {
@@ -1782,7 +1937,7 @@ function netejaPantallaConfiguracioJugadors() {
 
 // Si més endavant vols poder "esborrar" la partida manualment (opcional):
 function reiniciaPartida() {
-  //localStorage.removeItem("llistaJugadors");
+  localStorage.removeItem("llistaJugadors");
   //localStorage.removeItem("partidaIniciada");
   localStorage.removeItem("estatDaus");
   //localStorage.removeItem("numTirada");
@@ -1792,14 +1947,13 @@ function reiniciaPartida() {
   // Eliminem localStorage
   partidaIniciada.clear();
   partidaFinalitzada.clear();
-  llistaJugadors.clear();
   puntsTornActual.value = 0;
   numTirada.value = 0;
   cartaActual.value = null;
   //alert(numTirada.value);
   //numTirada.clear();
 
-  //llistaJugadors = [];
+  llistaJugadors = [];
   //partidaIniciada = false;
   //numTirada = 0;
   //puntsTornActual = 0;
@@ -1839,7 +1993,42 @@ function tancarModalPersonatges() {
 }
 		
 		
-		
+  function toggleMusica() {
+    const musicEl = document.getElementById('musica-fons');
+    const sfxEls  = [
+      document.getElementById('audio-dau'),
+      document.getElementById('audio-daus'),
+      document.getElementById('audio-botoPirata'),
+      document.getElementById('audio-botoGeneral')
+    ];
+    const btn = document.getElementById('musicButton');
+	const btn2 = document.getElementById('musicButton2');
+
+    // assegurem volum de fons al 50%
+    musicEl.volume = 0.5;
+
+    // passem al següent estat
+    audioState = (audioState + 1) % 4;
+
+    const musicOn   = (audioState === 0 || audioState === 2);
+    const effectsOn = (audioState === 0 || audioState === 1);
+
+    musicEl.muted = !musicOn;
+    sfxEls.forEach(el => el.muted = !effectsOn);
+
+    // actualitzem la imatge del botó
+    switch (audioState) {
+      case 0: btn.src = 'img/music_on-SFX_on.png';btn2.src = 'img/music_on-SFX_on.png';  break;
+      case 1: btn.src = 'img/music_off-SFX_on.png';btn2.src = 'img/music_off-SFX_on.png'; break;
+      case 2: btn.src = 'img/music_on-SFX_off.png';btn2.src = 'img/music_on-SFX_off.png'; break;
+      case 3: btn.src = 'img/music_off-SFX_off.png';btn2.src = 'img/music_off-SFX_off.png';break;
+    }
+
+    // opcional: si vols que la música s'iniciï automàticament en activar-la
+    if (musicOn) {
+      musicEl.play().catch(()=>{/* l'usuari ha de fer interacció */});
+    }
+  }
 		
 		
 		
@@ -1957,49 +2146,63 @@ function seleccionarJugador(num) {
 }
 
 
-
 function actualitzaLlistaJugador(num, accio) {
-  const input = document.getElementById("nom" + num);
-  // Fem un “snapshot” com a array real
-  let jugadors = Array.isArray(llistaJugadors.value)
-    ? Array.from(llistaJugadors.value)
-    : [];
+	
+	const audioBoto = document.getElementById('audio-botoGeneral');
+	if (audioBoto) { audioBoto.currentTime = 0; audioBoto.play().catch(() => {}); }
+	
+	
+	const input = document.getElementById("nom" + num);
 
-  if (accio === "afegir") {
-    const nom = input.value.trim();
-    if (!nom) return;
+	if (accio === "afegir") {
+		const nom = input.value.trim();
+		if (nom === "") return;
 
-    const idx = jugadors.findIndex(j => j.id === num);
-    if (idx === -1) {
-      // no existeix: el creem
-      jugadors.push({
-        id: num,
-        nom: nom,
-        poder: num,
-        punts: 0,
-        torn: false
-      });
-    } else {
-      // ja existeix: actualitzem el nom
-      jugadors[idx].nom = nom;
-    }
-  } else if (accio === "eliminar") {
-    jugadors = jugadors.filter(j => j.id !== num);
-  }
-
-  // Mostrem o amaguem el botó “Següent”
-  const botoSeguent = document.getElementById("botoSeguentConfigurarPartida");
-  if (botoSeguent) {
-    botoSeguent.style.display = jugadors.length >= 2 ? "block" : "none";
-  }
-
-  // Finalment re-escrivim l’array de jugadors al StorageVar
-  llistaJugadors.value = jugadors;
-
-  // (Opcional) per veure com queda:
-  console.log("Llista actualitzada:", JSON.stringify(jugadors, null, 2));
+		if (!llistaJugadors.find(j => j.id === num)) {
+			llistaJugadors.push({
+				id: num,
+				nom: nom,
+				poder: num, // número de 1 a 6 que identifica el poder
+				punts: 0,
+				torn: false
+			});
+		}
+		
+		
+		const existent = llistaJugadors.find(j => j.id === num);
+if (existent) {
+  existent.nom = nom; // Actualitza el nom si ja existeix
+} else {
+  llistaJugadors.push({
+    id: num,
+    nom: nom,
+    poder: num, // canviable després
+    punts: 0,
+    torn: false
+  });
 }
 
+		
+		
+		
+		
+		console.log("Editant jugador amb ID:", num, "→ Nom:", nom);
+
+	} else if (accio === "eliminar") {
+		llistaJugadors = llistaJugadors.filter(j => j.id !== num);
+	}
+console.log("Llista actualitzada:");
+console.log(JSON.stringify(llistaJugadors, null, 2));
+
+
+ const botoSeguent = document.getElementById("botoSeguentConfigurarPartida");
+  if (botoSeguent) {
+    botoSeguent.style.display = llistaJugadors.length >= 2 ? "block" : "none";
+  }
+
+
+	guardarLlistaJugadors();
+}
 
 
 function actualitzaPantallaInici() {
@@ -2029,6 +2232,19 @@ function actualitzaPantallaInici() {
 
 
 // Funcions localStorage
+
+function guardarLlistaJugadors() {
+  localStorage.setItem("llistaJugadors", JSON.stringify(llistaJugadors));
+  //localStorage.setItem("partidaIniciada", "true");
+}
+
+
+
+
+
+
+
+
 
 
 

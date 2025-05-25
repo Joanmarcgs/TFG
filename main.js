@@ -839,7 +839,10 @@ switch(cartaActual.value.id) {
 			if (numCalaveres > 3 && !illaCalaveraMode) {
 			// 1) entrem en “Illa Calavera”
 			illaCalaveraMode = true;
-			calaveresIllaAcumulades = numCalaveres;
+			//calaveresIllaAcumulades = numCalaveres;
+			//calaveresIllaAcumulades = daus.filter(d => obtenirCaraAmunt(d.mesh) === 6).length;
+			const fisics = daus.filter(d => obtenirCaraAmunt(d.mesh) === 6).length;
+			calaveresIllaAcumulades = fisics + extraCalaveresCarta();
 /*
 			// 2) assignem punts inicials: +100 per calavera al jugador actiu...
 			puntsTornActual = calaveresIllaAcumulades * 100;
@@ -852,6 +855,7 @@ switch(cartaActual.value.id) {
 			// 3) mostrem missatge i sortim
 			const text = `☠️ Illa Calavera activada! Acumula calaveres per restar punts als rivals!`;
 			mostrarModalMissatge(text, false);
+			document.getElementById("puntsTornActiu").textContent = "+" + calaveresIllaAcumulades*100 + " punts. -" + calaveresIllaAcumulades*200 + " punts";
 			document.getElementById("resumPuntsTornActiu").textContent =
 			  `☠️ Illa Calavera: ${calaveresIllaAcumulades} calaveres`;
 
@@ -866,6 +870,14 @@ switch(cartaActual.value.id) {
 	}
 	
 }
+
+function extraCalaveresCarta() {
+  const id = cartaActual.value.id;
+  if (id === 'Calavera1') return 1;
+  if (id === 'Calavera2') return 2;
+  return 0;
+}
+
 
 /*
 
@@ -899,7 +911,13 @@ function actualitzaPuntsTornIllaCalavera() {
 function actualitzaPuntsTornIllaCalavera() {
     // 0) comprova si hi ha calaveres noves; si no, acabem el torn
     const cares = daus.map(d => obtenirCaraAmunt(d.mesh));
-    const total = cares.filter(c => c === 6).length;
+    //const total = cares.filter(c => c === 6).length;
+	
+	const fisics = cares.filter(c => c === 6).length;
+  // ara incloem també les “fantasma” de la carta
+  const total = fisics + extraCalaveresCarta();
+	
+	
     const noves = total - calaveresIllaAcumulades;
     if (noves <= 0) {
         console.log("🔚 Illa Calavera: no hi ha calaveres noves, finalitzant torn");
@@ -919,7 +937,8 @@ function actualitzaPuntsTornIllaCalavera() {
     });
 
     // 2) actualitza la UI
-    document.getElementById("puntsTornActiu").textContent = puntsTornActual.value;
+    //document.getElementById("puntsTornActiu").textContent = puntsTornActual.value;
+	document.getElementById("puntsTornActiu").textContent = "+" + calaveresIllaAcumulades*100 + " punts. -" + calaveresIllaAcumulades*200 + " punts";
     document.getElementById("resumPuntsTornActiu").innerHTML =
       `☠️ Illa Calavera x${calaveresIllaAcumulades}: +${ptsSelf} (rivals -${penal})`;
 }
@@ -1005,6 +1024,9 @@ function finalitzarTorn() {
 
     const jugadorActiu = llistaJugadors[jugadorActiuIndex];
     jugadorActiu.punts += puntsTornActual.value;
+	// Si volguessim fer que mai hi hagi puntuacions negatives
+//jugadorActiu.punts = Math.max(0, jugadorActiu.punts);
+
     console.log(`🏆 ${jugadorActiu.nom} guanya ${puntsTornActual.value} punts. Total: ${jugadorActiu.punts}`);
 
 
@@ -1028,7 +1050,7 @@ function finalitzarTorn() {
   }
 
   // Com a Easter Egg, es pot guanyar perdent molt fort. Aquí comprovem si ha arribat a -20000 punts
-  if (jugadorActiu.punts <= -20000) {
+  if (jugadorActiu.punts <= -10001) {
     mostrarModalMissatge(`🎉 Enhorabona ${jugadorActiu.nom}! Perdre tants punts ha tingut premi! Guanyes la partida!`, false);
 	//partidaFinalitzada = true;
 	//localStorage.setItem('partidaFinalitzada', JSON.stringify(true));
@@ -1428,7 +1450,8 @@ function onMouseClick(event) {
             mesh.material.forEach(m => {
                 m.opacity = 1;
                 m.transparent = false;
-				m.color.setHex(0xffffff);  // o el color que fossin abans
+				//m.color.setHex(0xffffff);  // o el color que fossin abans
+
             });
             console.log(`Dau ${index + 1} DESBLOQUEJAT`);
         } else {
@@ -1439,9 +1462,11 @@ function onMouseClick(event) {
             body.type = CANNON.Body.STATIC;
             body.updateMassProperties();
             mesh.material.forEach(m => {
-                //m.opacity = 0.5;
+                m.opacity = 0.6;
                 m.transparent = true;
-				m.color.setHex(0xb3ffb6); //verd
+				//m.color.setHex(0xb3ffb6); //verd
+				//m.color.setHex(0xf8ffb5); //verd
+				//m.color.setHex(0xfffa6b); //verd
             });
             console.log(`Dau ${index + 1} FIXAT`);
         }
@@ -1484,8 +1509,8 @@ function carregarEstatDaus() {
             mesh.material.forEach(m => {
                 //m.opacity = 0.5;
                 m.transparent = true;
-				m.color.setHex(0xffb3b3);  // vermell
-				//m.color.setHex(0x707070);  // gris
+				//m.color.setHex(0xffb3b3);  // vermell
+				m.color.setHex(0x707070);  // gris
             });
         }
     }
@@ -1530,8 +1555,8 @@ function carregarEstatDaus() {
 						daus[i].mesh.material.forEach(m => {
 							m.transparent = true;
 							//m.opacity     = 0.50;           // baixa més l’opacitat
-							m.color.setHex(0xffb3b3); // vermell
-							//m.color.setHex(0x707070);  // gris
+							//m.color.setHex(0xffb3b3); // vermell
+							m.color.setHex(0x707070);  // gris
 						});
 					}
 				}
