@@ -24,10 +24,10 @@
 		<script src="lib/cannon.min.js"></script>
 		
 		<!-- Entire game logic -->
-		<script src="main.js?v133" defer></script>
+		<script src="main.js?v137" defer></script>
 		
 		<!-- Stylesheet -->
-		<link rel="stylesheet" href="style.css?v36" defer>
+		<link rel="stylesheet" href="style.css?v39" defer>
 		
 		<!--
 		<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -142,13 +142,42 @@
 				
 				<!-- Div que ens fa de llenç on poder esciure. D'altra manera el contrast fa el text poc llegible -->
 				<div class="pergami">
-					<h2>Crèdits i Mencions</h2>
-					Fonts Utilitzades:
-					<div>
-						Pirata: Copyright (c) 2012, Rodrigo Fuenzalida, Nicolas Massi (www.taip.com.ar / abc.taip.com.ar), with Reserved Font Name 'Pirata'
-						<br>SIL OPEN FONT LICENSE Version 1.1 - 26 February 2007<br>
-						Crèdits <a href="doc/pirataOneFont/OFL.txt" target="_blank">aquí</a>
-					</div>
+					<h2 style="font-size:58px; text-align:center;">Crèdits i Mencions</h2>
+					<ol style="font-size:42px; line-height:1.6;">
+						<li>Agraïments</li>
+							<ul>
+								<li>A la Laia per aguantar tot el procès creatiu i de producció</li>
+								<li>A l'Stivan i al Maik per inspirar-me a fer aquest TFG</li>
+								<li>A la meva familia per el recolzament al llarg dels anys</li>
+								<li>A l'equip docent de la UAB i la UOC que m'han dut aquí</li>
+								<li>A la Júlia Vilasís, al Joel Servitja i al Joan Arnedo per l'assesorament i la guia durant el procés d'elaboració del TFG</li>
+							</ul>
+						<li>Menció: Font utilitzada</li>
+							<ul>
+								<li>Nom de la font: Pieces of Eight</li>
+								<li>Autor: Steve Ferrera</li>
+								<li>Contacte: supercarguy@hotmail.com</li>
+								<li>Llicència: Freeware</li>
+							</ul>
+						<li>Menció: Imatges</li>
+							<ul>
+								<li>La totalitat de les imatges emprades en aquest projecte han estat creades mitjançant ChatGPT</li>
+								<li>Exemple de prompt</li>
+								<li>"A pixel art icon features a prominent white skull centered on a square wooden background. The skull is highly detailed in retro 8-bit style, with black eye sockets, a nose cavity, and teeth. The wooden background consists of light brown planks with subtle texture and variation. The image has a decorative wood frame or margin to enhance the icon's appearance, giving it a polished and app-like look. The style is consistent with classic game icons, with bold pixel outlines, high contrast, and a clean square composition suitable for a PWA icon (1024x1024)."</li>
+							</ul>
+						<li>Menció: Música de fons</li>
+							<ul>
+								<li>La música de fons ha estat realitzada amb una aplicació que utilitza IA per fer cançons a partir d'un prompt</li>
+								<li>Aplicació: https://aimusic.so/app</li>
+								<li>Exemple de prompt</li>
+								<li>"And adventurous song suitable for being the background track of a pirate dice game. It has to be loop melody with incremental instruments. It has to start with a lute or any similar instrument and then keep adding more instruments to give the sensation of going uphill during the track. Then a sudden stop so i can loop it again. "</li>
+							</ul>
+						<li>Menció: Sons de daus i clics de menú</li>
+							<ul>
+								<li>Els sons de daus rodant, el d'un dau individual rodant, el clic dels botons de menú, i el "pìrata" que sona al clicar la bandera; tots han estat tots generats analògicament i enregistrats directament a l'ordinador.</li>
+								<li>A cada un dels sons se li ha aplicat un efecte de normalització per evitar clipejar i llavors se'ls hi ha aplicat, depenent del so, algún efecte reverb o de pujar el gain.</li>
+							</ul>
+					</ol>
 				</div>
 			</div>
 			<!-- FI ESCENA Crèdits -->
@@ -164,8 +193,8 @@
 				
 				<!-- Div que simula un pergamí on podem escriure text sense exposar-lo a un contrast alt i fer-li illegible -->
 				<div class="pergami">
-					<h2 style="font-size:64px; text-align:center;">Regles del Joc</h2>
-					<ol style="font-size:52px; line-height:1.6;">
+					<h2 style="font-size:58px; text-align:center;">Regles del Joc</h2>
+					<ol style="font-size:42px; line-height:1.6;">
 						<li><b>Objectiu:</b> Ser el primer en arribar a 10 000 punts.</li>
 						<li><b>Torn de joc:</b>
 							<ul>
@@ -251,9 +280,15 @@
 				
 				<!-- Div que simula un pergamí on podem escriure text sense exposar-lo a un contrast alt i fer-li illegible -->
 				<div class="pergami">
-					<h2 style="font-size:64px;">Illa Calavera <span style="font-size:40px;">v0.9.1</span></h2>
-					<ol style="font-size:52px; line-height:1.6;">
-						<li><a href="https://github.com/joanmarcgs/TFG">https://github.com/joanmarcgs/TFG</a></li>
+					<h2 style="font-size:58px;">Illa Calavera <span style="font-size:40px;">v0.9.1</span></h2>
+					<ol style="font-size:42px; line-height:1.6;">
+						<li>Autor: Joan Marc Guillamon</li>
+						<li>Aquesta aplicació està realitzada en la seva totalitat amb HTML, Javascript i CSS</li>
+						<li>El codi és totalment obert i es pot utilitzar per qualsevol finalitat sense cap mena de restricció<br>
+						<a href="https://github.com/joanmarcgs/TFG" target="_blank">https://github.com/joanmarcgs/TFG</a></li>
+						<li>Basat en el joc de taula original "Isla Calavera" creat per Haim Shafir i publicat a Espanya per Mercurio Ediciones.<br>
+						<a href="https://mercurio.com.es/isla-calavera/" target="_blank">https://mercurio.com.es/isla-calavera/</a></li>
+						
 					</ol>
 				</div>
 			</div>

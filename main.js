@@ -234,10 +234,40 @@
 	let escenaAnterior = null; // Variable auxiliar que guarda l'escena anterior
 	let llistaJugadors = []; // Llista de jugadors amb info, la guardem també en localStorage
 	let audioState = 0; // Variable que ens controla l'audio
-	//let partidaIniciada = false; // Controla si hi ha una partida en curs
-	//let primerTiradaFeta = false; // Controla si s'ha fet una tirada ja en el torn present
-	//let cartaActual = null; // Controla quina carta està activa en el torn present
-	//let partidaFinalitzada = false;
+	let numCalaveres = 0; // Variable que ens controla el num de calaveres que hi ha en joc
+	let illaCalaveraMode = false; // VAriable que ens controla si estem en mode illa calavera
+	let calaveresIllaAcumulades = 0; // Variable que ens controla les calaveres acumulades en mode illa calavera
+	let escenaDausInicialitzada = false;
+	
+	// Variables globals per els daus
+	const daus = [];
+	const limitPixels = 50;
+	const maxHeight = 8;
+	let tiradaEnProgres = false;
+	
+	// Variables globals per la càmera
+	let scene, camera, renderer, world;
+	// Posició de la càmera, ho deixem en global
+	const posXcam = 0;
+	const posYcam = 30;
+	const posZcam = 20;
+	const lookXcam = 0;
+	const lookYcam = -2;
+	const lookZcam = 0;
+	const fovcam = 30;
+
+	// Funció que fem servir de debug per la càmera
+	//setupCameraSliders();
+	
+	// Constants que ens defineixen el poder tocar els daus amb el ratolí
+	const raycaster = new THREE.Raycaster();
+	const mouse = new THREE.Vector2();
+
+	// Definim les imatges de les cares dels daus
+	const caresDauSprite = 'img/dauCompletCompressed.png';
+	const caresDauMaterial = []; // Aquí guardem els materials creats des del sprite
+	
+	const clock = new THREE.Clock(); // Definim constant per arreglar BUG de renderitzat massa ràpid a pantalles amb refresc alt
 
 	// Llista de cartes modificadores de torn
 	const cartes = [
@@ -253,8 +283,6 @@
 	];
 // FI FUNCIONS I DECLARACIONS globals
 
-			
-			
 // Funció que cridem cada cop que volem carregar una escena
 function carregaEscena(escena){
 			
@@ -265,20 +293,6 @@ function carregaEscena(escena){
 	if (audioBoto) { audioBoto.currentTime = 0; audioBoto.play().catch(() => {}); }
 	
 	switch(escena){
-		/*
-		case "escena-pantallaCarrega": // Tornem a pantalla inicial
-			canviaEscena(escena); // Funció que amaga l'escena activa i mostra la desitjada
-		break;
-		case "escena-configuraPartida": // Iniciem una partida
-			canviaEscena(escena); // Funció que amaga l'escena activa i mostra la desitjada
-		break;
-		case "escena-instruccions": // Veiem les instruccions del joc
-			canviaEscena(escena); // Funció que amaga l'escena activa i mostra la desitjada
-		break;
-		case "escena-credits": // Veiem les instruccions del joc
-			canviaEscena(escena); // Funció que amaga l'escena activa i mostra la desitjada
-		break;
-		*/
 		case "escena-pantallaInici": // Tornem a pantalla inicial
 			actualitzaPantallaInici(); // <--- AFEGEIX AIXÒ!
 			canviaEscena(escena); // Funció que amaga l'escena activa i mostra la desitjada
@@ -340,7 +354,7 @@ function canviaEscena(escena){
 	// Actualitzem l'escena activa
 	escenaActiva = escena;
 }
-			
+
 // Funció que fem servir a la pantalla de selecció de jugadors. Quan fan clic en un avatar, aquest es posa en color i hi deixa posar un nom
 function seleccionarJugador(num) {
 	let avatar = document.getElementById("jugadorAvatar" + num);
@@ -359,6 +373,7 @@ function seleccionarJugador(num) {
 	}
 }
 
+// Funcio que actualitza els punts al panell esquerra
 function actualitzaPuntuacions() {
 	const div = document.getElementById("puntuacionsJugadorsMid");
 	if (!div) return;
@@ -367,38 +382,32 @@ function actualitzaPuntuacions() {
 		div.innerHTML += "<div style='padding:10px;'>"+j.nom+"<br>"+j.punts+" </div> ";
 	});
 }
-			
-			
-			
-			
-			//let puntsTornActual = 0;
 
+// Funció que es crida cada cop que s'ha d'iniciar una seqüència de torns
 function iniciarTorns() {
-    if (llistaJugadors.length === 0) return;
+	if (llistaJugadors.length === 0) return;
 
-    llistaJugadors.forEach((jugador, index) => {
-        if (jugador.torn === undefined) {
-            jugador.torn = false;
-        }
-    });
+	llistaJugadors.forEach((jugador, index) => {
+		if (jugador.torn === undefined) {
+			jugador.torn = false;
+		}
+	});
 
-    // Si cap jugador té torn actiu, inicialitzem
-    if (!llistaJugadors.some(j => j.torn)) {
-        llistaJugadors[0].torn = true;
-    }
+	// Si cap jugador té torn actiu, inicialitzem
+	if (!llistaJugadors.some(j => j.torn)) {
+		llistaJugadors[0].torn = true;
+	}
 
-    localStorage.setItem("llistaJugadors", JSON.stringify(llistaJugadors));
-    actualitzaTornsPantalla();
+	localStorage.setItem("llistaJugadors", JSON.stringify(llistaJugadors));
+	actualitzaTornsPantalla();
 }
 
 
 
 function actualitzaTornsPantalla() {
-    const jugadorActiu = llistaJugadors.find(j => j.torn);
-    if (!jugadorActiu) return;
-	
-	
-	
+	const jugadorActiu = llistaJugadors.find(j => j.torn);
+	if (!jugadorActiu) return;
+
 	// Si la partida està marcada com a finalitzada
 	if (partidaFinalitzada.value) {
 		document.getElementById("finalitzarTornContainer").style.display = "none";
@@ -411,767 +420,488 @@ function actualitzaTornsPantalla() {
 		document.getElementById("cartaEnJoc").style.display = 'block';
 		document.getElementById("puntsTornActiu").textContent = puntsTornActual.value + " punts";
 	}
-    
-    //document.getElementById("tornActual").style.display = "block";
-    document.getElementById("puntsProvisional").style.display = "block";
 
-    //document.getElementById("nomJugadorActiu").textContent = jugadorActiu.nom;
-    
+	document.getElementById("puntsProvisional").style.display = "block";
 
-    // 🔥 ACTUALITZA avatar i nom centrat
-    const avatarDisplay = document.getElementById("jugadorActiuInfo");
-    const avatarImg = document.getElementById("avatarJugadorActiu");
-    const nomDisplay = document.getElementById("nomJugadorActiuDisplay");
+	// ACTUALITZEM avatar i nom centrat
+	const avatarDisplay = document.getElementById("jugadorActiuInfo");
+	const avatarImg = document.getElementById("avatarJugadorActiu");
+	const nomDisplay = document.getElementById("nomJugadorActiuDisplay");
 
-    avatarImg.src = jugadorActiu.avatar || "img/avatar"+jugadorActiu.poder+".png"; // Valor per defecte
-    nomDisplay.textContent = jugadorActiu.nom;
+	avatarImg.src = jugadorActiu.avatar || "img/avatar"+jugadorActiu.poder+".png"; // Valor per defecte
+	nomDisplay.textContent = jugadorActiu.nom;
 
-    avatarDisplay.style.display = "block";
+	avatarDisplay.style.display = "block";
 	
 	robaCarta();
 }
 
-
+// FUnció que cridem cada cop que volem mostrar un missatge en pantalla
 function mostrarModalMissatge(text, callback) {
-  document.getElementById("textModalMissatge").textContent = text;
-  document.getElementById("modalMissatge").style.display = "flex";
-  document.getElementById("modalMissatge").dataset.callback = callback ? "true" : "";
+	document.getElementById("textModalMissatge").textContent = text;
+	document.getElementById("modalMissatge").style.display = "flex";
+	document.getElementById("modalMissatge").dataset.callback = callback ? "true" : "";
 }
 
+// Funció que ens tanca el modal de mostrar missatges en pantalla
 function tancarModalMissatge() {
-  document.getElementById("modalMissatge").style.display = "none";
-  if (document.getElementById("modalMissatge").dataset.callback === "true") {
-    document.getElementById("modalMissatge").dataset.callback = "";
-	 if (numCalaveres == 3) {
-        
-		finalitzarTorn();
-    }
-  }
-  
-
+	document.getElementById("modalMissatge").style.display = "none";
+	if (document.getElementById("modalMissatge").dataset.callback === "true") {
+		document.getElementById("modalMissatge").dataset.callback = "";
+		if (numCalaveres == 3) {
+			finalitzarTorn();
+		}
+	}
 }
 
 // FUnció que mostra i amaga l'ajuda dels punts que fem
-
-
 function toggleAjudaPunts() {
 	const audioBoto = document.getElementById('audio-botoPirata');
 	if (audioBoto) { audioBoto.currentTime = 0; audioBoto.play().catch(() => {}); }
-  const puntsProv = document.getElementById("resumPuntsTornActiu");
-  // llegeix el display computat, no l’inline
-  const actual = window.getComputedStyle(puntsProv).getPropertyValue("display");
-  puntsProv.style.display = (actual === "none") ? "block" : "none";
+	const puntsProv = document.getElementById("resumPuntsTornActiu");
+	// llegeix el display computat, no l’inline
+	const actual = window.getComputedStyle(puntsProv).getPropertyValue("display");
+	puntsProv.style.display = (actual === "none") ? "block" : "none";
 }
-
-
 
 // Funció per calcular els punts actuals del torn, incloent combinacions especials
-
-
-let numCalaveres = 0;
-
-let illaCalaveraMode = false;
-let calaveresIllaAcumulades = 0;
-
 function actualitzaPuntsTorn() {
-    const cares = [];
-    numCalaveres = 0;
-    puntsTornActual.value = 0;
+	const cares = [];
+	numCalaveres = 0;
+	puntsTornActual.value = 0;
 
-    let comptadorMonedes = 0;
-    let comptadorDiamants = 0;
-    let missatgesResum = [];
+	let comptadorMonedes = 0;
+	let comptadorDiamants = 0;
+	let missatgesResum = [];
 
 	let missatge = '';
-
-switch(cartaActual.value.id) {
-  case 'Diamant':
-	comptadorDiamants++;
-	puntsTornActual.value += 100;
-	missatge = `💎 Sumes un diamant per carta modificadora!`;
-     console.log(missatge);
-       missatgesResum.push(missatge);
-  break;
-  case 'Or':
-	comptadorMonedes++;
-	puntsTornActual.value += 100;
-	missatge = `🪙 Sumes una moneda d'or per carta modificadora!`;
-     console.log(missatge);
-       missatgesResum.push(missatge);
-  break;
-}
-
-
-
-    for (let { mesh } of daus) {
-        const cara = obtenirCaraAmunt(mesh);
-        if (cara) cares.push(cara);
-
-        if (cara === 2) {
-            puntsTornActual.value += 100;
-            comptadorMonedes++;
-        }
-        if (cara === 4) {
-            puntsTornActual.value += 100;
-            comptadorDiamants++;
-        }
-        if (cara === 6) numCalaveres++; // Calavera
-    }
 	
+	// Sumem punts si hi ha diamants o ors
+	switch(cartaActual.value.id) {
+		case 'Diamant':
+			comptadorDiamants++;
+			puntsTornActual.value += 100;
+			missatge = `💎 Sumes un diamant per carta modificadora!`;
+			console.log(missatge);
+			missatgesResum.push(missatge);
+		break;
+		case 'Or':
+			comptadorMonedes++;
+			puntsTornActual.value += 100;
+			missatge = `🪙 Sumes una moneda d'or per carta modificadora!`;
+			console.log(missatge);
+			missatgesResum.push(missatge);
+		break;
+	}
 	
+	for (let { mesh } of daus) {
+		const cara = obtenirCaraAmunt(mesh);
+		if (cara) cares.push(cara);
 
-    if (comptadorMonedes > 0) {
-        missatge = `🪙 ${comptadorMonedes * 100} punts per monedes (${comptadorMonedes})`;
-        console.log(missatge);
-        missatgesResum.push(missatge);
-    }
-    if (comptadorDiamants > 0) {
-        missatge = `💎 ${comptadorDiamants * 100} punts per diamants (${comptadorDiamants})`;
-        console.log(missatge);
-        missatgesResum.push(missatge);
-    }
+		if (cara === 2) {
+			puntsTornActual.value += 100;
+			comptadorMonedes++;
+		}
+		if (cara === 4) {
+			puntsTornActual.value += 100;
+			comptadorDiamants++;
+		}
+		if (cara === 6) numCalaveres++; // Calavera
+	}
 
-    
+	if (comptadorMonedes > 0) {
+		missatge = `🪙 ${comptadorMonedes * 100} punts per monedes (${comptadorMonedes})`;
+		console.log(missatge);
+		missatgesResum.push(missatge);
+	}
+	if (comptadorDiamants > 0) {
+		missatge = `💎 ${comptadorDiamants * 100} punts per diamants (${comptadorDiamants})`;
+		console.log(missatge);
+		missatgesResum.push(missatge);
+	}
 
-    const comptador = {};
-    for (let cara of cares) {
-        if (cara === 6) continue;
-        comptador[cara] = (comptador[cara] || 0) + 1;
-    }
-	
+	const comptador = {};
+	for (let cara of cares) {
+		if (cara === 6) continue;
+		comptador[cara] = (comptador[cara] || 0) + 1;
+	}
 	
 	// Comptador especial per monedes i diamants
 	switch (cartaActual.value.id) {
-		  case 'Or':
+		case 'Or':
 			// la cara “Moneda” de la carta també compta per al combo
 			comptador[2] = (comptador[2] || 0) + 1;
-			break;
-		  case 'Diamant':
+		break;
+		case 'Diamant':
 			// la cara “Diamant” de la carta també compta per al combo
 			comptador[4] = (comptador[4] || 0) + 1;
+		break;
+	}
+
+	let bonusCombinacio = 0;
+	let dausUtilitzats = new Set();
+
+	for (let cara in comptador) {
+		const num = comptador[cara];
+		if (num >= 3) {
+			let punts = 0;
+			if (num === 3) punts = 100;
+			if (num === 4) punts = 200;
+			if (num === 5) punts = 500;
+			if (num === 6) punts = 1000;
+			if (num === 7) punts = 2000;
+			if (num === 8) punts = 4000;
+
+			bonusCombinacio += punts;
+			const nom = nomCara(cara);
+			missatge = `🎲 ${punts} punts per cares iguals (${num}) (${nom})`;
+			console.log(missatge);
+			missatgesResum.push(missatge);
+
+			for (let i = 0, comptats = 0; i < cares.length && comptats < num; i++) {
+				if (cares[i] == cara) {
+					dausUtilitzats.add(i);
+					comptats++;
+				}
+			}
+		}
+	}
+
+	for (let i = 0; i < cares.length; i++) {
+		if (cares[i] === 2 || cares[i] === 4) {
+			dausUtilitzats.add(i);
+		}
+	}
+
+	if (dausUtilitzats.size === cares.length) {
+		bonusCombinacio += 500;
+		missatge = '💎 Tresor perfecte! Bonus extra de +500 punts';
+		console.log(missatge);
+		missatgesResum.push(missatge);
+	}
+
+	// Calculem si l'usuari suma punts per poder de Personatges
+	// 1. Troba el jugador actiu i el seu poder
+	const jugadorActiu = llistaJugadors.find(j => j.torn);
+	if (jugadorActiu) {
+		const poder = jugadorActiu.poder;
+		let bonusAvatar = 0;
+		let msgAvatar;
+
+		switch(poder) {
+			case 1:
+				// +100 per cada calavera
+				bonusAvatar = numCalaveres * 100;
+				msgAvatar = `🦴 +${bonusAvatar} punts de poder per calaveres x${numCalaveres}`;
+			break;
+			case 2: case 4:
+				// +100 per cada vaixell
+				const numVaixells = (comptador[5] || 0);
+				bonusAvatar = numVaixells * 100;
+				msgAvatar = `🚢 +${bonusAvatar} punts de poder per vaixells x${numVaixells}`;
+			break;
+			case 3:
+				// +100 per cada mico i lloro
+				const numMicos = (comptador[3] || 0);
+				const numLloros = (comptador[1] || 0);
+				const totalAnimals = numMicos + numLloros;
+				bonusAvatar = totalAnimals * 100;
+				msgAvatar = `🐒🦜 +${bonusAvatar} punts de poder per animals x${totalAnimals}`;
+			break;
+			case 5:
+				// +100 per cada or (moneda)
+				bonusAvatar = comptadorMonedes * 100;
+				msgAvatar = `🪙 +${bonusAvatar} punts de poder per or x${comptadorMonedes}`;
+			break;
+			case 6:
+				// +100 per cada diamant
+				bonusAvatar = comptadorDiamants * 100;
+				msgAvatar = `💎 +${bonusAvatar} punts de poder per diamants x${comptadorDiamants}`;
 			break;
 		}
-	
 
-    let bonusCombinacio = 0;
-    let dausUtilitzats = new Set();
-
-    for (let cara in comptador) {
-        const num = comptador[cara];
-        if (num >= 3) {
-            let punts = 0;
-            if (num === 3) punts = 100;
-            if (num === 4) punts = 200;
-            if (num === 5) punts = 500;
-            if (num === 6) punts = 1000;
-            if (num === 7) punts = 2000;
-            if (num === 8) punts = 4000;
-
-            bonusCombinacio += punts;
-            const nom = nomCara(cara);
-            missatge = `🎲 ${punts} punts per cares iguals (${num}) (${nom})`;
-            console.log(missatge);
-            missatgesResum.push(missatge);
-
-            for (let i = 0, comptats = 0; i < cares.length && comptats < num; i++) {
-                if (cares[i] == cara) {
-                    dausUtilitzats.add(i);
-                    comptats++;
-                }
-            }
-        }
-    }
-
-    for (let i = 0; i < cares.length; i++) {
-        if (cares[i] === 2 || cares[i] === 4) {
-            dausUtilitzats.add(i);
-        }
-    }
-
-    if (dausUtilitzats.size === cares.length) {
-        bonusCombinacio += 500;
-        missatge = '💎 Tresor perfecte! Bonus extra de +500 punts';
-        console.log(missatge);
-        missatgesResum.push(missatge);
-    }
-
-    
-	
-	
-	
-	
-	// Calculem si l'usuari suma punts per poder de Personatges
-	
-	
-    // 1. Troba el jugador actiu i el seu poder
-    const jugadorActiu = llistaJugadors.find(j => j.torn);
-    if (jugadorActiu) {
-      const poder = jugadorActiu.poder;
-      let bonusAvatar = 0;
-      let msgAvatar;
-
-      switch(poder) {
-        case 1:
-          // +100 per cada calavera
-          bonusAvatar = numCalaveres * 100;
-          msgAvatar = `🦴 +${bonusAvatar} punts de poder per calaveres x${numCalaveres}`;
-          break;
-        case 2: case 4:
-          // +100 per cada vaixell
-          const numVaixells = (comptador[5] || 0);
-          bonusAvatar = numVaixells * 100;
-          msgAvatar = `🚢 +${bonusAvatar} punts de poder per vaixells x${numVaixells}`;
-          break;
-        case 3:
-          // +100 per cada mico i lloro
-          const numMicos = (comptador[3] || 0);
-          const numLloros = (comptador[1] || 0);
-          const totalAnimals = numMicos + numLloros;
-          bonusAvatar = totalAnimals * 100;
-          msgAvatar = `🐒🦜 +${bonusAvatar} punts de poder per animals x${totalAnimals}`;
-          break;
-        case 5:
-          // +100 per cada or (moneda)
-          bonusAvatar = comptadorMonedes * 100;
-          msgAvatar = `🪙 +${bonusAvatar} punts de poder per or x${comptadorMonedes}`;
-          break;
-        case 6:
-          // +100 per cada diamant
-          bonusAvatar = comptadorDiamants * 100;
-          msgAvatar = `💎 +${bonusAvatar} punts de poder per diamants x${comptadorDiamants}`;
-          break;
-      }
-
-      if (bonusAvatar > 0) {
-        console.log(msgAvatar);
-        missatgesResum.push(msgAvatar);
-        puntsTornActual.value += bonusAvatar;
-      }
-    }
-	
-	
+		if (bonusAvatar > 0) {
+			console.log(msgAvatar);
+			missatgesResum.push(msgAvatar);
+			puntsTornActual.value += bonusAvatar;
+		}
+	}
 	
 	puntsTornActual.value += bonusCombinacio;
-    document.getElementById("puntsTornActiu").textContent = puntsTornActual.value + " punts";
-    //localStorage.setItem('puntsTornActual', puntsTornActual);
+	document.getElementById("puntsTornActiu").textContent = puntsTornActual.value + " punts";
 
+	switch(cartaActual.value.id) {
+		case 'Pirata':
+		// xo₂ al final
+			puntsTornActual.value *= 2;
+			missatgesResum.push(`☠️ Pirata: puntuació x2 = ${puntsTornActual.value}`);
+		break;
+		case 'Calavera1':
+			// Comptem una calavera extra “gratis”
+			numCalaveres = Math.max(0, numCalaveres + 1);
+			missatgesResum.push(`☠️ Calavera a la carta: ignoro 1 calavera`);
+		break;
+		case 'Calavera2':
+			numCalaveres = Math.max(0, numCalaveres + 2);
+			missatgesResum.push(`☠️ Calavera×2 a la carta: ignoro 2 calaveres`);
+		break;
+		case 'Vaixell2':
+			const v2 = comptador[5] || 0;
+			if (v2 >= 2) {
+				puntsTornActual.value += 500;
+				missatgesResum.push(`🚢×2: +500 punts per ≥2 vaixells`);
+			} else {
+				puntsTornActual.value -= 500;
+				missatgesResum.push(`🚢×2: -500 punts per <2 vaixells`);
+			}
+		break;
+		case 'Vaixell4':
+			const v4 = comptador[5] || 0;
+			if (v4 >= 4) {
+				puntsTornActual.value += 1000;
+				missatgesResum.push(`🚢×4: +1000 punts per ≥4 vaixells`);
+			} else {
+				puntsTornActual.value -= 1000;
+				missatgesResum.push(`🚢×4: -1000 punts per <4 vaixells`);
+			}
+		break;
 
+		case 'Animals':
+			// 1) Restem els punts que ja s'hagin posat per separat (micos i lloros)
+			function ptsCombo(n) { return [0,0,100,200,500,1000,2000,4000][n]||0; }
+			const cntLloro = comptador[1] || 0;
+			const cntMico  = comptador[3] || 0;
+			let sub = 0;
+			if (cntLloro >= 3) sub += ptsCombo(cntLloro);
+			if (cntMico  >= 3) sub += ptsCombo(cntMico);
+			if (sub) {
+				puntsTornActual.value -= sub;
+				missatgesResum.push(`🐒🦜 Animals carta: restem ${sub} punts de combos separats`);
+			}
 
+			// 2) Sumem el combo únic amb tots dos barrejats
+			const totAnimals = cntLloro + cntMico;
+			if (totAnimals >= 3) {
+				const ptsA = ptsCombo(totAnimals);
+				puntsTornActual.value += ptsA;
+				missatgesResum.push(`🐒🦜 Animals carta: +${ptsA} punts per ${totAnimals} cares iguals`);
+			}
+		break;
+	}
 
+	document.getElementById("puntsTornActiu").textContent = puntsTornActual.value + " punts";
 
-
-
-
+	// Mostrem el resum al span
+	document.getElementById("resumPuntsTornActiu").innerHTML = missatgesResum.join('   ');
 	
-switch(cartaActual.value.id) {
-  case 'Pirata':
-    // xo₂ al final
-    puntsTornActual.value *= 2;
-    missatgesResum.push(`☠️ Pirata: puntuació x2 = ${puntsTornActual.value}`);
-    break;
-  case 'Calavera1':
-    // Comptem una calavera extra “gratis”
-    numCalaveres = Math.max(0, numCalaveres + 1);
-    missatgesResum.push(`☠️ Calavera a la carta: ignoro 1 calavera`);
-    break;
-  case 'Calavera2':
-    numCalaveres = Math.max(0, numCalaveres + 2);
-    missatgesResum.push(`☠️ Calavera×2 a la carta: ignoro 2 calaveres`);
-    break;
-  case 'Vaixell2':
-    const v2 = comptador[5] || 0;
-    if (v2 >= 2) {
-      puntsTornActual.value += 500;
-      missatgesResum.push(`🚢×2: +500 punts per ≥2 vaixells`);
-    } else {
-      puntsTornActual.value -= 500;
-      missatgesResum.push(`🚢×2: -500 punts per <2 vaixells`);
-    }
-    break;
-  case 'Vaixell4':
-    const v4 = comptador[5] || 0;
-    if (v4 >= 4) {
-      puntsTornActual.value += 1000;
-      missatgesResum.push(`🚢×4: +1000 punts per ≥4 vaixells`);
-    } else {
-      puntsTornActual.value -= 1000;
-      missatgesResum.push(`🚢×4: -1000 punts per <4 vaixells`);
-    }
-    break;
-	
-	/*
-  case 'Animals':
-    // re-calcula combos sumant micos + lloros
-    const totAnimals = (comptador[1]||0) + (comptador[3]||0);
-    if (totAnimals >= 3) {
-      const ptsA = [0,0,100,200,500,1000,2000,4000][totAnimals] || 0;
-      puntsTornActual += ptsA;
-      missatgesResum.push(`🐒🦜 Animals carta: +${ptsA} punts per ${totAnimals} iguals`);
-    }
-    break;
-	*/
-	case 'Animals':
-  // 1) Restem els punts que ja s'hagin posat per separat (micos i lloros)
-  function ptsCombo(n) { return [0,0,100,200,500,1000,2000,4000][n]||0; }
-
-  const cntLloro = comptador[1] || 0;
-  const cntMico  = comptador[3] || 0;
-  let sub = 0;
-  if (cntLloro >= 3) sub += ptsCombo(cntLloro);
-  if (cntMico  >= 3) sub += ptsCombo(cntMico);
-  if (sub) {
-    puntsTornActual.value -= sub;
-    missatgesResum.push(`🐒🦜 Animals carta: restem ${sub} punts de combos separats`);
-  }
-
-  // 2) Sumem el combo únic amb tots dos barrejats
-  const totAnimals = cntLloro + cntMico;
-  if (totAnimals >= 3) {
-    const ptsA = ptsCombo(totAnimals);
-    puntsTornActual.value += ptsA;
-    missatgesResum.push(`🐒🦜 Animals carta: +${ptsA} punts per ${totAnimals} cares iguals`);
-  }
-  break;
-
-	
-}
-	
-	
-
-
-//puntsTornActual += bonusCombinacio;
-    document.getElementById("puntsTornActiu").textContent = puntsTornActual.value + " punts";
-    //localStorage.setItem('puntsTornActual', puntsTornActual);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    // Mostrem el resum al span
-    document.getElementById("resumPuntsTornActiu").innerHTML = missatgesResum.join('   ');
-	
-	
-	/*
-	if (numCalaveres == 3) {
-        
-        if(cartaActual.id=="Boti"){
-		mostrarModalMissatge("☠️ Has tret 3 calaveres! Perds el torn! Gràcies a la carta de Botí t'endús "+puntsTornActual+" punts!", true);
-		}else{
-		mostrarModalMissatge("☠️ Has tret 3 calaveres! Perds el torn!", true);
-		puntsTornActual = 0;
-		}
-		
-		
-		
-        //finalitzarTorn();
-        document.getElementById("resumPuntsTornActiu").textContent = "";
-        return;
-    }
-	
-	
-	
-	*/
 	
 	if (numCalaveres == 3) {
-    let penal = 0;
-    if (cartaActual.value.id === "Vaixell2") penal = 500;
-    if (cartaActual.value.id === "Vaixell4") penal = 1000;
+		let penal = 0;
+		if (cartaActual.value.id === "Vaixell2") penal = 500;
+		if (cartaActual.value.id === "Vaixell4") penal = 1000;
 
-    if (cartaActual.value.id === "Boti") {
-        // el Botí ja manté punts normals: no tocar
-        mostrarModalMissatge(
-          `☠️ Has tret 3 calaveres! Perds el torn! Gràcies a la carta de Botí t'endús ${puntsTornActual.value} punts!`,
-          true
-        );
-    } else {
-        // si és carta de vaixell, assignem un valor negatiu a puntsTornActual
-        puntsTornActual.value = -penal;
-        let miss = `☠️ Has tret 3 calaveres! Perds el torn!`;
-        if (penal > 0) miss += ` A més perds ${penal} punts per la carta de ${cartaActual.value.id}.`;
-        mostrarModalMissatge(miss, true);
-    }
-
-    document.getElementById("resumPuntsTornActiu").textContent = "";
-    return;
-}
-
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-
-/*
-    if (numCalaveres > 3) {
-        mostrarModalMissatge("Has tret 4 calaveres o més! Anem a Illa Calavera!☠️☠️☠️☠️", true);
-        puntsTornActual = 0;
-        document.getElementById("resumPuntsTornActiu").textContent = "☠️☠️☠️☠️ Illa Calavera!";
-        return;
-    }
-	*/
-			if (numCalaveres > 3 && !illaCalaveraMode) {
-			// 1) entrem en “Illa Calavera”
-			illaCalaveraMode = true;
-			//calaveresIllaAcumulades = numCalaveres;
-			//calaveresIllaAcumulades = daus.filter(d => obtenirCaraAmunt(d.mesh) === 6).length;
-			const fisics = daus.filter(d => obtenirCaraAmunt(d.mesh) === 6).length;
-			calaveresIllaAcumulades = fisics + extraCalaveresCarta();
-/*
-			// 2) assignem punts inicials: +100 per calavera al jugador actiu...
-			puntsTornActual = calaveresIllaAcumulades * 100;
-			// ...i -200 per calavera a cada altre jugador
-			const penal = calaveresIllaAcumulades * 200;
-			llistaJugadors.forEach(j => {
-				if (!j.torn) j.punts -= penal;
-			});
-*/
-			// 3) mostrem missatge i sortim
-			const text = `☠️ Illa Calavera activada! Acumula calaveres per restar punts als rivals!`;
-			mostrarModalMissatge(text, false);
-			document.getElementById("puntsTornActiu").textContent = "+" + calaveresIllaAcumulades*100 + " punts. -" + calaveresIllaAcumulades*200 + " punts";
-			document.getElementById("resumPuntsTornActiu").textContent =
-			  `☠️ Illa Calavera: ${calaveresIllaAcumulades} calaveres`;
-
-			return;
+		if (cartaActual.value.id === "Boti") {
+			// el Botí ja manté punts normals: no tocar
+			mostrarModalMissatge(
+				`☠️ Has tret 3 calaveres! Perds el torn! Gràcies a la carta de Botí t'endús ${puntsTornActual.value} punts!`,
+				true
+			);
+		} else {
+			// si és carta de vaixell, assignem un valor negatiu a puntsTornActual
+			puntsTornActual.value = -penal;
+			let miss = `☠️ Has tret 3 calaveres! Perds el torn!`;
+			if (penal > 0) miss += ` A més perds ${penal} punts per la carta de ${cartaActual.value.id}.`;
+			mostrarModalMissatge(miss, true);
 		}
+		document.getElementById("resumPuntsTornActiu").textContent = "";
+		return;
+	}
 
-	
-	//alert("actualitzaPuntsTorn: Torn " + numTirada.value);
-	if(numTirada.value == 0){ 
+
+	if (numCalaveres > 3 && !illaCalaveraMode) {
+		// Entrem en “Illa Calavera”
+		illaCalaveraMode = true;
+		const fisics = daus.filter(d => obtenirCaraAmunt(d.mesh) === 6).length;
+		calaveresIllaAcumulades = fisics + extraCalaveresCarta();
+
+		// Mostrem missatge i sortim
+		const text = `☠️ Illa Calavera activada! Acumula calaveres per restar punts als rivals!`;
+		mostrarModalMissatge(text, false);
+		document.getElementById("puntsTornActiu").textContent = "+" + calaveresIllaAcumulades*100 + " punts. -" + calaveresIllaAcumulades*200 + " punts";
+		document.getElementById("resumPuntsTornActiu").textContent =
+		  `☠️ Illa Calavera: ${calaveresIllaAcumulades} calaveres`;
+
+		return;
+	}
+
+	if(numTirada.value == 0){
 		document.getElementById("finalitzarTornContainer").style.display = "none";
 		document.getElementById("puntsTornActiu").textContent = "";
 	}
 	
 }
 
+// Funció que cridem si volem tenir en compte les calaveres de les cartes que afegeixen calaveres
 function extraCalaveresCarta() {
-  const id = cartaActual.value.id;
-  if (id === 'Calavera1') return 1;
-  if (id === 'Calavera2') return 2;
-  return 0;
+	const id = cartaActual.value.id;
+	if (id === 'Calavera1') return 1;
+	if (id === 'Calavera2') return 2;
+	return 0;
 }
 
-
-/*
-
+// Funció que calcula els punts quan estem a illa calavera
 function actualitzaPuntsTornIllaCalavera() {
-    // tornem a llegir les cares de tots els daus
-    const cares = daus.map(d => obtenirCaraAmunt(d.mesh));
-    // comptem quantes calaveres hi ha ara
-    const total = cares.filter(c => c === 6).length;
+	// 0) comprova si hi ha calaveres noves; si no, acabem el torn
+	const cares = daus.map(d => obtenirCaraAmunt(d.mesh));
+	//const total = cares.filter(c => c === 6).length;
 
-    // noves calaveres des de l’inici d’Illa
-    const noves = total - calaveresIllaAcumulades;
-    if (noves <= 0) return;
-
-    // acumulem
-    calaveresIllaAcumulades = total;
-    const ptsSelf = noves * 100;
-    const penal = noves * 200;
-
-    puntsTornActual += ptsSelf;
-    llistaJugadors.forEach(j => {
-        if (!j.torn) j.punts -= penal;
-    });
-
-    // actualitza UI
-    document.getElementById("puntsTornActiu").textContent = puntsTornActual;
-    document.getElementById("resumPuntsTornActiu").innerHTML =
-      `☠️ Illa Calavera x${calaveresIllaAcumulades}: +${ptsSelf} (rivals -${penal})`;
-}
-*/
-
-function actualitzaPuntsTornIllaCalavera() {
-    // 0) comprova si hi ha calaveres noves; si no, acabem el torn
-    const cares = daus.map(d => obtenirCaraAmunt(d.mesh));
-    //const total = cares.filter(c => c === 6).length;
-	
 	const fisics = cares.filter(c => c === 6).length;
-  // ara incloem també les “fantasma” de la carta
-  const total = fisics + extraCalaveresCarta();
-	
-	
-    const noves = total - calaveresIllaAcumulades;
-    if (noves <= 0) {
-        console.log("🔚 Illa Calavera: no hi ha calaveres noves, finalitzant torn");
+	// ara incloem també les “fantasma” de la carta
+	const total = fisics + extraCalaveresCarta();
+
+
+	const noves = total - calaveresIllaAcumulades;
+	if (noves <= 0) {
+		console.log("🔚 Illa Calavera: no hi ha calaveres noves, finalitzant torn");
 		mostrarModalMissatge("☠️ No has tret cap calavera nova en aquest torn! Marxem d'Illa Calavera!", true);
-        finalitzarTorn();
-        return;
-    }
+		finalitzarTorn();
+		return;
+	}
 
-    // 1) si sí que n’hi ha, acumula-les com abans...
-    calaveresIllaAcumulades = total;
-    const ptsSelf = noves * 100;
-    const penal = noves * 200;
+	// 1) si sí que n’hi ha, acumula-les com abans...
+	calaveresIllaAcumulades = total;
+	const ptsSelf = noves * 100;
+	const penal = noves * 200;
 
-    puntsTornActual.value += ptsSelf;
-    llistaJugadors.forEach(j => {
-        if (!j.torn) j.punts -= penal;
-    });
+	puntsTornActual.value += ptsSelf;
 
-    // 2) actualitza la UI
-    //document.getElementById("puntsTornActiu").textContent = puntsTornActual.value;
+	// 2) actualitza la UI
+	//document.getElementById("puntsTornActiu").textContent = puntsTornActual.value;
 	document.getElementById("puntsTornActiu").textContent = "+" + calaveresIllaAcumulades*100 + " punts. -" + calaveresIllaAcumulades*200 + " punts";
-    document.getElementById("resumPuntsTornActiu").innerHTML =
-      `☠️ Illa Calavera x${calaveresIllaAcumulades}: +${ptsSelf} (rivals -${penal})`;
+	document.getElementById("resumPuntsTornActiu").innerHTML =
+	`☠️ Illa Calavera x${calaveresIllaAcumulades}: +${ptsSelf} (rivals -${penal})`;
 }
 
-
-
-
-
-
+// Definim les cares dels daus
 function nomCara(cara) {
-    switch (Number(cara)) {
-        case 1: return "Lloro";
-        case 2: return "Moneda";
-        case 3: return "Mico";
-        case 4: return "Diamant";
-        case 5: return "Vaixell";
-        case 6: return "Calavera";
-        default: return "Desconeguda";
-    }
+	switch (Number(cara)) {
+		case 1: return "Lloro";
+		case 2: return "Moneda";
+		case 3: return "Mico";
+		case 4: return "Diamant";
+		case 5: return "Vaixell";
+		case 6: return "Calavera";
+		default: return "Desconeguda";
+	}
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+// Funció que cridem quan hem de finalitzar un torn
 function finalitzarTorn() {
 
+	const entrantEnIlla = !!illaCalaveraMode;
+	const skulls = calaveresIllaAcumulades;
 
-    const entrantEnIlla = !!illaCalaveraMode;
-    const skulls = calaveresIllaAcumulades;
-
-    // 1) si estàvem en mode Illa Calavera, ara sí que apliquem guany i penalització
-    if (entrantEnIlla) {
-        // +100 per calavera al jugador actiu
-        puntsTornActual.value = skulls * 100;
-        // -200 per calavera a cada rival
-        const penal = skulls * 200;
-        llistaJugadors.forEach(j => {
-            if (!j.torn) j.punts -= penal;
-        });
-        // (opcional) missatge resum
-        mostrarModalMissatge(
-          `🔚 Torn Illa Calavera acabat!  
+	// 1) si estàvem en mode Illa Calavera, ara sí que apliquem guany i penalització
+	if (entrantEnIlla) {
+		// +100 per calavera al jugador actiu
+		puntsTornActual.value = skulls * 100;
+		// -200 per calavera a cada rival
+		const penal = skulls * 200;
+		llistaJugadors.forEach(j => {
+			if (!j.torn) j.punts -= penal;
+		});
+		// (opcional) missatge resum
+		mostrarModalMissatge(
+			`🔚 Torn Illa Calavera acabat!  
 			Guanyes ${skulls * 100} punts, rivals -${penal} punts.`,
-          false
-        );
-    }
+			false
+		);
+	}
 
+	// sortir del mode Illa
+	illaCalaveraMode = false;
+	calaveresIllaAcumulades = 0;
 
+	const jugadorActiuIndex = llistaJugadors.findIndex(j => j.torn);
+	if (jugadorActiuIndex === -1) return;
 
-
-			// sortir del mode Illa
-		illaCalaveraMode = false;
-		calaveresIllaAcumulades = 0;
-
-
-
-    const jugadorActiuIndex = llistaJugadors.findIndex(j => j.torn);
-    if (jugadorActiuIndex === -1) return;
-
-    const jugadorActiu = llistaJugadors[jugadorActiuIndex];
-    jugadorActiu.punts += puntsTornActual.value;
+	const jugadorActiu = llistaJugadors[jugadorActiuIndex];
+	jugadorActiu.punts += puntsTornActual.value;
 	// Si volguessim fer que mai hi hagi puntuacions negatives
-//jugadorActiu.punts = Math.max(0, jugadorActiu.punts);
+	//jugadorActiu.punts = Math.max(0, jugadorActiu.punts);
 
-    console.log(`🏆 ${jugadorActiu.nom} guanya ${puntsTornActual.value} punts. Total: ${jugadorActiu.punts}`);
+	console.log(`🏆 ${jugadorActiu.nom} guanya ${puntsTornActual.value} punts. Total: ${jugadorActiu.punts}`);
 
 
-  // Aquí comprovem si ha arribat a 10000 punts
-  if (jugadorActiu.punts >= 10000) {
-    mostrarModalMissatge(`🎉 Enhorabona ${jugadorActiu.nom}! Has arribat a 10000 punts i guanyes la partida!`, false);
-	//partidaFinalitzada = true;
-	//localStorage.setItem('partidaFinalitzada', JSON.stringify(true));
-    // Opcional: amagar controls per no seguir tirant
-    //document.getElementById("dauTiradesContainer")?.remove();
-    //document.getElementById("finalitzarTornContainer")?.remove();
-	//document.getElementById("finalitzarTornContainer").style.display = 'none';
-	
-	partidaFinalitzada.value = true;
-	
-	
-	document.getElementById("dauTirades").style.display = 'none';
-	document.getElementById("finalitzarTornContainer").style.display = 'none';
-	document.getElementById("puntsTornActiu").textContent = "Ha guanyat " + jugadorActiu.nom;
-    return;  // sortim de la funció per no passar torn
-  }
+	// Aquí comprovem si ha arribat a 10000 punts
+	if (jugadorActiu.punts >= 10000) {
+		mostrarModalMissatge(`🎉 Enhorabona ${jugadorActiu.nom}! Has arribat a 10000 punts i guanyes la partida!`, false);
+		partidaFinalitzada.value = true;
+		document.getElementById("dauTirades").style.display = 'none';
+		document.getElementById("finalitzarTornContainer").style.display = 'none';
+		document.getElementById("puntsTornActiu").textContent = "Ha guanyat " + jugadorActiu.nom;
+		return;  // sortim de la funció per no passar torn
+	}
 
-  // Com a Easter Egg, es pot guanyar perdent molt fort. Aquí comprovem si ha arribat a -20000 punts
-  if (jugadorActiu.punts <= -10001) {
-    mostrarModalMissatge(`🎉 Enhorabona ${jugadorActiu.nom}! Perdre tants punts ha tingut premi! Guanyes la partida!`, false);
-	//partidaFinalitzada = true;
-	//localStorage.setItem('partidaFinalitzada', JSON.stringify(true));
-    // Opcional: amagar controls per no seguir tirant
-    //document.getElementById("dauTirades")?.remove();
-    //document.getElementById("finalitzarTornContainer")?.remove();
-	//document.getElementById("finalitzarTornContainer").style.display = 'none';
-	partidaFinalitzada.value = true;
-	document.getElementById("puntsTornActiu").textContent = "Ha guanyat " + jugadorActiu.nom + " per loser!";
-	document.getElementById("dauTirades").style.display = 'none';
-	document.getElementById("finalitzarTornContainer").style.display = 'none';
-    return;  // sortim de la funció per no passar torn
-  }
+	// Com a Easter Egg, es pot guanyar perdent molt fort. Aquí comprovem si ha arribat a -20000 punts
+	if (jugadorActiu.punts <= -10001) {
+		mostrarModalMissatge(`🎉 Enhorabona ${jugadorActiu.nom}! Perdre tants punts ha tingut premi! Guanyes la partida!`, false);
+		partidaFinalitzada.value = true;
+		document.getElementById("puntsTornActiu").textContent = "Ha guanyat " + jugadorActiu.nom + " per loser!";
+		document.getElementById("dauTirades").style.display = 'none';
+		document.getElementById("finalitzarTornContainer").style.display = 'none';
+		return;  // sortim de la funció per no passar torn
+	}
 
-    // Passem al següent jugador
-    llistaJugadors[jugadorActiuIndex].torn = false;
-    const següentIndex = (jugadorActiuIndex + 1) % llistaJugadors.length;
-    llistaJugadors[següentIndex].torn = true;
-	
+	// Passem al següent jugador
+	llistaJugadors[jugadorActiuIndex].torn = false;
+	const següentIndex = (jugadorActiuIndex + 1) % llistaJugadors.length;
+	llistaJugadors[següentIndex].torn = true;
+
 	//localStorage.removeItem('cartaActual');
 	cartaActual.clear();
-	
-    puntsTornActual.value = 0;
+	puntsTornActual.value = 0;
+	localStorage.setItem("llistaJugadors", JSON.stringify(llistaJugadors));
 
-    localStorage.setItem("llistaJugadors", JSON.stringify(llistaJugadors));
+	numTirada.value = 0;
+	updateFinalitzarTornButton();
 
-
-		numTirada.value = 0;
-  //localStorage.setItem('numTirada', numTirada);
-  updateFinalitzarTornButton();
-  //updateNumTiradaDisplay();
-  
-   document.getElementById("resumPuntsTornActiu").textContent = "";
+	document.getElementById("resumPuntsTornActiu").textContent = "";
 		
-    actualitzaPuntuacions();
+	actualitzaPuntuacions();
 	desbloquejarTotsElsDaus();
-    actualitzaTornsPantalla();
-	
-
-	
+	actualitzaTornsPantalla();
 }
-/*
+
+// Funció que ens mostra o amaga el botó de finalitzar torn (en funció si és primera tirada, etc)
 function updateFinalitzarTornButton() {
-  const botoFinalitzar = document.getElementById('botoFinalitzarTorn');
-  if (numTirada === 0 || tiradaEnProgres) {
-    botoFinalitzar.style.display = 'none';
-  } else {
-    botoFinalitzar.style.display = 'flex';
-  }
-}
-*/
-
-function updateFinalitzarTornButton() {
-  const botoFinalitzar = document.getElementById('botoFinalitzarTorn');
-  if (numTirada.value === 0 || tiradaEnProgres) {
-    botoFinalitzar.style.display = 'none';
-  } else {
-    botoFinalitzar.style.display = 'flex';
-  }
+	const botoFinalitzar = document.getElementById('botoFinalitzarTorn');
+	if (numTirada.value === 0 || tiradaEnProgres) {
+		botoFinalitzar.style.display = 'none';
+	} else {
+		botoFinalitzar.style.display = 'flex';
+	}
 }
 
-/*
-function updateNumTiradaDisplay() {
-  const marcadorTirada = document.getElementById('numTiradaDisplay');
-  marcadorTirada.textContent = `Tirada nº ${numTirada}`;
-}
-*/
-
-
+// Funció que cridem quan acaba un torn i desbloquegem tots els daus
 function desbloquejarTotsElsDaus() {
-    for (let dau of daus) {
-        // Només desbloquegem si estava bloquejat per calavera
-        //if (dau.bloquejatCalavera) {
-            dau.body.type = CANNON.Body.DYNAMIC;
-            dau.body.mass = 500;
-            dau.body.updateMassProperties();
-            dau.bloquejatCalavera = false;
-            if (dau.mesh && dau.mesh.material) {
-                dau.mesh.material.forEach(m => {
-                    m.opacity = 1;
-                    m.transparent = false;
-					m.color.setHex(0xffffff);  // o el color que fossin abans
-                });
-            }
-        //}
-    }
+	for (let dau of daus) {
+		dau.body.type = CANNON.Body.DYNAMIC;
+		dau.body.mass = 500;
+		dau.body.updateMassProperties();
+		dau.bloquejatCalavera = false;
+		if (dau.mesh && dau.mesh.material) {
+			dau.mesh.material.forEach(m => {
+				m.opacity = 1;
+				m.transparent = false;
+				m.color.setHex(0xffffff);  // o el color que fossin abans
+			});
+		}
+	}
 }
 
-
-			
-
-
-			
-			let escenaDausInicialitzada = false;
-			let scene, camera, renderer, world;
-			const daus = [];
-			const limitPixels = 50;
-			const maxHeight = 8;
-			//let numTirada = 0;
-			let tiradaEnProgres = false;
-
-			
-			// Posició de la càmera, ho deixem en global
-			const posXcam = 0;
-			const posYcam = 30;
-			const posZcam = 20;
-			const lookXcam = 0;
-			const lookYcam = -2;
-			const lookZcam = 0;
-			const fovcam = 30;
-			
-			// Funció que fem servir de debug per la càmera
-			//setupCameraSliders();
-			
-			// Definim les imatges de les cares dels daus
-			
-			const caresDauSprite = 'img/dauCompletCompressed.png';
-			const caresDauMaterial = []; // Aquí guardem els materials creats des del sprite
-			
-			
-			function preCarregaTextures(callback) {
+// FUnció que ens carrega imatges perquè el joc sigui més fluit
+function preCarregaTextures(callback) {
 	const loader = new THREE.TextureLoader();
 	loader.load(caresDauSprite, function (fullTexture) {
 		for (let i = 0; i < 6; i++) {
@@ -1193,727 +923,619 @@ function desbloquejarTotsElsDaus() {
 		console.error("❌ Error carregant la textura del sprite:", caresDauSprite);
 	});
 }
+
+function initDaus() {
+	if (escenaDausInicialitzada) return;
+	escenaDausInicialitzada = true;
+
+	scene = new THREE.Scene();
+
+	camera = new THREE.PerspectiveCamera(50, 1920/1080, 0.1, 1000);
+
+	camera.fov = fovcam;
+	camera.updateProjectionMatrix(); // Actualitza la càmera amb el nou FOV
+	camera.position.set(posXcam, posYcam, posZcam);
+	camera.lookAt(lookXcam, lookYcam, lookZcam);
+
+	renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+	renderer.setSize(1920, 1080);
+	renderer.shadowMap.enabled = true;
+	document.getElementById('contenidorDaus').appendChild(renderer.domElement);
+
+	const ambientLight = new THREE.AmbientLight(0xffffff, 1.0);
+	scene.add(ambientLight);
+
+	world = new CANNON.World();
+	world.gravity.set(0, -200, 0);
+
+	crearTerra();
+
+	for (let i = 0; i < 8; i++) crearDau(i);
+
+	animate();
+	renderer.domElement.addEventListener('click', onMouseClick, false); // Iniciem el poder tocar daus
+	carregarEstatDaus();
+}
+
+function crearTerra() {
+	// Creem només el terra físic, invisible al renderitzat
+	const terraFisica = new CANNON.Body({
+		mass: 0, // És el sòl, no es mou
+		shape: new CANNON.Plane(),
+		material: new CANNON.Material({ friction: 0.3, restitution: 0.7 }) // Paràmetres de fricció i rebots
+	});
+	terraFisica.quaternion.setFromEuler(-Math.PI / 2, 0, 0); // Pla horitzontal
+	world.addBody(terraFisica);
+}
+
+function crearDau(index) {
+	const fila = Math.floor(index / 4);
+	const columna = index % 4;
+	//const x = columna * 4.5 - 6.75;
+	const x = columna * 4 - 6;
+	const z = fila * 2.5 - 1.25;
+
+	const geometria = new THREE.BoxGeometry(1.5, 1.5, 1.5);
+	const materials = caresDauMaterial.map(mat => mat.clone());
+
+
+
+	const mesh = new THREE.Mesh(geometria, materials);
+	mesh.castShadow = true;
+	mesh.position.set(x, 5, z);
+	scene.add(mesh);
+
+	const shape = new CANNON.Box(new CANNON.Vec3(0.75, 0.75, 0.75));
+	const body = new CANNON.Body({
+		mass: 500,
+		shape: shape,
+		position: new CANNON.Vec3(mesh.position.x, mesh.position.y, mesh.position.z),
+		material: new CANNON.Material({ friction: 0.1, restitution: 0.8 })
+	});
+
+	body.angularDamping = 0.9;
+	body.linearDamping = 0.1;
+
+	world.addBody(body);
+	daus.push({ mesh, body, initialPosition: { x: mesh.position.x, z: mesh.position.z } });
+}
 			
+// FUnció que anima els daus
+function animate() {
+	requestAnimationFrame(animate);
+	
+	// BUG DETECTAT: al fer servir requestAnimationFrame(animate) i cridar world.step(1/60) sense passar-li el temps real transcorregut, la física “avança” 1/60 s cada vegada que arriba un frame, i a 144 Hz això són 144 calls/s, és a dir 144 × (1/60 s) = 2,4 s de simulació per cada segon real
+	//world.step(1 / 60); 
+	
+	// BUG FIX
+	// 1) Definim la mida del pas de temps real (en segons)
+	const delta = clock.getDelta();
+	// 2) en comptes de world.step(1/60), fem:
+	//    - primer argument: timeStep fix (per a la física, 1/60 s)
+	//    - segon argument: delta real (en s)
+	//    - tercer argument: nombre màxim de substeps (p. ex. 4)
+	world.step(1/60, delta, 4);
 
-			// Constants que ens defineixen el poder tocar els daus amb el ratolí
-			const raycaster = new THREE.Raycaster();
-			const mouse = new THREE.Vector2();
+	for (let { mesh, body, initialPosition } of daus) {
+		const deltaX = body.position.x - initialPosition.x;
+		const deltaZ = body.position.z - initialPosition.z;
 
+		if (Math.abs(deltaX) > limitPixels / 100) {
+			body.position.x = initialPosition.x + Math.sign(deltaX) * limitPixels / 100;
+			body.velocity.x = 0;
+		}
 
-			function initDaus() {
-				if (escenaDausInicialitzada) return;
-				escenaDausInicialitzada = true;
+		if (Math.abs(deltaZ) > limitPixels / 100) {
+			body.position.z = initialPosition.z + Math.sign(deltaZ) * limitPixels / 100;
+			body.velocity.z = 0;
+		}
 
-				scene = new THREE.Scene();
-				//scene.background = new THREE.Color(0xf0f0f0);
+		if (body.position.y > maxHeight) {
+			body.position.y = maxHeight;
+			body.velocity.y = 0;
+		}
 
-				camera = new THREE.PerspectiveCamera(50, 1920/1080, 0.1, 1000);
-				//camera.position.set(0, 15, 20);
-				//camera.lookAt(0, -2, 0);
-				
-				
-				
-				camera.fov = fovcam;
-				camera.updateProjectionMatrix(); // Actualitza la càmera amb el nou FOV
-				camera.position.set(posXcam, posYcam, posZcam);
-				camera.lookAt(lookXcam, lookYcam, lookZcam);
+		if (body.velocity.lengthSquared() < 0.01 && body.angularVelocity.lengthSquared() < 0.01) {
+			body.velocity.set(0, 0, 0);
+			body.angularVelocity.set(0, 0, 0);
+		}
 
-				renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-				renderer.setSize(1920, 1080);
-				renderer.shadowMap.enabled = true;
-				document.getElementById('contenidorDaus').appendChild(renderer.domElement);
+		mesh.position.copy(body.position);
+		mesh.quaternion.copy(body.quaternion);
+	}
 
-				const ambientLight = new THREE.AmbientLight(0xffffff, 1.0);
-				scene.add(ambientLight);
+	comprovaCaresDaus(); // <----- Mirem les cares dels daus un cop han aturat de moure's
 
-				world = new CANNON.World();
-				world.gravity.set(0, -200, 0);
+	renderer.render(scene, camera);
+	actualitzaPuntuacions();
+}
 
-				crearTerra();
+// Funció que s'executa quan tirem els daus
+function tirarDaus() {
+	// Comptem quants daus queden disponibles (dinàmics i no bloquejats per calavera)
+	const disponibles = daus.filter(d =>
+		d.body.type !== CANNON.Body.STATIC &&
+		!d.bloquejatCalavera
+	).length;
+	
+	if (tiradaEnProgres) {
+		console.log("⏳ Tirada en curs. Espera que acabi abans de tornar a tirar.");
+		return;
+	}
+	
+	if (disponibles === 0) {
+		console.log("⏳ no hi ha daus disponibles per tirar.");
+		return;
+	}
 
-				for (let i = 0; i < 8; i++) crearDau(i);
+	// Reproduïm un so o l'altre segons quants quedin
+	if (disponibles === 1) {
+		const snd1 = document.getElementById('audio-dau');
+		if (snd1) { snd1.currentTime = 0; snd1.play().catch(() => {}); }
+	} else {
+		const snd = document.getElementById('audio-daus');
+		if (snd) { snd.currentTime = 0; snd.play().catch(() => {}); }
+	}
+	
+	
+	tiradaEnProgres = true;
+	numTirada.value++;
+	updateFinalitzarTornButton();
+	
+	console.log(`➤ Llançant tirada ${numTirada.value}...`);
+	  //localStorage.setItem('numTirada', numTirada);
+	  updateFinalitzarTornButton();
+  //updateNumTiradaDisplay();
 
-				animate();
+	for (let { body, bloquejatCalavera } of daus) {
+		if (body.type !== CANNON.Body.STATIC && !bloquejatCalavera) {
+			const minVerticalForce = 8;
+			const verticalForce = Math.random() * 6 + minVerticalForce;
 
-				// Afegim botó provisional per fer proves (pots personalitzar-lo)
-				/*
-				let boto = document.createElement("button");
-				boto.innerText = "Tirar Daus";
-				boto.style.position = "absolute";
-				boto.style.top = "20px";
-				boto.style.left = "20px";
-				boto.onclick = tirarDaus;
-				document.getElementById("escena-joc").appendChild(boto);
-				*/
-				
-				
-				renderer.domElement.addEventListener('click', onMouseClick, false); // Iniciem el poder tocar daus
-				
-				carregarEstatDaus();
-			}
+			body.velocity.set(
+				(Math.random() * 8 - 4) * 1.5,
+				verticalForce,
+				(Math.random() * 8 - 4) * 1.5
+			);
 
-			function crearTerra() {
-				// Creem només el terra físic, invisible al renderitzat
-				const terraFisica = new CANNON.Body({
-					mass: 0, // És el sòl, no es mou
-					shape: new CANNON.Plane(),
-					material: new CANNON.Material({ friction: 0.3, restitution: 0.7 }) // Paràmetres de fricció i rebots
-				});
-				terraFisica.quaternion.setFromEuler(-Math.PI / 2, 0, 0); // Pla horitzontal
-				world.addBody(terraFisica);
-			}
+			const minRotation = 200;
+			let rotationX = (Math.random() * 200 - 100) + minRotation;
+			let rotationY = (Math.random() * 200 - 100) + minRotation;
+			let rotationZ = (Math.random() * 200 - 100) + minRotation;
 
-			function crearDau(index) {
-				const fila = Math.floor(index / 4);
-				const columna = index % 4;
-				//const x = columna * 4.5 - 6.75;
-				const x = columna * 4 - 6;
-				const z = fila * 2.5 - 1.25;
+			if (Math.abs(rotationX) < minRotation * 1.5) rotationX *= 1.5;
+			if (Math.abs(rotationY) < minRotation * 1.5) rotationY *= 1.5;
+			if (Math.abs(rotationZ) < minRotation * 1.5) rotationZ *= 1.5;
 
-				const geometria = new THREE.BoxGeometry(1.5, 1.5, 1.5);
-				const materials = caresDauMaterial.map(mat => mat.clone());
+			const maxRotation = Math.max(rotationX, rotationY, rotationZ);
+			rotationX = (rotationX / maxRotation) * minRotation;
+			rotationY = (rotationY / maxRotation) * minRotation;
+			rotationZ = (rotationZ / maxRotation) * minRotation;
 
-
-
-				const mesh = new THREE.Mesh(geometria, materials);
-				mesh.castShadow = true;
-				mesh.position.set(x, 5, z);
-				scene.add(mesh);
-
-				const shape = new CANNON.Box(new CANNON.Vec3(0.75, 0.75, 0.75));
-				const body = new CANNON.Body({
-					mass: 500,
-					shape: shape,
-					position: new CANNON.Vec3(mesh.position.x, mesh.position.y, mesh.position.z),
-					material: new CANNON.Material({ friction: 0.1, restitution: 0.8 })
-				});
-
-				body.angularDamping = 0.9;
-				body.linearDamping = 0.1;
-
-				world.addBody(body);
-				daus.push({ mesh, body, initialPosition: { x: mesh.position.x, z: mesh.position.z } });
-			}
-			
-			const clock = new THREE.Clock(); // Definim constant per arreglar BUG de renderitzat massa ràpid a pantalles amb refresc alt
-			function animate() {
-				requestAnimationFrame(animate);
-				
-				// BUG DETECTAT: al fer servir requestAnimationFrame(animate) i cridar world.step(1/60) sense passar-li el temps real transcorregut, la física “avança” 1/60 s cada vegada que arriba un frame, i a 144 Hz això són 144 calls/s, és a dir 144 × (1/60 s) = 2,4 s de simulació per cada segon real
-				//world.step(1 / 60); 
-				
-				// BUG FIX
-				// 1) Definim la mida del pas de temps real (en segons)
-				const delta = clock.getDelta();
-				// 2) en comptes de world.step(1/60), fem:
-				//    - primer argument: timeStep fix (per a la física, 1/60 s)
-				//    - segon argument: delta real (en s)
-				//    - tercer argument: nombre màxim de substeps (p. ex. 4)
-				world.step(1/60, delta, 4);
-
-				for (let { mesh, body, initialPosition } of daus) {
-					const deltaX = body.position.x - initialPosition.x;
-					const deltaZ = body.position.z - initialPosition.z;
-
-					if (Math.abs(deltaX) > limitPixels / 100) {
-						body.position.x = initialPosition.x + Math.sign(deltaX) * limitPixels / 100;
-						body.velocity.x = 0;
-					}
-
-					if (Math.abs(deltaZ) > limitPixels / 100) {
-						body.position.z = initialPosition.z + Math.sign(deltaZ) * limitPixels / 100;
-						body.velocity.z = 0;
-					}
-
-					if (body.position.y > maxHeight) {
-						body.position.y = maxHeight;
-						body.velocity.y = 0;
-					}
-
-					if (body.velocity.lengthSquared() < 0.01 && body.angularVelocity.lengthSquared() < 0.01) {
-						body.velocity.set(0, 0, 0);
-						body.angularVelocity.set(0, 0, 0);
-					}
-
-					mesh.position.copy(body.position);
-					mesh.quaternion.copy(body.quaternion);
-				}
-
-				  comprovaCaresDaus(); // <----- 🔥 AFEGEIX AIXÒ
-
-				renderer.render(scene, camera);
-				actualitzaPuntuacions();
-
-			}
-
-			
-			function tirarDaus() {
-				// Comptem quants daus queden disponibles (dinàmics i no bloquejats per calavera)
-				const disponibles = daus.filter(d =>
-					d.body.type !== CANNON.Body.STATIC &&
-					!d.bloquejatCalavera
-				).length;
-				
-				if (tiradaEnProgres) {
-					console.log("⏳ Tirada en curs. Espera que acabi abans de tornar a tirar.");
-					return;
-				}
-				
-				if (disponibles === 0) {
-					console.log("⏳ no hi ha daus disponibles per tirar.");
-					return;
-				}
-
-				// Reproduïm un so o l'altre segons quants quedin
-				if (disponibles === 1) {
-					const snd1 = document.getElementById('audio-dau');
-					if (snd1) { snd1.currentTime = 0; snd1.play().catch(() => {}); }
-				} else {
-					const snd = document.getElementById('audio-daus');
-					if (snd) { snd.currentTime = 0; snd.play().catch(() => {}); }
-				}
-				
-				
-				tiradaEnProgres = true;
-				numTirada.value++;
-				updateFinalitzarTornButton();
-				
-				console.log(`➤ Llançant tirada ${numTirada.value}...`);
-				  //localStorage.setItem('numTirada', numTirada);
-				  updateFinalitzarTornButton();
-			  //updateNumTiradaDisplay();
-
-				for (let { body, bloquejatCalavera } of daus) {
-					if (body.type !== CANNON.Body.STATIC && !bloquejatCalavera) {
-						const minVerticalForce = 8;
-						const verticalForce = Math.random() * 6 + minVerticalForce;
-
-						body.velocity.set(
-							(Math.random() * 8 - 4) * 1.5,
-							verticalForce,
-							(Math.random() * 8 - 4) * 1.5
-						);
-
-						const minRotation = 200;
-						let rotationX = (Math.random() * 200 - 100) + minRotation;
-						let rotationY = (Math.random() * 200 - 100) + minRotation;
-						let rotationZ = (Math.random() * 200 - 100) + minRotation;
-
-						if (Math.abs(rotationX) < minRotation * 1.5) rotationX *= 1.5;
-						if (Math.abs(rotationY) < minRotation * 1.5) rotationY *= 1.5;
-						if (Math.abs(rotationZ) < minRotation * 1.5) rotationZ *= 1.5;
-
-						const maxRotation = Math.max(rotationX, rotationY, rotationZ);
-						rotationX = (rotationX / maxRotation) * minRotation;
-						rotationY = (rotationY / maxRotation) * minRotation;
-						rotationZ = (rotationZ / maxRotation) * minRotation;
-
-						body.angularVelocity.set(rotationX, rotationY, rotationZ);
-					}
-				}
-			}
+			body.angularVelocity.set(rotationX, rotationY, rotationZ);
+		}
+	}
+}
 
 		
-			
+// FUnció que controla els clics que fem als daus o al botó de tirada
 function onMouseClick(event) {
 	if (numTirada.value === 0) {
 		console.log("🚫 No es poden clicar daus a la tirada 0.");
 		return;
 	}
-    const rect = renderer.domElement.getBoundingClientRect();
-    mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-    mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+	const rect = renderer.domElement.getBoundingClientRect();
+	mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+	mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
 
-    raycaster.setFromCamera(mouse, camera);
+	raycaster.setFromCamera(mouse, camera);
 
-    const meshes = daus.map(dau => dau.mesh);
-    const interseccions = raycaster.intersectObjects(meshes);
+	const meshes = daus.map(dau => dau.mesh);
+	const interseccions = raycaster.intersectObjects(meshes);
 
-    if (interseccions.length > 0) {
-        const dauTocat = interseccions[0].object;
-        const index = daus.findIndex(d => d.mesh === dauTocat);
-        const { body, mesh, bloquejat } = daus[index];
+	if (interseccions.length > 0) {
+		const dauTocat = interseccions[0].object;
+		const index = daus.findIndex(d => d.mesh === dauTocat);
+		const { body, mesh, bloquejat } = daus[index];
 
-        // Si ja està bloquejat per calavera, no fem res
-        if (daus[index].bloquejatCalavera) {
-            console.log(`Dau ${index + 1} ja bloquejat per calavera, no es pot tocar.`);
-            return;
-        }
+		// Si ja està bloquejat per calavera, no fem res
+		if (daus[index].bloquejatCalavera) {
+			console.log(`Dau ${index + 1} ja bloquejat per calavera, no es pot tocar.`);
+			return;
+		}
 
-        if (body.type === CANNON.Body.STATIC) {
-            // 🔵 Desbloquegem
-            body.type = CANNON.Body.DYNAMIC;
-            body.mass = 500;
-            body.velocity.set(0,0,0);
-            body.angularVelocity.set(0,0,0);
-            body.updateMassProperties();
-            mesh.material.forEach(m => {
-                m.opacity = 1;
-                m.transparent = false;
-				//m.color.setHex(0xffffff);  // o el color que fossin abans
-
-            });
-            console.log(`Dau ${index + 1} DESBLOQUEJAT`);
-        } else {
-            // 🔴 Fixem
-            body.velocity.set(0,0,0);
-            body.angularVelocity.set(0,0,0);
-            body.mass = 0;
-            body.type = CANNON.Body.STATIC;
-            body.updateMassProperties();
-            mesh.material.forEach(m => {
-                m.opacity = 0.6;
-                m.transparent = true;
-				//m.color.setHex(0xb3ffb6); //verd
-				//m.color.setHex(0xf8ffb5); //verd
-				//m.color.setHex(0xfffa6b); //verd
-            });
-            console.log(`Dau ${index + 1} FIXAT`);
-        }
-		  guardarEstatDaus(); // <<<<< AFEGIR AIXÒ AQUÍ
-    }
+		if (body.type === CANNON.Body.STATIC) {
+			// Desbloquegem
+			body.type = CANNON.Body.DYNAMIC;
+			body.mass = 500;
+			body.velocity.set(0,0,0);
+			body.angularVelocity.set(0,0,0);
+			body.updateMassProperties();
+			mesh.material.forEach(m => {
+				m.opacity = 1;
+				m.transparent = false;
+			});
+			console.log(`Dau ${index + 1} DESBLOQUEJAT`);
+		} else {
+			// Fixem
+			body.velocity.set(0,0,0);
+			body.angularVelocity.set(0,0,0);
+			body.mass = 0;
+			body.type = CANNON.Body.STATIC;
+			body.updateMassProperties();
+			mesh.material.forEach(m => {
+				m.opacity = 0.6;
+				m.transparent = true;
+			});
+			console.log(`Dau ${index + 1} FIXAT`);
+		}
+		guardarEstatDaus(); // IMPORTANT perquè es guardi al tancar el navegador
+	}
 }
 
 function guardarEstatDaus() {
-    const estatDaus = daus.map(({ body, bloquejatCalavera }) => ({
-        posicio: { x: body.position.x, y: body.position.y, z: body.position.z },
-        rotacio: { x: body.quaternion.x, y: body.quaternion.y, z: body.quaternion.z, w: body.quaternion.w },
-        bloquejat: bloquejatCalavera || false
-    }));
+	const estatDaus = daus.map(({ body, bloquejatCalavera }) => ({
+		posicio: { x: body.position.x, y: body.position.y, z: body.position.z },
+		rotacio: { x: body.quaternion.x, y: body.quaternion.y, z: body.quaternion.z, w: body.quaternion.w },
+		bloquejat: bloquejatCalavera || false
+	}));
 
-    localStorage.setItem("estatDaus", JSON.stringify(estatDaus));
-    console.log("💾 Estat dels daus guardat a LocalStorage.");
+	localStorage.setItem("estatDaus", JSON.stringify(estatDaus));
+	console.log("💾 Estat dels daus guardat a LocalStorage.");
 }
 
 function carregarEstatDaus() {
-    const estatGuardat = JSON.parse(localStorage.getItem("estatDaus"));
-    if (!estatGuardat || estatGuardat.length !== daus.length) return;
+	const estatGuardat = JSON.parse(localStorage.getItem("estatDaus"));
+	if (!estatGuardat || estatGuardat.length !== daus.length) return;
 
-    for (let i = 0; i < daus.length; i++) {
-        const { posicio, rotacio, bloquejat } = estatGuardat[i];
-        const { body, mesh } = daus[i];
+	for (let i = 0; i < daus.length; i++) {
+		const { posicio, rotacio, bloquejat } = estatGuardat[i];
+		const { body, mesh } = daus[i];
 
-        body.position.set(posicio.x, posicio.y, posicio.z);
-        body.quaternion.set(rotacio.x, rotacio.y, rotacio.z, rotacio.w);
-		 
-		 // 🔥 AFEGIT
-        body.velocity.set(0, 0, 0);
-        body.angularVelocity.set(0, 0, 0);
-		
-		
-        if (bloquejat) {
-            body.mass = 0;
-            body.type = CANNON.Body.STATIC;
-            body.updateMassProperties();
-            daus[i].bloquejatCalavera = true;
-            mesh.material.forEach(m => {
-                //m.opacity = 0.5;
-                m.transparent = true;
-				//m.color.setHex(0xffb3b3);  // vermell
+		body.position.set(posicio.x, posicio.y, posicio.z);
+		body.quaternion.set(rotacio.x, rotacio.y, rotacio.z, rotacio.w);
+
+		body.velocity.set(0, 0, 0);
+		body.angularVelocity.set(0, 0, 0);
+
+		if (bloquejat) {
+			body.mass = 0;
+			body.type = CANNON.Body.STATIC;
+			body.updateMassProperties();
+			daus[i].bloquejatCalavera = true;
+			mesh.material.forEach(m => {
+				m.transparent = true;
 				m.color.setHex(0x707070);  // gris
-            });
-        }
-    }
-    console.log("✅ Estat dels daus carregat des de LocalStorage.");
-}
-
-
-
-	function comprovaCaresDaus() {
-		let caresActuals = [];
-
-		let totsAturats = daus.every(({ body }) => 
-		body.velocity.lengthSquared() < 0.01 && body.angularVelocity.lengthSquared() < 0.01
-		);
-
-		if (totsAturats && tiradaEnProgres) {
-			console.log('--------------------------');
-			console.log(`Tirada ${numTirada.value}:`);
-
-			const simbols = ["Lloro", "Moneda", "Mico", "Diamant", "Vaixell", "Calavera"];
-
-			for (let i = 0; i < daus.length; i++) {
-				const { mesh, body } = daus[i];
-				const caraAmunt = obtenirCaraAmunt(mesh);
-
-				caresActuals.push(caraAmunt);
-
-				if (caraAmunt !== null) {
-					const simbol = simbols[caraAmunt - 1]; // recorda que el primer símbol és a index 0
-					console.log(`🎲 Dau ${i + 1}: ${simbol}`);
-
-					if (simbol === "Calavera" && !daus[i].bloquejatCalavera) {
-						console.log(`☠️ Dau ${i+1} mostra una calavera! BLOQUEJAT!`);
-
-						body.velocity.set(0,0,0);
-						body.angularVelocity.set(0,0,0);
-						body.mass = 0;
-						body.type = CANNON.Body.STATIC;
-						body.updateMassProperties();
-						daus[i].bloquejatCalavera = true;
-
-						daus[i].mesh.material.forEach(m => {
-							m.transparent = true;
-							//m.opacity     = 0.50;           // baixa més l’opacitat
-							//m.color.setHex(0xffb3b3); // vermell
-							m.color.setHex(0x707070);  // gris
-						});
-					}
-				}
-			}
-
-			console.log('--------------------------');
-			tiradaEnProgres = false;
-			updateFinalitzarTornButton(); // Fem que el dau de finalitzar torn torni a estar disponible
-			guardarEstatDaus(); // Guardem estat dels daus
-			//actualitzaPuntsTorn();
-
-			// si estem en illaCalaveraMode, usem la nova funció; sinó, l’original
-			if (illaCalaveraMode) {
-				actualitzaPuntsTornIllaCalavera();
-			} else {
-				actualitzaPuntsTorn();
-			}
-
+			});
 		}
 	}
+	console.log("✅ Estat dels daus carregat des de LocalStorage.");
+}
+
+// Funció que mira quines cares queden amunt
+function comprovaCaresDaus() {
+	let caresActuals = [];
+
+	let totsAturats = daus.every(({ body }) => 
+	body.velocity.lengthSquared() < 0.01 && body.angularVelocity.lengthSquared() < 0.01
+	);
+
+	if (totsAturats && tiradaEnProgres) {
+		console.log('--------------------------');
+		console.log(`Tirada ${numTirada.value}:`);
+
+		const simbols = ["Lloro", "Moneda", "Mico", "Diamant", "Vaixell", "Calavera"];
+
+		for (let i = 0; i < daus.length; i++) {
+			const { mesh, body } = daus[i];
+			const caraAmunt = obtenirCaraAmunt(mesh);
+
+			caresActuals.push(caraAmunt);
+
+			if (caraAmunt !== null) {
+				const simbol = simbols[caraAmunt - 1]; // recorda que el primer símbol és a index 0
+				console.log(`🎲 Dau ${i + 1}: ${simbol}`);
+
+				if (simbol === "Calavera" && !daus[i].bloquejatCalavera) {
+					console.log(`☠️ Dau ${i+1} mostra una calavera! BLOQUEJAT!`);
+
+					body.velocity.set(0,0,0);
+					body.angularVelocity.set(0,0,0);
+					body.mass = 0;
+					body.type = CANNON.Body.STATIC;
+					body.updateMassProperties();
+					daus[i].bloquejatCalavera = true;
+
+					daus[i].mesh.material.forEach(m => {
+						m.transparent = true;
+						//m.opacity     = 0.50;           // baixa més l’opacitat
+						//m.color.setHex(0xffb3b3); // vermell
+						m.color.setHex(0x707070);  // gris
+					});
+				}
+			}
+		}
+
+		console.log('--------------------------');
+		tiradaEnProgres = false;
+		updateFinalitzarTornButton(); // Fem que el dau de finalitzar torn torni a estar disponible
+		guardarEstatDaus(); // Guardem estat dels daus
+
+		// si estem en illaCalaveraMode, usem la nova funció; sinó, l’original
+		if (illaCalaveraMode) {
+			actualitzaPuntsTornIllaCalavera();
+		} else {
+			actualitzaPuntsTorn();
+		}
+	}
+}
 
 
 function obtenirCaraAmunt(mesh) {
-    const up = new THREE.Vector3(0, 1, 0);
-    const directions = [
-        new THREE.Vector3(1, 0, 0),  // dreta
-        new THREE.Vector3(-1, 0, 0), // esquerra
-        new THREE.Vector3(0, 1, 0),  // amunt
-        new THREE.Vector3(0, -1, 0), // avall
-        new THREE.Vector3(0, 0, 1),  // davant
-        new THREE.Vector3(0, 0, -1)  // darrera
-    ];
-    let maxDot = -Infinity;
-    let cara = null;
+	const up = new THREE.Vector3(0, 1, 0);
+	const directions = [
+		new THREE.Vector3(1, 0, 0),  // dreta
+		new THREE.Vector3(-1, 0, 0), // esquerra
+		new THREE.Vector3(0, 1, 0),  // amunt
+		new THREE.Vector3(0, -1, 0), // avall
+		new THREE.Vector3(0, 0, 1),  // davant
+		new THREE.Vector3(0, 0, -1)  // darrera
+	];
+	let maxDot = -Infinity;
+	let cara = null;
 
-    for (let i = 0; i < directions.length; i++) {
-        const dir = directions[i].clone().applyQuaternion(mesh.quaternion);
-        const dot = dir.dot(up);
-        if (dot > maxDot) {
-            maxDot = dot;
-            cara = i + 1; // les cares són de 1 a 6
-        }
-    }
-    return cara;
+	for (let i = 0; i < directions.length; i++) {
+		const dir = directions[i].clone().applyQuaternion(mesh.quaternion);
+		const dot = dir.dot(up);
+		if (dot > maxDot) {
+			maxDot = dot;
+			cara = i + 1; // les cares són de 1 a 6
+		}
+	}
+	return cara;
 }
 
 
+// EXTENSIÓ DE LA FUNCIÓ CANVIAESCENA
+const canviaEscenaOriginal = canviaEscena;
+canviaEscena = function(escena){
+	canviaEscenaOriginal(escena);
+	if (escena === "escena-joc") {
+		initDaus();
+		//partidaIniciada = true;
+		partidaIniciada.value = true;
+		iniciarTorns(); //MODIFICACIO
+		//localStorage.setItem("partidaIniciada", "true");
+	}
+}
 
+// FUnció que ens canvia la carta al passar de torn
+function robaCarta() {
+	const guardada = cartaActual.value;
+	if (guardada) {
+		mostrarCartaAlUI(guardada);
+	} else {
+		cartaActual.value = cartes[Math.floor(Math.random() * cartes.length)];
+		mostrarCartaAlUI(cartaActual.value);
+	}
+}
 
+// Extensió de robaCarta()
+function mostrarCartaAlUI(carta) {
+	const img = document.getElementById('cartesImgSrc');
+	img.src = carta.img;
+	// Assignem un callback, no cridem la funció ara mateix:
+	missatge = carta.desc;
+	img.onclick = () => mostrarModalMissatge(missatge, false);
+	//img.onclick = () => mostrarModalMissatge(carta.desc, false);
+}
 
-			// EXTENSIÓ DE LA FUNCIÓ CANVIAESCENA
-			const canviaEscenaOriginal = canviaEscena;
-			canviaEscena = function(escena){
-				canviaEscenaOriginal(escena);
-				if (escena === "escena-joc") {
-					initDaus();
-					//partidaIniciada = true;
-					partidaIniciada.value = true;
-					iniciarTorns(); //MODIFICACIO
-					//localStorage.setItem("partidaIniciada", "true");
-				}
-			}
-			
-			
-			
-			
-			/*
-			function robaCarta() {
-				 // Si ja en tenim una guardada, la recarreguem
-				  //const guardada = localStorage.getItem('cartaActual');
-				  const guardada = cartaActual.value;
-				  if (guardada) {
-					//cartaActual = JSON.parse(guardada);
-					cartaActual.value = guardada;
-				  } else {
-					
-					//cartaActual = cartes[Math.floor(Math.random() * cartes.length)];
-					//localStorage.setItem('cartaActual', JSON.stringify(cartaActual));
-					
-					cartaActual.value = cartes[Math.floor(Math.random() * cartes.length)];
-				  }
-				  mostrarCartaAlUI(cartaActual.value);
-			}
-			*/
-			
-			
-			function robaCarta() {
-			  const guardada = cartaActual.value;
-			  if (guardada) {
-				mostrarCartaAlUI(guardada);
-			  } else {
-				cartaActual.value = cartes[Math.floor(Math.random() * cartes.length)];
-				mostrarCartaAlUI(cartaActual.value);
-			  }
-			}
+// Aquesta funció és de debug, serveix per fer mostrar un slider de càmera i canviar-la manualment
+function setupCameraSliders() {
+	
+	// Populem els sliders amb els valors que hem definit a les variables globals per la càmera
+	document.getElementById("camPosX").value = posXcam;
+	document.getElementById("camPosY").value = posYcam;
+	document.getElementById("camPosZ").value = posZcam;
+	document.getElementById("camLookX").value = lookXcam;
+	document.getElementById("camLookY").value = lookYcam;
+	document.getElementById("camLookZ").value = lookZcam;
+	document.getElementById("camFOV").value = fovcam;
+	
+	// Aquesta funció ens actualitza els valors si movem els sliders
+	const updateCamera = () => {
+		const posX = parseFloat(document.getElementById("camPosX").value);
+		const posY = parseFloat(document.getElementById("camPosY").value);
+		const posZ = parseFloat(document.getElementById("camPosZ").value);
+		const lookX = parseFloat(document.getElementById("camLookX").value);
+		const lookY = parseFloat(document.getElementById("camLookY").value);
+		const lookZ = parseFloat(document.getElementById("camLookZ").value);
+		const fov = parseFloat(document.getElementById("camFOV").value);
+		
+		document.getElementById("posX-debug").innerHTML = posX;
+		document.getElementById("posY-debug").innerHTML = posY;
+		document.getElementById("posZ-debug").innerHTML = posZ;
+		document.getElementById("lookX-debug").innerHTML = lookX;
+		document.getElementById("lookY-debug").innerHTML = lookY;
+		document.getElementById("lookZ-debug").innerHTML = lookZ;
+		document.getElementById("fov-debug").innerHTML = fov;
+		
+		camera.fov = fov;
+		camera.updateProjectionMatrix(); // Actualitza la càmera amb el nou FOV
+		camera.position.set(posX, posY, posZ);
+		camera.lookAt(lookX, lookY, lookZ);
+	};
+	
+	// Si aquesta funció s'està executant hem de mostrar el DIV amb els sliders
+	document.getElementById("cameraControls").style.display = "block";
+	
+	// Inicialitzem un listener als sliders que ens actualitzarà en viu la càmera
+	document.querySelectorAll("#cameraControls input").forEach(input => {
+		input.addEventListener("input", updateCamera);
+	});
+	
+}
 
-			
-			
-			
-			
-/*
-			function mostrarCartaAlUI(carta) {
-				//document.getElementById('cartaNom').textContent  = carta.id;
-				//document.getElementById('cartaDesc').textContent = carta.desc;
-				document.getElementById('cartesImgSrc').src = carta.img;
-			}
-*/
+//Funció que ens carrega els assets
+function preCarregaTot(callback) {
+	let carregats = 0;
+	const total = arxiusACarregar.length;
 
-			function mostrarCartaAlUI(carta) {
-			  const img = document.getElementById('cartesImgSrc');
-			  img.src = carta.img;
-			  // Assignem un callback, no cridem la funció ara mateix:
-			  missatge = carta.desc;
-			  img.onclick = () => mostrarModalMissatge(missatge, false);
-			  //img.onclick = () => mostrarModalMissatge(carta.desc, false);
-			}
+	function actualitzaProgres() {
+		const percentatge = Math.floor((carregats / total) * 100);
+		document.getElementById("barraProgres").style.width = percentatge + "%";
+		document.getElementById("numPercentatge").innerText = percentatge + "%";
 
-
-			
-			
-			
-			
-			
-			// Aquesta funció és de debug, serveix per fer mostrar un slider de càmera i canviar-la manualment
-			function setupCameraSliders() {
-				
-				// Populem els sliders amb els valors que hem definit a les variables globals per la càmera
-				document.getElementById("camPosX").value = posXcam;
-				document.getElementById("camPosY").value = posYcam;
-				document.getElementById("camPosZ").value = posZcam;
-				document.getElementById("camLookX").value = lookXcam;
-				document.getElementById("camLookY").value = lookYcam;
-				document.getElementById("camLookZ").value = lookZcam;
-				document.getElementById("camFOV").value = fovcam;
-				
-				// Aquesta funció ens actualitza els valors si movem els sliders
-				const updateCamera = () => {
-					const posX = parseFloat(document.getElementById("camPosX").value);
-					const posY = parseFloat(document.getElementById("camPosY").value);
-					const posZ = parseFloat(document.getElementById("camPosZ").value);
-					const lookX = parseFloat(document.getElementById("camLookX").value);
-					const lookY = parseFloat(document.getElementById("camLookY").value);
-					const lookZ = parseFloat(document.getElementById("camLookZ").value);
-					const fov = parseFloat(document.getElementById("camFOV").value);
-					
-					document.getElementById("posX-debug").innerHTML = posX;
-					document.getElementById("posY-debug").innerHTML = posY;
-					document.getElementById("posZ-debug").innerHTML = posZ;
-					document.getElementById("lookX-debug").innerHTML = lookX;
-					document.getElementById("lookY-debug").innerHTML = lookY;
-					document.getElementById("lookZ-debug").innerHTML = lookZ;
-					document.getElementById("fov-debug").innerHTML = fov;
-					
-					camera.fov = fov;
-					camera.updateProjectionMatrix(); // Actualitza la càmera amb el nou FOV
-					camera.position.set(posX, posY, posZ);
-					camera.lookAt(lookX, lookY, lookZ);
-				};
-				
-				// Si aquesta funció s'està executant hem de mostrar el DIV amb els sliders
-				document.getElementById("cameraControls").style.display = "block";
-				
-				// Inicialitzem un listener als sliders que ens actualitzarà en viu la càmera
-				document.querySelectorAll("#cameraControls input").forEach(input => {
-					input.addEventListener("input", updateCamera);
-				});
-				
-			}
-
-
-
-			
-			//Funció que ens carrega els assets
-			function preCarregaTot(callback) {
-				let carregats = 0;
-				const total = arxiusACarregar.length;
-
-				function actualitzaProgres() {
-					const percentatge = Math.floor((carregats / total) * 100);
-					document.getElementById("barraProgres").style.width = percentatge + "%";
-					document.getElementById("numPercentatge").innerText = percentatge + "%";
-
-					if (carregats === total) {
-						document.getElementById("botoCarregant").style.display = "none";
-						document.getElementById("botoIniciar").innerHTML = "Iniciar el joc";
-						document.getElementById("botoIniciar").style.display = "flex";
-						document.getElementById("botoIniciarContainer").style.display = "flex";
-						document.getElementById("cartellPantallaCarrega").innerHTML = "Illa Calavera";
-					}
-				}
-
-				arxiusACarregar.forEach((url) => {
-					const extensio = url.split('.').pop().toLowerCase();
-					let element;
-
-					if (['png', 'jpg', 'jpeg', 'webp'].includes(extensio)) {
-						element = new Image();
-						element.onload = element.onerror = () => { carregats++; actualitzaProgres(); };
-						element.src = url;
-					} else if (['mp3', 'wav', 'ogg'].includes(extensio)) {
-						element = new Audio();
-						element.oncanplaythrough = element.onerror = () => { carregats++; actualitzaProgres(); };
-						element.src = url;
-					} else if (['ttf', 'woff', 'woff2'].includes(extensio)) {
-						// Carreguem fonts creant un <link> invisible
-						/* OMETEM LES FONTS DE MOMENT
-						element = document.createElement('link');
-						element.rel = 'preload';
-						element.href = url;
-						element.as = 'font';
-						element.onload = element.onerror = () => { carregats++; actualitzaProgres(); };
-						document.head.appendChild(element);
-						*/
-					} else {
-						console.warn("No sé com carregar:", url);
-						alert("No sé com carregar:");
-						carregats++;
-						actualitzaProgres();
-					}
-				});
-			}
-			
-			
-			// Funció que ens permet que el contenidor on dibuixem el joc tingui sempre la mateixa ratio de 1400x800px
-			// Així podem treballar en pixels sempre, i si per cas tenim una pantalla més gran o més petita, la ratio serà la mateixa (sols que es veurà més gran, o més petit)
-			function escalarContenidor() {
-				let cont = document.getElementById("contenidor"); // Triem el DIV
-				//let escalaX = window.innerWidth / 1400; // Amplada desitjada
-				//let escalaY = window.innerHeight / 800; // Alçada desitjada
-				let escalaX = window.innerWidth / 1920; // Amplada desitjada
-				let escalaY = window.innerHeight / 1080; // Alçada desitjada
-				let escalaFinal = Math.min(escalaX, escalaY); // Calculem
-				cont.style.transform = `translate(-50%, -50%) scale(${escalaFinal})`; // Apliquem escala (si escau)
-			}
-			
-
-			
-			
-			// Funcions automàtiques
-			
-			
-			// Indiquem que la funció 'escalarContenidor' s'executi sempre que la finestra canvii de mida. També quan la finestra carrega per primer cop
-			window.addEventListener("resize", escalarContenidor);
-			window.addEventListener("load", escalarContenidor);
-			
-			// Evitem el zoom amb els dits en els telèfons
-			document.addEventListener("gesturestart", function (e) {
-				e.preventDefault();
-			});
-			
-			document.addEventListener("click", function () {
-				let musica = document.getElementById("musica-fons");
-				if (musica.paused) {
-					musica.play().catch(error => console.log("Autoplay bloquejat:", error));
-				}
-			}, { once: true }); // Executa aquest esdeveniment només una vegada
-			
-			// Aquí afegim el listener per tancar el teclat si cliquem fora
-				document.addEventListener("click", function (e) {
-					const teclat = document.getElementById("teclatPersonalitzat");
-					if (teclat.classList.contains("teclatOcult")) return;
-					if (teclat.contains(e.target)) return;
-					if (e.target.closest(".jugadorAvatar")) return;
-					tancarTeclat();
-				});
-			
-			
-			
-
-
-
-
-// Aquest codi va dins del bloc DOMContentLoaded (cap al final del document)
-document.addEventListener("DOMContentLoaded", function () {
-		  // Escena inicial
-		  carregaEscena("escena-pantallaCarrega");
-		  escalarContenidor();
-		  //preCarregaTot();
-		  
-		  preCarregaTextures(() => {
-				preCarregaTot(); // Precarrega altres assets si vols
-			});
-			
-			const música = document.getElementById('musica-fons');
-    música.volume = 0.5;
-
-
-		  // Carreguem llista de jugadors si n'hi havia
-		  const llistaGuardada = JSON.parse(localStorage.getItem("llistaJugadors")) || [];
-		  //const partidaGuardada = localStorage.getItem("partidaIniciada") === "true";
-
-		  //if (llistaGuardada.length > 0 && partidaGuardada) {
-		if (llistaGuardada.length > 0 && partidaIniciada.value) {
-			llistaJugadors = llistaGuardada;
-			//partidaIniciada = true;
-			sincronitzaJugadorsAmbPantalla(); // <-- AFEGEIX AIXÒ!
-		  }
-		  
-		  //const numTiradaGuardada = localStorage.getItem('numTirada');
-		  const numTiradaGuardada = numTirada.value;
-			if (numTiradaGuardada !== null) {
-			  numTirada.value = parseInt(numTiradaGuardada, 10);
-			  
-			}else{
-				numTirada.value = 0;
-			}
-			
-			//const puntsTornActualGuardat = localStorage.getItem('puntsTornActual');
-			const puntsTornActualGuardat = puntsTornActual.value;
-		if (puntsTornActualGuardat !== null) {
-		  puntsTornActual.value = parseInt(puntsTornActualGuardat, 10);
-		} else {
-		  puntsTornActual.value = 0;
+		if (carregats === total) {
+			document.getElementById("botoCarregant").style.display = "none";
+			document.getElementById("botoIniciar").innerHTML = "Iniciar el joc";
+			document.getElementById("botoIniciar").style.display = "flex";
+			document.getElementById("botoIniciarContainer").style.display = "flex";
+			document.getElementById("cartellPantallaCarrega").innerHTML = "Illa Calavera";
 		}
+	}
 
-			updateFinalitzarTornButton();
-			 // updateNumTiradaDisplay();
+	arxiusACarregar.forEach((url) => {
+		const extensio = url.split('.').pop().toLowerCase();
+		let element;
 
-		  // Si la partida ja estava començada, canviem el botó principal
-		  
-		  //if (partidaIniciada) {
-		if (partidaIniciada.value) {
+		if (['png', 'jpg', 'jpeg', 'webp'].includes(extensio)) {
+			element = new Image();
+			element.onload = element.onerror = () => { carregats++; actualitzaProgres(); };
+			element.src = url;
+		} else if (['mp3', 'wav', 'ogg'].includes(extensio)) {
+			element = new Audio();
+			element.oncanplaythrough = element.onerror = () => { carregats++; actualitzaProgres(); };
+			element.src = url;
+		} else if (['ttf', 'woff', 'woff2'].includes(extensio)) {
+			// Carreguem fonts creant un <link> invisible
+			/* OMETEM LES FONTS DE MOMENT
+			element = document.createElement('link');
+			element.rel = 'preload';
+			element.href = url;
+			element.as = 'font';
+			element.onload = element.onerror = () => { carregats++; actualitzaProgres(); };
+			document.head.appendChild(element);
+			*/
+		} else {
+			console.warn("No sé com carregar:", url);
+			alert("No sé com carregar:");
+			carregats++;
+			actualitzaProgres();
+		}
+	});
+}
 
-					const botoIniciarPantallaInici = document.getElementById("escena-pantallaInici-botoIniciarPartida");
-					if (botoIniciarPantallaInici) {
-					  //if (partidaIniciada) {
-						if (partidaIniciada.value) {
-						botoIniciarPantallaInici.innerText = "Continuar partida";
-						botoIniciarPantallaInici.onclick = function () {
-						  carregaEscena("escena-joc");
-						};
-					  } else {
-						botoIniciarPantallaInici.onclick = function () {
-						  carregaEscena("escena-configuraPartida");
-						};
-					  }
-					}
-					document.getElementById("botoEliminarPartidaContainer").style.display = "flex";
-					//document.getElementById("botoEliminarPartida").style.display = "flex";
-		  }else{
-			document.getElementById("botoEliminarPartidaContainer").style.display = "none";
-			//document.getElementById("botoEliminarPartida").style.display = "none";
-		  }
-		  
+// Funció que ens permet que el contenidor on dibuixem el joc tingui sempre la mateixa ratio de 1400x800px
+// Així podem treballar en pixels sempre, i si per cas tenim una pantalla més gran o més petita, la ratio serà la mateixa (sols que es veurà més gran, o més petit)
+function escalarContenidor() {
+	let cont = document.getElementById("contenidor"); // Triem el DIV
+	//let escalaX = window.innerWidth / 1400; // Amplada desitjada
+	//let escalaY = window.innerHeight / 800; // Alçada desitjada
+	let escalaX = window.innerWidth / 1920; // Amplada desitjada
+	let escalaY = window.innerHeight / 1080; // Alçada desitjada
+	let escalaFinal = Math.min(escalaX, escalaY); // Calculem
+	cont.style.transform = `translate(-50%, -50%) scale(${escalaFinal})`; // Apliquem escala (si escau)
+}
+
+// Funcions automàtiques
+// Indiquem que la funció 'escalarContenidor' s'executi sempre que la finestra canvii de mida. També quan la finestra carrega per primer cop
+window.addEventListener("resize", escalarContenidor);
+window.addEventListener("load", escalarContenidor);
+
+// Evitem el zoom amb els dits en els telèfons
+document.addEventListener("gesturestart", function (e) {
+	e.preventDefault();
 });
 
+document.addEventListener("click", function () {
+	let musica = document.getElementById("musica-fons");
+	if (musica.paused) {
+		musica.play().catch(error => console.log("Autoplay bloquejat:", error));
+	}
+}, { once: true }); // Executem aquest esdeveniment només una vegada
+
+// Aquí afegim el listener per tancar el teclat si cliquem fora
+document.addEventListener("click", function (e) {
+	const teclat = document.getElementById("teclatPersonalitzat");
+	if (teclat.classList.contains("teclatOcult")) return;
+	if (teclat.contains(e.target)) return;
+	if (e.target.closest(".jugadorAvatar")) return;
+	tancarTeclat();
+});
+			
+// Un cop el doc està caregat completament
+document.addEventListener("DOMContentLoaded", function () {
+		// Escena inicial
+		carregaEscena("escena-pantallaCarrega");
+		escalarContenidor();
+		//preCarregaTot();
+		
+		preCarregaTextures(() => {
+			preCarregaTot(); // Precarreguem altres assets
+		});
+			
+		const música = document.getElementById('musica-fons');
+		música.volume = 0.5;
+
+		// Carreguem llista de jugadors si n'hi havia
+		const llistaGuardada = JSON.parse(localStorage.getItem("llistaJugadors")) || [];
+
+		if (llistaGuardada.length > 0 && partidaIniciada.value) {
+			llistaJugadors = llistaGuardada;
+			sincronitzaJugadorsAmbPantalla(); 
+		}
+		
+		const numTiradaGuardada = numTirada.value;
+		if (numTiradaGuardada !== null) {
+			numTirada.value = parseInt(numTiradaGuardada, 10);
+		}else{
+			numTirada.value = 0;
+		}
+			
+		const puntsTornActualGuardat = puntsTornActual.value;
+		if (puntsTornActualGuardat !== null) {
+			puntsTornActual.value = parseInt(puntsTornActualGuardat, 10);
+		} else {
+			puntsTornActual.value = 0;
+		}
+
+		updateFinalitzarTornButton();
+
+		// Si la partida ja estava començada, canviem el botó principal
+		
+		if (partidaIniciada.value) {
+			const botoIniciarPantallaInici = document.getElementById("escena-pantallaInici-botoIniciarPartida");
+			if (botoIniciarPantallaInici) {
+				if (partidaIniciada.value) {
+					botoIniciarPantallaInici.innerText = "Continuar partida";
+					botoIniciarPantallaInici.onclick = function () {
+						carregaEscena("escena-joc");
+					};
+				} else {
+					botoIniciarPantallaInici.onclick = function () {
+						carregaEscena("escena-configuraPartida");
+					};
+				}
+			}
+			document.getElementById("botoEliminarPartidaContainer").style.display = "flex";
+		}else{
+			document.getElementById("botoEliminarPartidaContainer").style.display = "none";
+		}
+});
+
+// FUnció que sincronitza els jugadors a pantalla
 function sincronitzaJugadorsAmbPantalla() {
-  llistaJugadors.forEach(j => {
-    const avatar = document.getElementById("jugadorAvatar" + j.id);
-    const input = document.getElementById("nom" + j.id);
-    if (avatar && input) {
-      avatar.classList.remove("avatarDesactivat");
-      avatar.classList.add("avatarActivat");
-      input.disabled = false;
-      input.value = j.nom;
-    }
-  });
+	llistaJugadors.forEach(j => {
+		const avatar = document.getElementById("jugadorAvatar" + j.id);
+		const input = document.getElementById("nom" + j.id);
+		if (avatar && input) {
+			avatar.classList.remove("avatarDesactivat");
+			avatar.classList.add("avatarActivat");
+			input.disabled = false;
+			input.value = j.nom;
+		}
+	});
 }
 
 

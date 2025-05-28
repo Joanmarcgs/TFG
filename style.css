@@ -15,6 +15,10 @@ a, a:visited{
 	color: black;
 }
 
+img:hover{
+	cursor:pointer;
+}
+
 /* Carreguem la font que farem servir en el joc*/
 @font-face {font-family: 'PiecesOfEight';src: url('lib/piecesofeightFont/PiecesofEight.ttf') format('truetype');font-weight: normal;font-style: normal;}
 
@@ -551,7 +555,14 @@ button:active {
 #escena-instruccions .pergami {
 	max-height: 80%;      /* Limita l’alçada a un 80% de l’escena */
 	overflow-y: auto;     /* Activa el scroll vertical */
-	padding-right: 20px;   /* Deixa espai perquè no talli el text al costat de l’scroll */
+	padding-right: 80px;   /* Deixa espai perquè no talli el text al costat de l’scroll */
+}
+
+/* Només afecta el pergamí de la pantalla d’instruccions */
+#escena-credits .pergami {
+	max-height: 80%;      /* Limita l’alçada a un 80% de l’escena */
+	overflow-y: auto;     /* Activa el scroll vertical */
+	padding-right: 80px;   /* Deixa espai perquè no talli el text al costat de l’scroll */
 }
 
 /* Posició dels Botons imatge */
