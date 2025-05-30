@@ -21,7 +21,7 @@ El projecte està allotjat en dues versions accessibles via navegador:
   [https://burxat.dev/TFG-UOC/](https://burxat.dev/TFG-UOC/)
 
 - 🚀 **Versió de producció (estable):**  
-  [https://TFG.burxat.dev](https://TFG.burxat.dev)
+  [https://illa-calavera.burxat.dev](https://illa-calavera.burxat.dev)
 
 ---
 
@@ -47,7 +47,7 @@ El projecte està format per un fitxer `index.html` principal i diverses carpete
 
 - Arxius d'àudio (`/audio/`)
 - Arzius d'imatge (`/img/`)
-- Recursos generals (`/doc/`)
+- Recursos generals (`/lib/`)
 
 ## 🖼️ Captures de pantalla
 
@@ -78,9 +78,9 @@ Vista del joc en diferents dispositius:
 - ✅ Simulació de daus amb física realista
 - ✅ Multiplataforma (PC, mòbil, tauleta, TV)
 - ✅ Llançament públic via GitHub i domini personalitzat
-- 🔜 Mode multijugador local
-- 🔜 Persistència de puntuacions entre sessions
-- 🔜 Sons i animacions enriquides
+- ✅ Mode multijugador local
+- ✅ Persistència de puntuacions entre sessions
+- ✅ Sons i animacions enriquides
 - 🔜 Guia interactiva per a nous jugadors
 - 🔜 Traducció a diversos idiomes
 
